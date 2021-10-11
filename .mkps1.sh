@@ -40,10 +40,11 @@ __mkps1_time() {
 }
 
 __mkps1_username() {
+    local BG_GRAY=`tput setab 240`;
     local cyan=`tput setaf 45`;
     local reset=`tput sgr0`;
 
-    echo "\[${cyan}\] \u \[${reset}\]";
+    echo "\[${BG_GRAY}${cyan}\] \u \[${reset}\]";
 }
 
 __mkps1_arrows() {
@@ -51,16 +52,21 @@ __mkps1_arrows() {
     local red=`tput setaf 1`;
     local green=`tput setaf 34`;
     local reset=`tput sgr0`;
+    local BG_GRAY=`tput setab 240`;
 
-    echo "\[${bold}${red}\]>\[${green}\]>\[${reset}\]";
+    # echo "\[${bold}${red}\]>\[${green}\]>\[${reset}\]";
+    echo "\[${BG_GRAY}\] >> \[${reset}\]";
+
 }
 
 __mkps1_workdir() {
+    local BG_GRAY=`tput setab 240`;
     local bold=`tput bold`;
     local cyan=`tput setaf 45`;
+    local green=`tput setaf 46`;
     local reset=`tput sgr0`;
 
-    echo "\[${bold}${cyan}\]\w\[${reset}\]";
+    echo "\[${BG_GRAY}${bold}${green}\] \w \[${reset}\]";
 }
 
 __mkps1_git() {
@@ -92,7 +98,7 @@ __mkps1_user_prompt() {
 }
 
 __mkps1() {
-    local ps1="\n$(__mkps1_box_top)$(__mkps1_debian_chroot)$(__mkps1_exitcode)$(__mkps1_time)$(__mkps1_username)$(__mkps1_arrows) $(__mkps1_workdir)$(__mkps1_git)\n$(__mkps1_box_bottom)$(__mkps1_user_prompt)";
+    local ps1="\n$(__mkps1_box_top)$(__mkps1_debian_chroot)$(__mkps1_exitcode)$(__mkps1_time)$(__mkps1_username)$(__mkps1_arrows)$(__mkps1_workdir)$(__mkps1_git)\n$(__mkps1_box_bottom)$(__mkps1_user_prompt)";
 
     echo "$ps1";
 }
