@@ -32,19 +32,19 @@ __mkps1_exitcode() {
 }
 
 __mkps1_time() {
-    local BG_GRAY=`tput setab 240`;
+    local BG_BLUE=`tput setab 26`;
     local white=`tput setaf 7`;
     local reset=`tput sgr0`;
 
-    echo "\[${BG_GRAY}${white}\] \@ \[${reset}\]"
+    echo "\[${BG_BLUE}${white}\] \@ \[${reset}\]"
 }
 
 __mkps1_username() {
-    local BG_GRAY=`tput setab 240`;
+    local BG_BLUE=`tput setab 26`;
     local cyan=`tput setaf 45`;
     local reset=`tput sgr0`;
 
-    echo "\[${BG_GRAY}${cyan}\] \u \[${reset}\]";
+    echo "\[${BG_BLUE}${cyan}\] \u \[${reset}\]";
 }
 
 __mkps1_arrows() {
@@ -52,21 +52,21 @@ __mkps1_arrows() {
     local red=`tput setaf 1`;
     local green=`tput setaf 34`;
     local reset=`tput sgr0`;
-    local BG_GRAY=`tput setab 240`;
+    local BG_BLUE=`tput setab 26`;
 
     # echo "\[${bold}${red}\]>\[${green}\]>\[${reset}\]";
-    echo "\[${BG_GRAY}\] >> \[${reset}\]";
+    echo "\[${BG_BLUE}\] >> \[${reset}\]";
 
 }
 
 __mkps1_workdir() {
-    local BG_GRAY=`tput setab 240`;
+    local BG_BLUE=`tput setab 26`;
     local bold=`tput bold`;
     local cyan=`tput setaf 45`;
     local green=`tput setaf 46`;
     local reset=`tput sgr0`;
 
-    echo "\[${BG_GRAY}${bold}${green}\] \w \[${reset}\]";
+    echo "\[${BG_BLUE}${bold}${green}\] \w \[${reset}\]";
 }
 
 __mkps1_git() {
