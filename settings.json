@@ -1,8 +1,10 @@
 {
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": [
+    "actions": 
+    [
         {
-            "command": {
+            "command": 
+            {
                 "action": "copy",
                 "singleLine": false
             },
@@ -13,7 +15,8 @@
             "keys": "ctrl+shift+f"
         },
         {
-            "command": {
+            "command": 
+            {
                 "action": "splitPane",
                 "split": "auto",
                 "splitMode": "duplicate"
@@ -28,17 +31,21 @@
     "copyFormatting": "none",
     "copyOnSelect": false,
     "defaultProfile": "{2c4de342-38b7-51cf-b940-2309a097f518}",
-    "disabledProfileSources": [
+    "disabledProfileSources": 
+    [
         "Windows.Terminal.Azure"
     ],
-    "initialCols": 180,
-    "initialRows": 50,
-    "profiles": {
+    "initialCols": 150,
+    "initialRows": 48,
+    "profiles": 
+    {
         "defaults": {},
-        "list": [
+        "list": 
+        [
             {
                 "commandline": "powershell.exe -NoLogo",
-                "font": {
+                "font": 
+                {
                     "size": 12
                 },
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
@@ -47,7 +54,8 @@
             },
             {
                 "commandline": "cmd.exe",
-                "font": {
+                "font": 
+                {
                     "size": 12
                 },
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
@@ -56,42 +64,48 @@
             },
             {
                 "acrylicOpacity": 0.94999999999999996,
-                "colorScheme": "Galaxy",
+                "backgroundImage": "desktopWallpaper",
+                "backgroundImageOpacity": 0.080000000000000002,
+                "colorScheme": "Neutron",
                 "experimental.retroTerminalEffect": false,
-                "font": {
+                "font": 
+                {
+                    "face": "Cascadia Code",
                     "size": 12
                 },
                 "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
                 "hidden": false,
+                "intenseTextStyle": "all",
                 "name": "Ubuntu",
                 "source": "Windows.Terminal.Wsl",
                 "startingDirectory": "//wsl$/Ubuntu/home/mattw"
             }
         ]
     },
-    "schemes": [
+    "schemes": 
+    [
         {
-            "name": "Galaxy",
-            "black": "#000000",
-            "red": "#f9555f",
-            "green": "#21b089",
-            "yellow": "#fef02a",
-            "blue": "#589df6",
-            "purple": "#944d95",
-            "cyan": "#1f9ee7",
-            "white": "#bbbbbb",
-            "brightBlack": "#555555",
-            "brightRed": "#fa8c8f",
-            "brightGreen": "#35bb9a",
-            "brightYellow": "#ffff55",
-            "brightBlue": "#589df6",
-            "brightPurple": "#e75699",
-            "brightCyan": "#3979bc",
-            "brightWhite": "#ffffff",
-            "background": "#1d2837",
-            "foreground": "#ffffff",
-            "selectionBackground": "#b5d5ff",
-            "cursorColor": "#bbbbbb"
+            "background": "#000000",
+            "black": "#4F4F4F",
+            "blue": "#96CBFE",
+            "brightBlack": "#7C7C7C",
+            "brightBlue": "#B5DCFF",
+            "brightCyan": "#DFDFFE",
+            "brightGreen": "#CEFFAC",
+            "brightPurple": "#FF9CFE",
+            "brightRed": "#FFB6B0",
+            "brightWhite": "#FFFFFF",
+            "brightYellow": "#FFFFCC",
+            "cursorColor": "#FFA560",
+            "cyan": "#C6C5FE",
+            "foreground": "#BBBBBB",
+            "green": "#A8FF60",
+            "name": "Builtin Pastel Dark",
+            "purple": "#FF73FD",
+            "red": "#FF6C60",
+            "selectionBackground": "#363983",
+            "white": "#EEEEEE",
+            "yellow": "#FFFFB6"
         },
         {
             "background": "#0C0C0C",
@@ -161,6 +175,29 @@
             "selectionBackground": "#44475A",
             "white": "#F8F8F2",
             "yellow": "#F1FA8C"
+        },
+        {
+            "background": "#1D2837",
+            "black": "#000000",
+            "blue": "#589DF6",
+            "brightBlack": "#555555",
+            "brightBlue": "#589DF6",
+            "brightCyan": "#3979BC",
+            "brightGreen": "#35BB9A",
+            "brightPurple": "#E75699",
+            "brightRed": "#FA8C8F",
+            "brightWhite": "#FFFFFF",
+            "brightYellow": "#FFFF55",
+            "cursorColor": "#BBBBBB",
+            "cyan": "#1F9EE7",
+            "foreground": "#FFFFFF",
+            "green": "#21B089",
+            "name": "Galaxy",
+            "purple": "#944D95",
+            "red": "#F9555F",
+            "selectionBackground": "#B5D5FF",
+            "white": "#BBBBBB",
+            "yellow": "#FEF02A"
         },
         {
             "background": "#101216",
