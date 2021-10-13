@@ -11,5 +11,7 @@ export EDITOR="vim"
 export LS_COLORS='ow=01;36;40'
 
 # Source PS1 variable
-source "$HOME/Dropbox/.config/.mkps1.sh"
-PS1="$(__mkps1)"
+export PS1="________________________________________________________________________________\n| \w @ \h (\u) \n| => "
+
+#source "$HOME/Dropbox/.config/.mkps1.sh"
+#PS1="$(__mkps1)"
