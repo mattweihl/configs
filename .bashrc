@@ -11,7 +11,9 @@ export EDITOR="vim"
 export LS_COLORS='ow=01;36;40'
 
 # Source PS1 variable
-export PS1="________________________________________________________________________________\n| \w @ \h (\u) \n| => "
+function nonzero_return() {
+	RETVAL=$?
+	[ $RETVAL -ne 0 ] && echo "$RETVAL"
+}
 
-#source "$HOME/Dropbox/.config/.mkps1.sh"
-#PS1="$(__mkps1)"
+export PS1="\[\e[31m\]\`nonzero_return\`\[\e[m\][\[\e[35m\]\@\[\e[m\]] \[\e[32m\]\u\[\e[m\]@\[\e[33m\]\h\[\e[m\]:\[\e[34m\]\W\[\e[m\]\\n↳ "
