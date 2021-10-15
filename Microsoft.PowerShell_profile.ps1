@@ -19,7 +19,7 @@ function get_hostname()
 function get_location()
 {
 	$ESC = [char]27
-    return "$(pwd | Convert-Path)"
+    return "$ESC[34m$( $pwd | Resolve-Path -Relative)$ESC[0m"
 }
 
 function prompt {
