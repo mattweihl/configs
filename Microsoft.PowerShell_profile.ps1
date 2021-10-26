@@ -1,30 +1,28 @@
 function get_time()
 {
-	$ESC = [char]27
-	return "$ESC[35m$(Get-Date -UFormat "%I:%M %p")$ESC[0m"
+        $ESC = [char]27
+        $prompt="$ESC[38;2;0;0;0m$ESC[48;2;0;135;255m $(Get-Date -UFormat "%I:%M %p") $ESC[0m"
+        return $prompt
+
 }
 
-function get_username()
+function get_username_and_hostname()
 {
-	$ESC = [char]27
-	return "$ESC[32m$env:UserName$ESC[0m"
+        $ESC = [char]27
+        $prompt = "$ESC[38;2;0;0;0m$ESC[48;2;95;255;0m $env:UserName@$(hostname) $ESC[0m"
+        return $prompt
 }
 
-function get_hostname()
-{
-	$ESC = [char]27
-	return "$ESC[33m$(hostname)$ESC[0m"
-}
 
 function get_location()
 {
-	$ESC = [char]27
-    return "$ESC[15m$( $pwd | Resolve-Path -Relative)$ESC[0m"
+        $ESC = [char]27
+        return "$ESC[38;2;0;0;0m$ESC[48;2;13;188;121m 📂 $( $pwd | Resolve-Path -Relative) ⚡ $ESC[0m"
 }
 
 function prompt {
-	$Host.UI.RawUI.WindowTitle = "$pwd"
-	return "[$(get_time)] $(get_username)@$(get_hostname):$(get_location) `n↳ "
+        $Host.UI.RawUI.WindowTitle = "$pwd"
+        return "$(get_time)$(get_username_and_hostname)$(get_location) `n➤ "
 }
 
 function Get-ChildItemUnix {
@@ -34,5 +32,11 @@ function Get-ChildItemUnix {
 
 if (!(test-path alias:ll))
 {
-	New-Alias ll Get-ChildItemUnix
+        New-Alias ll Get-ChildItemUnix
+}
+
+
+function c()
+{
+        Set-Location  $env:HOMEPATH\Code
 }
