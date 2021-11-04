@@ -1,14 +1,16 @@
-alias ll='ls -alF --color=auto'
+alias ll='ls -alFh --color=auto'
 alias la='ls -A --color=auto'
 alias l='ls -CF --color=auto'
 alias c='cd ~/code'
 alias gs='git status'
-alias dt="cd /mnt/c/Users/mattw/Desktop"
+alias dt="cd $DESKTOP" 
 
 export EDITOR="vim"
 export LS_COLORS='ow=01;36;40'
 
+# source $HOME/Dropbox/.config/bashrc_ps1.sh --enable_color
 source $HOME/Dropbox/.config/bashrc_ps1.sh
+
 
 function colorgrid()
 {

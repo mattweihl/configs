@@ -22,7 +22,7 @@ function get_location()
 
 function prompt {
         $Host.UI.RawUI.WindowTitle = "$pwd"
-        return "$(get_time)$(get_username_and_hostname)$(get_location) `n➤ "
+        return "$(get_username_and_hostname)$(get_location) `n➤ "
 }
 
 function Get-ChildItemUnix {
