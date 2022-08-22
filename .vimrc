@@ -25,3 +25,9 @@ set expandtab
 " Show chars for tabs.
 set list
 set listchars=tab:␉·
+set clipboard=unnamed
+
+noremap <Up>    <Nop>
+noremap <Down>  <Nop>
+noremap <Left>  <Nop>
+noremap <Right> <Nop>

@@ -22,10 +22,6 @@
                 "splitMode": "duplicate"
             },
             "keys": "alt+shift+d"
-        },
-        {
-            "command": "toggleShaderEffects",
-            "keys": "shift+f10"
         }
     ],
     "copyFormatting": "none",
@@ -35,20 +31,22 @@
     [
         "Windows.Terminal.Azure"
     ],
-    "initialCols": 122,
-    "initialRows": 42,
+    "initialCols": 112,
+    "initialRows": 40,
     "profiles": 
     {
         "defaults": 
         {
-            "backgroundImage": "C:\\Users\\mattd\\Dropbox\\Backgrounds\\Bruce McCandless.jpg",
-            "backgroundImageOpacity": 0.10000000000000001,
-            "colorScheme": "Blue Matrix",
+            "acrylicOpacity": 0.88,
+            "backgroundImage": "desktopWallpaper",
+            "backgroundImageOpacity": 0.20000000000000001,
+            "colorScheme": "Breeze",
             "font": 
             {
                 "face": "Cascadia Code",
                 "size": 12
-            }
+            },
+            "useAcrylic": false
         },
         "list": 
         [
@@ -60,14 +58,15 @@
                 "name": "Command Prompt"
             },
             {
+                "commandline": "wsl -d Ubuntu",
                 "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
                 "hidden": false,
                 "name": "Ubuntu",
                 "source": "Windows.Terminal.Wsl",
-                "startingDirectory": "\\\\wsl.localhost\\Ubuntu\\home\\mattd"
+                "startingDirectory": "\\\\wsl$\\Ubuntu\\home\\mattd"
             },
             {
-                "commandline": "C:\\Users\\mattd\\AppData\\Local\\Microsoft\\WindowsApps\\Microsoft.PowerShell_8wekyb3d8bbwe\\pwsh.exe -NoLogo",
+                "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -NoLogo",
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
                 "hidden": false,
                 "name": "PowerShell",
