@@ -50,3 +50,4 @@ set laststatus=2
 
 " }}}
 
+packloadall

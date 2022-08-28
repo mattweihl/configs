@@ -1,7 +1,8 @@
 
 alias ll='ls -alFh --color=auto'
 alias la='ls -A --color=auto'
-alias l='ls -CF --color=auto'
+alias l="ll"
+#alias l='ls -CF --color=auto'
 alias c='cd $CODE_LOCATION'
 alias gs='git status'
 alias dt="cd $DESKTOP" 
