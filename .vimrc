@@ -24,8 +24,8 @@ set expandtab
 set list
 set listchars=tab:␉·
 set clipboard=unnamed
-set cursorline
-set cursorcolumn
+"set cursorline
+"set cursorcolumn
 set nobackup
 set history=1000
 set wildmode=list:longest
