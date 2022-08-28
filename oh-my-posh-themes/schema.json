@@ -17,7 +17,7 @@
     },
     "color_string": {
       "type": "string",
-      "pattern": "^(#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})|black|red|green|yellow|blue|magenta|cyan|white|default|darkGray|lightRed|lightGreen|lightYellow|lightBlue|lightMagenta|lightCyan|lightWhite|transparent|parentBackground|parentForeground|background|foreground|accent)$",
+      "pattern": "^(#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})|^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$|black|red|green|yellow|blue|magenta|cyan|white|default|darkGray|lightRed|lightGreen|lightYellow|lightBlue|lightMagenta|lightCyan|lightWhite|transparent|parentBackground|parentForeground|background|foreground|accent)$",
       "title": "Color string",
       "description": "https://ohmyposh.dev/docs/configuration/colors",
       "format": "color"
@@ -28,10 +28,9 @@
       "title": "Palette reference",
       "description": "https://ohmyposh.dev/docs/configuration/colors#palette"
     },
-    "color_templates": {
+    "templates": {
       "type": "array",
-      "title": "Templates to define a color",
-      "description": "https://ohmyposh.dev/docs/configuration/colors#color-templates",
+      "title": "An array of templates",
       "default": [],
       "items": {
         "$ref": "#/definitions/segment/properties/template"
@@ -52,8 +51,32 @@
     "http_timeout": {
       "type": "integer",
       "title": "Http request timeout",
-      "description": "Timeout value to use for http request",
+      "description": "Milliseconds to use for http request timeouts",
       "default": 20
+    },
+    "cache_timeout": {
+      "type": "integer",
+      "title": "cache timeout",
+      "description": "Minutes the response is cached. A value of 0 disables the cache.",
+      "default": 10
+    },
+    "expires_in": {
+      "type": "integer",
+      "title": "Expires in",
+      "description": "Access token expiration time in seconds",
+      "default": 0
+    },
+    "access_token": {
+      "type": "string",
+      "title": "Access token",
+      "description": "The initial access token",
+      "default": ""
+    },
+    "refresh_token": {
+      "type": "string",
+      "title": "Refresh token",
+      "description": "The initial refresh token",
+      "default": ""
     },
     "display_mode": {
       "type": "string",
@@ -86,13 +109,15 @@
           "$ref": "#/definitions/color"
         },
         "foreground_templates": {
-          "$ref": "#/definitions/color_templates"
+          "$ref": "#/definitions/templates",
+          "description": "https://ohmyposh.dev/docs/configuration/colors#color-templates"
         },
         "background": {
           "$ref": "#/definitions/color"
         },
         "background_templates": {
-          "$ref": "#/definitions/color_templates"
+          "$ref": "#/definitions/templates",
+          "description": "https://ohmyposh.dev/docs/configuration/colors#color-templates"
         }
       }
     },
@@ -125,6 +150,29 @@
             "required": ["type", "segments"],
             "title": "RPrompt definition, contains 1 or more segments to render to the right of the cursor"
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "prompt"
+              },
+              "alignment": {
+                "const": "right"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "overflow": {
+                "type": "string",
+                "title": "Block overflow",
+                "description": "https://ohmyposh.dev/docs/configuration/block#overflow",
+                "enum": ["break", "hide"],
+                "default": ""
+              }
+            }
+          }
         }
       ],
       "properties": {
@@ -147,16 +195,6 @@
           "title": "Newline",
           "description": "https://ohmyposh.dev/docs/configuration/block#newline",
           "default": false
-        },
-        "vertical_offset": {
-          "type": "integer",
-          "title": "Block vertical offset",
-          "description": "https://ohmyposh.dev/docs/configuration/block#vertical-offset"
-        },
-        "horizontal-offset": {
-          "type": "integer",
-          "title": "Block vertical offset",
-          "description": "https://ohmyposh.dev/docs/configuration/block#horizontal-offset"
         },
         "segments": {
           "type": "array",
@@ -191,12 +229,14 @@
             "cds",
             "cf",
             "cftarget",
+            "cmake",
             "dotnet",
             "dart",
             "exit",
             "executiontime",
             "flutter",
             "fossil",
+            "gcp",
             "git",
             "go",
             "haskell",
@@ -204,14 +244,16 @@
             "iterm",
             "julia",
             "java",
-            "kubectl",
             "kotlin",
+            "kubectl",
+            "lua",
             "node",
             "npm",
             "nx",
             "os",
             "owm",
             "path",
+            "perl",
             "python",
             "poshgit",
             "php",
@@ -235,6 +277,7 @@
             "wakatime",
             "wifi",
             "winreg",
+            "withings",
             "ytm"
           ]
         },
@@ -248,19 +291,31 @@
           "$ref": "#/definitions/color"
         },
         "foreground_templates": {
-          "$ref": "#/definitions/color_templates"
+          "$ref": "#/definitions/templates",
+          "description": "https://ohmyposh.dev/docs/configuration/colors#color-templates"
         },
         "background": {
           "$ref": "#/definitions/color"
         },
         "background_templates": {
-          "$ref": "#/definitions/color_templates"
+          "$ref": "#/definitions/templates",
+          "description": "https://ohmyposh.dev/docs/configuration/colors#color-templates"
         },
         "template": {
           "type": "string",
           "title": "Template text",
           "description": "https://ohmyposh.dev/docs/configuration/templates",
           "default": ""
+        },
+        "templates": {
+          "$ref": "#/definitions/templates",
+          "description": "https://ohmyposh.dev/docs/configuration/segment#templates"
+        },
+        "templates_logic": {
+          "type": "string",
+          "title": "Templates Logic",
+          "description": "https://ohmyposh.dev/docs/configuration/segment#templates",
+          "enum": ["first_match", "join"]
         },
         "properties": {
           "type": "object",
@@ -502,7 +557,47 @@
                     "type": "string",
                     "title": "Command",
                     "description": "the command(s) to run",
-                    "default": "echo no command specified"
+                    "default": ""
+                  },
+                  "script": {
+                    "type": "string",
+                    "title": "Script",
+                    "description": "A script to run",
+                    "default": ""
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "cmake"
+              }
+            }
+          },
+          "then": {
+            "title": "Cmake Segment",
+            "description": "https://ohmyposh.dev/docs/segments/cmake",
+            "properties": {
+              "properties": {
+                "properties": {
+                  "home_enabled": {
+                    "$ref": "#/definitions/home_enabled"
+                  },
+                  "fetch_version": {
+                    "$ref": "#/definitions/fetch_version"
+                  },
+                  "display_mode": {
+                    "$ref": "#/definitions/display_mode"
+                  },
+                  "missing_command_text": {
+                    "$ref": "#/definitions/missing_command_text"
+                  },
+                  "version_url_template": {
+                    "$ref": "#/definitions/version_url_template"
                   }
                 }
               }
@@ -763,6 +858,12 @@
                     "title": "Untracked files mode",
                     "description": "Set the untracked files mode for a repository",
                     "default": {}
+                  },
+                  "ignore_submodules": {
+                    "type": "object",
+                    "title": "Ignore submodules",
+                    "description": "Ignore changes to submodules when looking for changes",
+                    "default": {}
                   }
                 }
               }
@@ -905,6 +1006,37 @@
                   },
                   "version_url_template": {
                     "$ref": "#/definitions/version_url_template"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "perl"
+              }
+            }
+          },
+          "then": {
+            "title": "Perl Segment",
+            "description": "https://ohmyposh.dev/docs/segments/perl",
+            "properties": {
+              "properties": {
+                "properties": {
+                  "home_enabled": {
+                    "$ref": "#/definitions/home_enabled"
+                  },
+                  "fetch_version": {
+                    "$ref": "#/definitions/fetch_version"
+                  },
+                  "display_mode": {
+                    "$ref": "#/definitions/display_mode"
+                  },
+                  "missing_command_text": {
+                    "$ref": "#/definitions/missing_command_text"
                   }
                 }
               }
@@ -1729,10 +1861,7 @@
                     "$ref": "#/definitions/http_timeout"
                   },
                   "cache_timeout": {
-                    "type": "integer",
-                    "title": "cache timeout",
-                    "description": "The number of minutes the response is cached. A value of 0 disables the cache.",
-                    "default": 10
+                    "$ref": "#/definitions/cache_timeout"
                   }
                 }
               }
@@ -1774,6 +1903,7 @@
                       "roundrock",
                       "dallas",
                       "galveston",
+                      "galvestonms",
                       "houston",
                       "amarillo",
                       "round"
@@ -1877,10 +2007,16 @@
                     "$ref": "#/definitions/http_timeout"
                   },
                   "cache_timeout": {
-                    "type": "integer",
-                    "title": "cache timeout",
-                    "description": "The number of minutes the response is cached. A value of 0 disables the cache.",
-                    "default": 10
+                    "$ref": "#/definitions/cache_timeout"
+                  },
+                  "access_token": {
+                    "$ref": "#/definitions/access_token"
+                  },
+                  "refresh_token": {
+                    "$ref": "#/definitions/refresh_token"
+                  },
+                  "expires_in": {
+                    "$ref": "#/definitions/expires_in"
                   }
                 }
               }
@@ -1998,10 +2134,7 @@
                     "$ref": "#/definitions/http_timeout"
                   },
                   "cache_timeout": {
-                    "type": "integer",
-                    "title": "cache timeout",
-                    "description": "The number of minutes the response is cached. A value of 0 disables the cache.",
-                    "default": 10
+                    "$ref": "#/definitions/cache_timeout"
                   }
                 }
               }
@@ -2046,6 +2179,40 @@
                     "title": "Fallback value",
                     "description": "Value to display if registry value cannot be retrieved",
                     "default": ""
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "withings"
+              }
+            }
+          },
+          "then": {
+            "title": "Display activity data from Withings",
+            "description": "https://ohmyposh.dev/docs/segments/withings",
+            "properties": {
+              "properties": {
+                "properties": {
+                  "http_timeout": {
+                    "$ref": "#/definitions/http_timeout"
+                  },
+                  "cache_timeout": {
+                    "$ref": "#/definitions/cache_timeout"
+                  },
+                  "access_token": {
+                    "$ref": "#/definitions/access_token"
+                  },
+                  "refresh_token": {
+                    "$ref": "#/definitions/refresh_token"
+                  },
+                  "expires_in": {
+                    "$ref": "#/definitions/expires_in"
                   }
                 }
               }
@@ -2149,10 +2316,7 @@
                     "$ref": "#/definitions/http_timeout"
                   },
                   "cache_timeout": {
-                    "type": "integer",
-                    "title": "cache timeout in minutes",
-                    "description": "The number of minutes the response is cached. A value of 0 disables the cache.",
-                    "default": 5
+                    "$ref": "#/definitions/cache_timeout"
                   },
                   "doubleup_icon": {
                     "type": "string",
@@ -2261,10 +2425,7 @@
                     "$ref": "#/definitions/http_timeout"
                   },
                   "cache_timeout": {
-                    "type": "integer",
-                    "title": "cache timeout",
-                    "description": "The number of minutes the response is cached. A value of 0 disables the cache.",
-                    "default": 10
+                    "$ref": "#/definitions/cache_timeout"
                   }
                 }
               }
@@ -2431,6 +2592,47 @@
           "if": {
             "properties": {
               "type": {
+                "const": "lua"
+              }
+            }
+          },
+          "then": {
+            "title": "Lua Segment",
+            "description": "https://ohmyposh.dev/docs/segments/lua",
+            "properties": {
+              "properties": {
+                "properties": {
+                  "home_enabled": {
+                    "$ref": "#/definitions/home_enabled"
+                  },
+                  "fetch_version": {
+                    "$ref": "#/definitions/fetch_version"
+                  },
+                  "display_mode": {
+                    "$ref": "#/definitions/display_mode"
+                  },
+                  "missing_command_text": {
+                    "$ref": "#/definitions/missing_command_text"
+                  },
+                  "version_url_template": {
+                    "$ref": "#/definitions/version_url_template"
+                  },
+                  "preferred_executable": {
+                    "type": "string",
+                    "title": "Preferred Executable",
+                    "description": "The preferred executable to use when fetching the version.",
+                    "enum": ["lua", "luajit"],
+                    "default": "lua"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
                 "const": "swift"
               }
             }
@@ -2525,6 +2727,19 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "gcp"
+              }
+            }
+          },
+          "then": {
+            "title": "GCP Segment",
+            "description": "https://ohmyposh.dev/docs/segments/gcp"
+          }
         }
       ]
     }
@@ -2537,11 +2752,11 @@
       "description": "https://ohmyposh.dev/docs/configuration/overview#general-settings",
       "default": true
     },
-    "osc99": {
-      "type": "boolean",
-      "title": "Enable OSC99",
+    "pwd": {
+      "type": "string",
+      "title": "Enable OSC99/7",
       "description": "https://ohmyposh.dev/docs/configuration/overview#general-settings",
-      "default": false
+      "default": ""
     },
     "console_title_template": {
       "type": "string",
@@ -2591,18 +2806,23 @@
     },
     "valid_line": {
       "$ref": "#/definitions/extra_prompt",
-      "title": "Valid Prompt Setting",
-      "description": "https://ohmyposh.dev/docs/configuration/prompt-override"
+      "title": "Valid Line Setting (for PowerShell only)",
+      "description": "https://ohmyposh.dev/docs/configuration/line-error"
     },
     "error_line": {
       "$ref": "#/definitions/extra_prompt",
-      "title": "Error Prompt Setting",
-      "description": "https://ohmyposh.dev/docs/configuration/prompt-override"
+      "title": "Error Line Setting (for PowerShell only)",
+      "description": "https://ohmyposh.dev/docs/configuration/line-error"
     },
     "secondary_prompt": {
       "$ref": "#/definitions/extra_prompt",
       "title": "Secondary Prompt Setting",
       "description": "https://ohmyposh.dev/docs/configuration/secondary-prompt"
+    },
+    "debug_prompt": {
+      "$ref": "#/definitions/extra_prompt",
+      "title": "Debug Prompt Setting (for PowerShell only)",
+      "description": "https://ohmyposh.dev/docs/configuration/debug-prompt"
     },
     "palette": {
       "type": "object",

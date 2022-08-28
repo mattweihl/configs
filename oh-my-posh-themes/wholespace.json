@@ -3,7 +3,6 @@
   "blocks": [
     {
       "alignment": "left",
-      "newline": true,
       "segments": [
         {
           "background": "#FEF5ED",
@@ -23,10 +22,13 @@
           "background": "#FEF5ED",
           "foreground": "#011627",
           "leading_diamond": "\ue0b2",
+          "properties": {
+            "time_format": "15:04:05"
+          },
           "style": "diamond",
-          "template": "\uf489 {{ .Name }}",
+          "template": " \u2665 {{ .CurrentDate | date .Format }} ",
           "trailing_diamond": "<transparent,#FEF5ED>\ue0b2</>",
-          "type": "shell"
+          "type": "time"
         },
         {
           "background": "#516BEB",
@@ -40,7 +42,7 @@
           "background": "#516BEB",
           "foreground": "#ffffff",
           "style": "diamond",
-          "template": "MEM: {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1000000000.0) }}/{{ (div .PhysicalTotalMemory 1000000000.0) }}GB \uf85a ",
+          "template": "RAM: {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1000000000.0) }}/{{ (div .PhysicalTotalMemory 1068786176.0) }}GB \uf85a ",
           "trailing_diamond": "<transparent,#516BEB>\ue0b2</>",
           "type": "sysinfo"
         },
@@ -63,6 +65,20 @@
     {
       "alignment": "right",
       "segments": [
+        {
+          "background": "#ffffff",
+          "foreground": "#000000",
+          "leading_diamond": "\ue0b2",
+          "properties": {
+            "fetch_package_manager": true,
+            "npm_icon": " <#cc3a3a>\ue5fa</> ",
+            "yarn_icon": " <#348cba>\uf61a</>"
+          },
+          "style": "diamond",
+          "template": "\ue718 {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }}",
+          "trailing_diamond": "<transparent,#ffffff>\ue0b2</>",
+          "type": "node"
+        },
         {
           "background": "#17D7A0",
           "foreground": "#011627",
@@ -87,46 +103,24 @@
       "newline": true,
       "segments": [
         {
-          "style": "plain",
-          "template": "\u256d\u2500",
-          "type": "text"
-        },
-        {
+          "foreground": "#ffafd2",
           "properties": {
-            "time_format": "15:04"
+            "folder_icon": "\uf07b",
+            "home_icon": "home",
+            "style": "agnoster_full"
           },
-          "style": "plain",
-          "template": " \u2665 {{ .CurrentDate | date .Format }} |",
-          "type": "time"
-        },
-        {
-          "style": "plain",
-          "template": " \uf292 ",
-          "type": "root"
-        },
-        {
-          "properties": {
-            "folder_icon": "\uf07b ",
-            "folder_separator_icon": " \uf554 ",
-            "home_icon": "\uf7db "
-          },
-          "style": "plain",
-          "template": " {{ .Path }} ",
+          "style": "diamond",
+          "template": " \ue5ff {{ .Path }} ",
           "type": "path"
-        }
-      ],
-      "type": "prompt"
-    },
-    {
-      "alignment": "left",
-      "newline": true,
-      "segments": [
+        },
         {
+          "foreground": "#00ff15",
+          "foreground_templates": ["{{ if gt .Code 0 }}#ff0000{{ end }}"],
           "properties": {
             "always_enabled": true
           },
           "style": "plain",
-          "template": "\u2570\u2500 ",
+          "template": " \uf7d4 ",
           "type": "exit"
         }
       ],
