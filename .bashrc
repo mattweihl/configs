@@ -10,4 +10,4 @@ alias db="cd ~/Dropbox"
 export EDITOR="vim"
 export LS_COLORS='ow=01;36;40'
 
-eval "$(oh-my-posh init bash --config $HOME/Dropbox/.config/oh-my-posh-themes/gruvbox.omp.json)"
+eval "$(oh-my-posh init bash --config $HOME/configs/oh-my-posh-themes/gruvbox.omp.json)"
