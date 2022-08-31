@@ -2,15 +2,15 @@ set nocompatible
 filetype plugin indent on
 syntax on
 
-set rtp+=~/.vim/bundle/Vundle.vim
-
-call vundle#begin()
-"call vundle#begin('~/some/path/here')
-
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'file:///$HOME/configs/vim/vim-oscyank'
-
-call vundle#end()            
+"set rtp+=~/.vim/bundle/Vundle.vim
+"
+"call vundle#begin()
+""call vundle#begin('~/some/path/here')
+"
+"Plugin 'VundleVim/Vundle.vim'
+"Plugin 'file:///$HOME/configs/vim/vim-oscyank'
+"
+"call vundle#end()            
 filetype plugin indent on    
 
 runtime macros/matchit.vim
