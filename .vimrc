@@ -3,8 +3,8 @@ syntax on
 
 runtime macros/matchit.vim
 
-colorscheme gruvbox
-set background=dark
+" colorscheme gruvbox 
+" set background=light
 
 nnoremap <esc><esc> :silent! nohls<cr>
 set backspace=indent,eol,start
@@ -52,8 +52,5 @@ set laststatus=2
 
 packloadall
 
-" vmap <Leader>f <Plug>(PrettierPartial)
-
 let g:prettier#autoformat = 1
 let g:prettier#autoformat_require_pragma = 0
-
