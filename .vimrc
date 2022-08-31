@@ -1,5 +1,17 @@
+set nocompatible
 filetype plugin indent on
 syntax on
+
+set rtp+=~/.vim/bundle/Vundle.vim
+
+call vundle#begin()
+"call vundle#begin('~/some/path/here')
+
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'file:///$HOME/configs/vim/vim-oscyank'
+
+call vundle#end()            
+filetype plugin indent on    
 
 runtime macros/matchit.vim
 
@@ -54,3 +66,10 @@ packloadall
 
 let g:prettier#autoformat = 1
 let g:prettier#autoformat_require_pragma = 0
+
+" yank operation don't need to use the *" register (system clipboard)
+"set clipboard+=unnamedplus
+
+" autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | OSCYankReg " | endif
+
+
