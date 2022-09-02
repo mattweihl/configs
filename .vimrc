@@ -26,7 +26,7 @@ set softtabstop=4
 set expandtab
 set list
 set listchars=tab:␉·
-set clipboard=unnamed
+set clipboard^=unnamed,unnamedplus
 "set cursorline
 "set cursorcolumn
 set nobackup
