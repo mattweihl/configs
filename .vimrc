@@ -74,3 +74,11 @@ function! s:raw_echo(str)
     endif
   endif
 endfunction
+
+function Copy()
+  let c = join(v:event.regcontents,"\n")
+  let c64 = system("base64", c)
+  let s = "\e]52;c;" . trim(c64) . "\x07"
+  call s:raw_echo(s)
+endfunction
+autocmd TextYankPost * call Copy()
