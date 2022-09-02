@@ -26,7 +26,7 @@ set softtabstop=4
 set expandtab
 set list
 set listchars=tab:␉·
-set clipboard=unnamedplus
+set clipboard=unnamed
 "set cursorline
 "set cursorcolumn
 set nobackup
@@ -62,3 +62,15 @@ if has('mouse_sgr')
     set ttymouse=sgr
 endif
 
+function! s:raw_echo(str)
+  if has('win32') && has('nvim')
+    call chansend(v:stderr, a:str)
+  else
+    if filewritable('/dev/fd/2')
+      call writefile([a:str], '/dev/fd/2', 'b')
+    else
+      exec("silent! !echo " . shellescape(a:str))
+      redraw!
+    endif
+  endif
+endfunction
