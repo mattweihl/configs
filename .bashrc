@@ -14,3 +14,8 @@ then
     eval "$(oh-my-posh init bash --config $HOME/configs/oh-my-posh-themes/gruvbox.omp.json)"
 fi
 
+if command -v nvim &> /dev/null
+then 
+    alias vim="nvim"
+fi
+
