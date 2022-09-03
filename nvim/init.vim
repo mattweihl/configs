@@ -49,7 +49,7 @@ set termguicolors
 set statusline=%!StatusLineNormal()
 set number
 
-let g:mapleader = ' '
+" let g:mapleader = ' '
 
 let g:closetag_filenames = '*.html,*.js,*.jsx,*.ts,*.tsx'
 
@@ -287,3 +287,17 @@ require('telescope').setup({
   },
 })
 EOF
+
+nmap <silent> <leader>qq :qa!<CR>
+nmap <silent> <leader>q :wqa!<CR>
+nmap <silent> <leader>w :w!<CR>
+
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+set updatetime=300
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
