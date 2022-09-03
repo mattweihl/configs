@@ -44,8 +44,6 @@ set laststatus=3
 " Plugins
 call plug#begin()
 
-"Plug 'kyazdani42/nvim-web-devicons' 
-"Plug 'kyazdani42/nvim-tree.lua'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.0' }
 Plug 'ojroques/vim-oscyank', {'branch': 'main'}
@@ -83,8 +81,6 @@ let g:floaterm_wintype = 'split'
 let g:floaterm_position = 'botright'
 let g:floaterm_keymap_toggle = '<leader>tt'
 
-" autocmd User CocNvimInit :CocCommand explorer
-
 nmap <silent> <leader>qq :qa!<CR>
 nmap <silent> <leader>q :wqa!<CR>
 
@@ -115,59 +111,6 @@ let g:endoflines = {
   \ 'windows': 'crlf'
   \ }
 
-function StatusLineNormal() abort
-  let b:leftstatus = ''
-  let b:rightstatus = ''
-  
-  let b:branch = FugitiveHead()
+nmap <silent> <leader><left> :tabprev<CR>
+nmap <silent> <leader><right> :tabnext<CR>
 
-  hi SshGroup guibg=#fafafa guifg=#0d0d0d
-
-  let b:leftstatus .= "%#SshGroup#    %#StatusLine#"
-
-  let b:leftstatus .= '   '
-
-  if !empty(b:branch)
-    let b:leftstatus .= ' %{b:branch}   '
-  endif
-
-  let b:leftstatus .= ' %{StatusErrors()} '
-  let b:leftstatus .= ' %{StatusWarnings()}   '
-
-  let b:leftstatus .= '-- %{toupper(g:currentmode[mode()])} --'
-
-  let b:rightstatus .= 'Spaces: %{&shiftwidth}'
-  let b:rightstatus .= '   %{empty(&fenc)?toupper(&fenc):toupper(&enc)}'
-  let b:rightstatus .= '   %{toupper(g:endoflines[&ff])}'
-
-  if !empty(&ft) && &ft != 'TelescopePrompt'
-    let b:rightstatus .= '    %{&ft}'
-  endif
-
-  let b:rightstatus .= '   '
-
-  return b:leftstatus . '%=' . b:rightstatus
-endfunction
-
-function StatusWarnings() abort
-  let info = get(b:, 'coc_diagnostic_info', {})
-
-  if empty(info) | return '0' | endif
-
-  return info['warning']
-endfunction
-
-function StatusErrors() abort
-  let info = get(b:, 'coc_diagnostic_info', {})
-
-  if empty(info) | return '0' | endif
-
-  return info['error']
-endfunction
-
-set statusline=%!StatusLineNormal()
-
-nmap <silent> <c-k> :wincmd k<CR>
-nmap <silent> <c-j> :wincmd j<CR>
-nmap <silent> <c-h> :wincmd h<CR>
-nmap <silent> <c-l> :wincmd l<CR>
