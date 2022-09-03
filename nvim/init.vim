@@ -4,6 +4,14 @@ syntax on
 
 runtime macros/matchit.vim
 
+" Plugins
+call plug#begin('~/configs/nvim/plugged')
+
+Plug 'ojroques/vim-oscyank', {'branch': 'main'}
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+call plug#end()
+
 " Theme
 colorscheme gabriel 
 set termguicolors
@@ -41,21 +49,14 @@ set statusline+=%=
 set statusline+=\ ascii:\ %b\ hex:\ 0x%B\ row:\ %l\ col:\ %c\ percent:\ %p%%
 set laststatus=3
 
-" Plugins
-call plug#begin()
-
-Plug 'ojroques/vim-oscyank', {'branch': 'main'}
-
-call plug#end()
-
 " Clipboard yanking setup
 autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | execute 'OSCYankReg "' | endif
 
 " Shortcuts
-
 if !exists('*ReloadConfig')
     function! ReloadConfig()
-        echo "RELOADED VIM CONFIG"
+        echo "Reloaded neovim configuration"
         source $MYVIMRC
     endfunction
 endif
+nmap <silent> <leader>rr :call ReloadConfig()<CR>
