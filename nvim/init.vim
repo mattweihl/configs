@@ -83,7 +83,7 @@ let g:floaterm_wintype = 'split'
 let g:floaterm_position = 'botright'
 let g:floaterm_keymap_toggle = '<leader>tt'
 
-autocmd User CocNvimInit :CocCommand explorer
+" autocmd User CocNvimInit :CocCommand explorer
 
 nmap <silent> <leader>qq :qa!<CR>
 nmap <silent> <leader>q :wqa!<CR>
@@ -167,3 +167,7 @@ endfunction
 
 set statusline=%!StatusLineNormal()
 
+nmap <silent> <c-k> :wincmd k<CR>
+nmap <silent> <c-j> :wincmd j<CR>
+nmap <silent> <c-h> :wincmd h<CR>
+nmap <silent> <c-l> :wincmd l<CR>
