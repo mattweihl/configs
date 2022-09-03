@@ -17,8 +17,13 @@ Plug 'mhinz/vim-signify'
 Plug 'tpope/vim-fugitive'
 Plug 'sheerun/vim-polyglot'
 Plug 'voldikss/vim-floaterm'
+Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 
 call plug#end()
+
+" Clipboard yanking setup
+autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | execute 'OSCYankReg "' | endif
+
 
 colorscheme gabriel
 
