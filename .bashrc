@@ -6,7 +6,7 @@ alias gs='git status'
 alias dt="cd $DESKTOP" 
 alias db="cd ~/Dropbox"
 
-export EDITOR="vim"
+export EDITOR="nvim"
 export LS_COLORS='ow=01;36;40'
 
 if command -v oh-my-posh &> /dev/null
@@ -17,5 +17,6 @@ fi
 if command -v nvim &> /dev/null
 then 
     alias vim="nvim"
+    alias vi="nvim"
 fi
 

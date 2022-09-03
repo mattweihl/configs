@@ -24,7 +24,6 @@ call plug#end()
 " Clipboard yanking setup
 autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | execute 'OSCYankReg "' | endif
 
-
 colorscheme gabriel
 
 set background=dark
@@ -51,7 +50,14 @@ set splitbelow
 set splitright
 set termguicolors
 " set relativenumber
-set statusline=%!StatusLineNormal()
+" set statusline=%!StatusLineNormal()
+set statusline=
+set statusline+=\ %F\ %M\ %Y\ %R
+set statusline+=%=
+set statusline+=\ ascii:\ %b\ hex:\ 0x%B\ row:\ %l\ col:\ %c\ percent:\ %p%%
+set laststatus=3
+
+
 set number
 
 " let g:mapleader = ' '
@@ -306,3 +312,13 @@ inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 set updatetime=300
 xmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
+
+if !exists('*ReloadConfig')
+    function! ReloadConfig()
+        echo "RELOADED VIM CONFIG"
+        source $MYVIMRC
+    endfunction
+endif
+
+nmap <silent> <leader>rr :call ReloadConfig()<CR>
+
