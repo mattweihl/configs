@@ -12,9 +12,12 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ryanoasis/vim-devicons'
 Plug 'ctrlpvim/ctrlp.vim' " fuzzy find files
 Plug 'morhetz/gruvbox'
-
+Plug 'scrooloose/nerdtree'
 
 call plug#end()
+
+inoremap jk <ESC>
+nmap <C-n> :NERDTreeToggle<CR>
 
 " Theme
 colorscheme gabriel 
@@ -45,9 +48,7 @@ set cursorline
 set encoding=utf-8
 set fileencoding=utf-8
 set shortmess=FI
-" set smarttab
-
-
+set smarttab
 
 " Status Line
 set statusline=

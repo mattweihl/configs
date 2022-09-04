@@ -3,7 +3,6 @@ function get_time()
         $ESC = [char]27
         $prompt="$ESC[38;2;0;0;0m$ESC[48;2;0;135;255m $(Get-Date -UFormat "%I:%M %p") $ESC[0m"
         return $prompt
-
 }
 
 function get_username_and_hostname()
@@ -21,8 +20,6 @@ function get_location()
         # return "$ESC[38;2;0;0;0m$ESC[48;2;13;188;121m 📂 $( $pwd | Resolve-Path -Relative) $ESC[0m"
         # return " 📂 $( $pwd | Resolve-Path -Relative) "
         return "$( $pwd | Resolve-Path -Relative) "
-
-
 }
 
 # function prompt {
@@ -42,12 +39,10 @@ if (!(test-path alias:ll))
         New-Alias ll Get-ChildItemUnix
 }
 
-
 function c()
 {
         Set-Location  $env:HOMEPATH\Code
 }
-
 
 function clear()
 {
@@ -60,14 +55,6 @@ function gs()
 }
 
 function rmrf {
-     <#
-        .DESCRIPTION
-        Deletes the specified file or directory.
-        .PARAMETER target
-        Target file or directory to be deleted.
-        .NOTES
-        This is an equivalent command of "rm -rf" in Unix-like systems.
-        #>
     Param(
         [Parameter(Mandatory=$true)]
         [string]$Target
