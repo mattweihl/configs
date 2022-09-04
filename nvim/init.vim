@@ -9,6 +9,10 @@ call plug#begin('~/configs/nvim/plugged')
 
 Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'ryanoasis/vim-devicons'
+Plug 'ctrlpvim/ctrlp.vim' " fuzzy find files
+Plug 'morhetz/gruvbox'
+
 
 call plug#end()
 
@@ -41,6 +45,9 @@ set cursorline
 set encoding=utf-8
 set fileencoding=utf-8
 set shortmess=FI
+" set smarttab
+
+
 
 " Status Line
 set statusline=
@@ -60,3 +67,46 @@ if !exists('*ReloadConfig')
     endfunction
 endif
 nmap <silent> <leader>rr :call ReloadConfig()<CR>
+
+" coc config
+let g:coc_global_extensions = [
+  \ 'coc-snippets',
+  \ 'coc-pairs',
+  \ 'coc-tsserver',
+  \ 'coc-eslint', 
+  \ 'coc-prettier', 
+  \ 'coc-json', 
+  \ ]
+
+" use <tab> for trigger completion and navigate to the next complete item
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Remap for rename current word
+nmap <F2> <Plug>(coc-rename)
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Remap for format selected region
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+" Find symbol of current document
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
