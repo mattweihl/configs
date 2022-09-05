@@ -70,8 +70,9 @@ if !exists('*ReloadConfig')
 endif
 nmap <silent> <leader>rr :call ReloadConfig()<CR>
 
-nmap <silent> <leader>qq :q!<CR>
-nmap <silent> <leader>wq :wq!<CR>
+nmap <silent> <leader>q :q!<CR>
+nmap <silent> <leader>qq :qa!<CR>
+nmap <silent> <leader>wq :wqa!<CR>
 nmap <silent> <leader>ww :w!<CR>
 
 " coc config
