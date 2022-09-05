@@ -10,9 +10,10 @@ call plug#begin('~/configs/nvim/plugged')
 Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ryanoasis/vim-devicons'
-Plug 'ctrlpvim/ctrlp.vim' " fuzzy find files
 Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
 
 call plug#end()
 
@@ -69,6 +70,10 @@ if !exists('*ReloadConfig')
 endif
 nmap <silent> <leader>rr :call ReloadConfig()<CR>
 
+nmap <silent> <leader>qq :q!<CR>
+nmap <silent> <leader>wq :wq!<CR>
+nmap <silent> <leader>ww :w!<CR>
+
 " coc config
 let g:coc_global_extensions = [
   \ 'coc-snippets',
@@ -77,6 +82,7 @@ let g:coc_global_extensions = [
   \ 'coc-eslint', 
   \ 'coc-prettier', 
   \ 'coc-json', 
+  \ 'coc-pyright'
   \ ]
 
 " use <tab> for trigger completion and navigate to the next complete item
@@ -89,6 +95,20 @@ inoremap <silent><expr> <Tab>
       \ coc#pum#visible() ? coc#pum#next(1) :
       \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
+
+"inoremap <silent><expr> <TAB>
+"      \ pumvisible() ? coc#_select_confirm() :
+"      \ coc#expandableOrJumpable() ?
+"      \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+"      \ <SID>check_back_space() ? "\<TAB>" :
+"      \ coc#refresh()
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+let g:coc_snippet_next = '<tab>'
 
 " Use <c-space> to trigger completion.
 inoremap <silent><expr> <c-space> coc#refresh()
@@ -111,3 +131,16 @@ nmap <leader>f  <Plug>(coc-format-selected)
 
 " Find symbol of current document
 nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+
+lua << EOF
+require('telescope').setup({
+  defaults = {
+    mappings = { i = { ['<esc>'] = require('telescope.actions').close } },
+    borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+    file_ignore_patterns = { 'node_modules', '.git', 'build' },
+  },
+})
+EOF
+
+nmap <silent> <leader>ff :Telescope find_files<CR>
+nmap <silent> <leader>fg :Telescope live_grep<CR>
