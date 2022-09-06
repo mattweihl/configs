@@ -1,4 +1,5 @@
 set nocompatible
+
 filetype plugin indent on
 syntax on
 
@@ -14,14 +15,20 @@ Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'embark-theme/vim', { 'as': 'embark', 'branch': 'main' }
 
 call plug#end()
 
 inoremap jk <ESC>
 nmap <C-n> :NERDTreeToggle<CR>
+nmap <C-s> :w<CR>
+nmap <C-w> :q<CR>
+
+" Start NERDTree and leave the cursor in it.
+autocmd VimEnter * NERDTree
 
 " Theme
-colorscheme gabriel 
+colorscheme embark
 set termguicolors
 
 set backspace=indent,eol,start
@@ -83,7 +90,8 @@ let g:coc_global_extensions = [
   \ 'coc-eslint', 
   \ 'coc-prettier', 
   \ 'coc-json', 
-  \ 'coc-pyright'
+  \ 'coc-pyright',
+  \ 'coc-terminal',
   \ ]
 
 " use <tab> for trigger completion and navigate to the next complete item
@@ -96,13 +104,6 @@ inoremap <silent><expr> <Tab>
       \ coc#pum#visible() ? coc#pum#next(1) :
       \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-
-"inoremap <silent><expr> <TAB>
-"      \ pumvisible() ? coc#_select_confirm() :
-"      \ coc#expandableOrJumpable() ?
-"      \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-"      \ <SID>check_back_space() ? "\<TAB>" :
-"      \ coc#refresh()
 
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -145,3 +146,5 @@ EOF
 
 nmap <silent> <leader>ff :Telescope find_files<CR>
 nmap <silent> <leader>fg :Telescope live_grep<CR>
+
+let g:NERDTreeShowHidden=1

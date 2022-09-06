@@ -1,8 +1,5 @@
 {
   "suggest.noselect": true,
-  "python.jediEnabled": false,
-  "prettier.disableSuccessMessage": true,
-
   "coc.preferences.formatOnSaveFiletypes": [
     "css",
     "scss",
