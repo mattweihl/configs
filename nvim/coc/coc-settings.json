@@ -55,5 +55,8 @@
   "explorer.file.child.template": "[selection | clip | 1] [indent][icon | 1] [filename growRight 1] [git]",
   "explorer.keyMappings.global": {
     "<cr>": ["expandable?", ["expanded?", "collapse", "expand"], "open"]
-  }
+  },
+  "eslint.run": "onSave",
+  "eslint.autoFixOnSave": true,
+  "eslint.enable": true
 }
