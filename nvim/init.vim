@@ -139,7 +139,7 @@ require('telescope').setup({
   defaults = {
     mappings = { i = { ['<esc>'] = require('telescope.actions').close } },
     borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
-    file_ignore_patterns = { 'node_modules', '.git', 'build' },
+    file_ignore_patterns = { 'node_modules', '.git', 'build', 'node-offline-mirror' },
   },
 })
 EOF
