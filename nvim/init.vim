@@ -25,7 +25,7 @@ nmap <C-s> :w<CR>
 nmap <C-w> :q<CR>
 
 " Start NERDTree and leave the cursor in it.
-autocmd VimEnter * NERDTree
+" autocmd VimEnter * NERDTree
 
 " Theme
 colorscheme embark
