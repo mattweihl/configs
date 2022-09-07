@@ -16,8 +16,13 @@ Plug 'scrooloose/nerdtree'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'embark-theme/vim', { 'as': 'embark', 'branch': 'main' }
+Plug 'APZelos/blamer.nvim'
 
 call plug#end()
+
+let g:blamer_enabled = 1
+let g:blamer_show_in_insert_modes = 0
+let g:blamer_show_in_visual_modes = 0
 
 inoremap jk <ESC>
 nmap <C-n> :NERDTreeToggle<CR>
