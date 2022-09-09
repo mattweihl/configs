@@ -11,18 +11,14 @@ call plug#begin('~/configs/nvim/plugged')
 Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ryanoasis/vim-devicons'
-Plug 'morhetz/gruvbox'
+" Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
+"Plug 'nvim-lua/plenary.nvim'
+"Plug 'nvim-telescope/telescope.nvim'
 Plug 'embark-theme/vim', { 'as': 'embark', 'branch': 'main' }
-Plug 'APZelos/blamer.nvim'
+"Plug 'APZelos/blamer.nvim'
 
 call plug#end()
-
-let g:blamer_enabled = 1
-let g:blamer_show_in_insert_modes = 0
-let g:blamer_show_in_visual_modes = 0
 
 inoremap jk <ESC>
 nmap <C-n> :NERDTreeToggle<CR>
@@ -139,17 +135,15 @@ nmap <leader>f  <Plug>(coc-format-selected)
 " Find symbol of current document
 nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
 
-lua << EOF
-require('telescope').setup({
-  defaults = {
-    mappings = { i = { ['<esc>'] = require('telescope.actions').close } },
-    borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
-    file_ignore_patterns = { 'node_modules', '.git', 'build', 'node-offline-mirror' },
-  },
-})
-EOF
-
-nmap <silent> <leader>ff :Telescope find_files<CR>
-nmap <silent> <leader>fg :Telescope live_grep<CR>
-
-let g:NERDTreeShowHidden=1
+"lua << EOF
+"require('telescope').setup({
+"  defaults = {
+"    mappings = { i = { ['<esc>'] = require('telescope.actions').close } },
+"    borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+"    file_ignore_patterns = { 'node_modules', '.git', 'build', 'node-offline-mirror' },
+"  },
+"})
+"EOF
+"
+"nmap <silent> <leader>ff :Telescope find_files<CR>
+"nmap <silent> <leader>fg :Telescope live_grep<CR>
