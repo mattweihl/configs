@@ -9,7 +9,7 @@ runtime macros/matchit.vim
 call plug#begin('~/configs/nvim/plugged')
 
 Plug 'ojroques/vim-oscyank', {'branch': 'main'}
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ryanoasis/vim-devicons'
 " Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree'
@@ -84,16 +84,16 @@ nmap <silent> <leader>wq :wqa!<CR>
 nmap <silent> <leader>ww :w!<CR>
 
 " coc config
-let g:coc_global_extensions = [
-  \ 'coc-snippets',
-  \ 'coc-pairs',
-  \ 'coc-tsserver',
-  \ 'coc-eslint', 
-  \ 'coc-prettier', 
-  \ 'coc-json', 
-  \ 'coc-pyright',
-  \ 'coc-terminal',
-  \ ]
+"let g:coc_global_extensions = [
+"  \ 'coc-snippets',
+"  \ 'coc-pairs',
+"  \ 'coc-tsserver',
+"  \ 'coc-eslint', 
+"  \ 'coc-prettier', 
+"  \ 'coc-json', 
+"  \ 'coc-pyright',
+"  \ 'coc-terminal',
+"  \ ]
 
 " use <tab> for trigger completion and navigate to the next complete item
 function! CheckBackspace() abort
