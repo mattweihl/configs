@@ -15,7 +15,7 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'scrooloose/nerdtree'
 "Plug 'nvim-lua/plenary.nvim'
 "Plug 'nvim-telescope/telescope.nvim'
-Plug 'embark-theme/vim', { 'as': 'embark', 'branch': 'main' }
+"Plug 'embark-theme/vim', { 'as': 'embark', 'branch': 'main' }
 "Plug 'APZelos/blamer.nvim'
 
 call plug#end()
@@ -29,8 +29,11 @@ nmap <C-w> :q<CR>
 " autocmd VimEnter * NERDTree
 
 " Theme
-colorscheme embark
-set termguicolors
+" colorscheme embark
+set background=light
+"colorscheme PaperColor
+colorscheme solarized
+" set termguicolors
 
 set backspace=indent,eol,start
 set hidden                    
@@ -72,7 +75,7 @@ autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | exe
 " Shortcuts
 if !exists('*ReloadConfig')
     function! ReloadConfig()
-        echo "Reloaded neovim configuration"
+        echo "Reloaded configuration"
         source $MYVIMRC
     endfunction
 endif
