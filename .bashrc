@@ -21,5 +21,10 @@ export LS_COLORS='ow=01;36;40'
 # Use oh-my-posh for prompt, if present
 if command -v oh-my-posh &> /dev/null
 then
-    eval "$(oh-my-posh init bash --config $HOME/configs/oh-my-posh-themes/cinnamon.omp.json)"
+    eval "$(oh-my-posh init bash --config $HOME/configs/oh-my-posh-themes/cert.omp.json)"
 fi
+
+#if command -v starship &> /dev/null
+#then
+#    eval "$(starship init bash)"
+#fi
