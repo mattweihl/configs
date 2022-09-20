@@ -124,6 +124,12 @@
           "style": "powerline",
           "template": " \uf0ad ",
           "type": "root"
+        },
+        {
+          "type": "text",
+          "style": "plain",
+          "foreground": "#E06C75",
+          "template": "\n⮕ "
         }
       ],
       "type": "prompt"
