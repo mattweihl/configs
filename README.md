@@ -1,5 +1,2 @@
 # configs
-
-My configs for bash, vim, tmux
-
-https://github.com/gantoreno/gfiles
+My dev configs for bash, vim, tmux, etc.
