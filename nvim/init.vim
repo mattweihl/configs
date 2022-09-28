@@ -30,9 +30,9 @@ nmap <C-w> :q<CR>
 
 " Theme
 " colorscheme embark
-set background=light
+"set background=light
 "colorscheme PaperColor
-colorscheme solarized
+"colorscheme solarized
 " set termguicolors
 
 set backspace=indent,eol,start
