@@ -29,8 +29,9 @@ nmap <C-w> :q<CR>
 " autocmd VimEnter * NERDTree
 
 " Theme
-" colorscheme embark
-"set background=light
+"colorscheme embark
+set background=dark
+colorscheme gruvbox
 "colorscheme PaperColor
 "colorscheme solarized
 " set termguicolors
