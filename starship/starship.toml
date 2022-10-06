@@ -1,3 +1,5 @@
+
+add_newline = false
 #format = """
 #[](#9A348E)\
 #$username\
