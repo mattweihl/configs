@@ -1,3 +1,5 @@
+source $HOME/configs/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+
 # Alias
 alias ll='ls -alFh --color=auto'
 alias la='ls -A --color=auto'
@@ -17,3 +19,8 @@ fi
 # Variables
 export EDITOR="nvim"
 export LS_COLORS='ow=01;36;40'
+
+if which starship >/dev/null; then
+    eval "$(starship init zsh)"
+fi
+
