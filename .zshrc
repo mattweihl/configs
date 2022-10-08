@@ -20,5 +20,3 @@ export LS_COLORS='ow=01;36;40'
 if which starship >/dev/null; then
     eval "$(starship init zsh)"
 fi
-
-setopt noglob
