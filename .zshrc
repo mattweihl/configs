@@ -1,5 +1,10 @@
 source $HOME/configs/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
+if which starship >/dev/null; then
+    eval "$(starship init zsh)"
+fi
+
+
 alias ll="ls -alFh --color=auto"
 alias la="ls -A --color=auto"
 alias l="ll"
@@ -17,6 +22,6 @@ fi
 export EDITOR="nvim"
 export LS_COLORS='ow=01;36;40'
 
-if which starship >/dev/null; then
-    eval "$(starship init zsh)"
-fi
+autoload edit-command-line
+zle -N edit-command-line
+bindkey '^X^e' edit-command-line
