@@ -1,8 +1,13 @@
 source $HOME/configs/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
-if which starship >/dev/null; then
-    eval "$(starship init zsh)"
+#if which starship >/dev/null; then
+#    eval "$(starship init zsh)"
+#fi
+
+if which oh-my-posh >/dev/null; then
+    eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/json.omp.json)"
 fi
+
 
 alias ll="ls -alFh --color=auto"
 alias la="ls -A --color=auto"
