@@ -1,2 +1,3 @@
 coc/commands
+.DS_Store
 coc/list-extensions-history.json
