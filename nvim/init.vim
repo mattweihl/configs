@@ -17,7 +17,7 @@ Plug 'scrooloose/nerdtree'
 "Plug 'nvim-telescope/telescope.nvim'
 "Plug 'embark-theme/vim', { 'as': 'embark', 'branch': 'main' }
 "Plug 'APZelos/blamer.nvim'
-
+Plug 'sonph/onehalf', { 'rtp': 'vim' }
 call plug#end()
 
 inoremap jk <ESC>
@@ -32,6 +32,8 @@ nmap <C-w> :q<CR>
 "colorscheme embark
 set background=dark
 colorscheme gruvbox
+"colorscheme gruvbox
+"colorscheme onehalfdark
 "colorscheme PaperColor
 "colorscheme solarized
 " set termguicolors
