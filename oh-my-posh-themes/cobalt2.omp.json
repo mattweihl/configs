@@ -6,7 +6,7 @@
       "segments": [
         {
           "background": "#1478DB",
-          "foreground": "#000000",
+          "foreground": "#FFFFFF",
           "leading_diamond": "\ue0b6",
           "trailing_diamond": "\uE0B0",
           "properties": {
