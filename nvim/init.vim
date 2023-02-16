@@ -31,9 +31,9 @@ nmap <C-w> :q<CR>
 " Theme
 "colorscheme embark
 set background=dark
-colorscheme gruvbox
 "colorscheme gruvbox
-"colorscheme onehalfdark
+"colorscheme gruvbox
+colorscheme onehalfdark
 "colorscheme PaperColor
 "colorscheme solarized
 " set termguicolors
