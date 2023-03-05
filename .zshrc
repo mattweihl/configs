@@ -1,5 +1,3 @@
-#source $HOME/configs/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-
 if which oh-my-posh >/dev/null; then
     eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/cobalt2.omp.json)"
 fi
