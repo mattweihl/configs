@@ -1,3 +1,5 @@
+autoload -Uz compinit && compinit
+
 if which oh-my-posh >/dev/null; then
     eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/cobalt2.omp.json)"
 fi
@@ -8,7 +10,10 @@ alias l="ll"
 alias c="cd $CODE_LOCATION"
 alias gs="git status"
 alias dt="cd $DESKTOP"
-alias db="cd ~/Dropbox"
+
+if [ -d "$HOME/Dropbox" ]; then
+    alias db="cd ~/Dropbox"
+fi
 
 if command -v nvim &> /dev/null
 then
@@ -28,5 +33,3 @@ select-word-style bash
 HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=1000
-
-autoload -Uz compinit && compinit
