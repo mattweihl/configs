@@ -24,7 +24,7 @@ Plug 'jiangmiao/auto-pairs' "this will auto close ( [ {
 "Plug 'HerringtonDarkholme/yats.vim'
 "Plug 'maxmellon/vim-jsx-pretty'
 
-Plug 'lambdalisue/fern.vim'
+"Plug 'lambdalisue/fern.vim'
 
 call plug#end()
 
