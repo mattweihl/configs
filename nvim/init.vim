@@ -9,15 +9,23 @@ runtime macros/matchit.vim
 call plug#begin('~/configs/nvim/plugged')
 
 Plug 'ojroques/vim-oscyank', {'branch': 'main'}
-" Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ryanoasis/vim-devicons'
-" Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree'
-"Plug 'nvim-lua/plenary.nvim'
-"Plug 'nvim-telescope/telescope.nvim'
-"Plug 'embark-theme/vim', { 'as': 'embark', 'branch': 'main' }
-"Plug 'APZelos/blamer.nvim'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
+
+Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'} " this is for auto complete, prettier and tslinting
+
+let g:coc_global_extensions = ['coc-tslint-plugin', 'coc-tsserver', 'coc-css', 'coc-html', 'coc-json', 'coc-prettier']  " list of CoC extensions needed
+
+Plug 'jiangmiao/auto-pairs' "this will auto close ( [ {
+
+" these two plugins will add highlighting and indenting to JSX and TSX files.
+Plug 'yuezk/vim-js'
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'maxmellon/vim-jsx-pretty'
+
+Plug 'lambdalisue/fern.vim'
+
 call plug#end()
 
 inoremap jk <ESC>
