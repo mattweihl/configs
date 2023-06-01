@@ -21,7 +21,8 @@ then
 fi
 
 export EDITOR="nvim"
-export LS_COLORS='ow=01;36;40'
+export LSCOLORS=GxFxCxDxBxegedabagaced
+#export LS_COLORS='ow=01;36;40'
 
 autoload edit-command-line
 zle -N edit-command-line
@@ -35,3 +36,4 @@ HISTSIZE=1000
 SAVEHIST=1000
 
 bindkey -e 
+export CLICOLOR=1
