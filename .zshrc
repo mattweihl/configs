@@ -22,7 +22,6 @@ fi
 
 export EDITOR="nvim"
 export LSCOLORS=GxFxCxDxBxegedabagaced
-#export LS_COLORS='ow=01;36;40'
 
 autoload edit-command-line
 zle -N edit-command-line

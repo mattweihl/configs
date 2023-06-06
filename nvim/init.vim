@@ -12,7 +12,7 @@ Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 Plug 'ryanoasis/vim-devicons'
 Plug 'scrooloose/nerdtree'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
-
+Plug 'github/copilot.vim'
 "Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'} " this is for auto complete, prettier and tslinting
 "
 "let g:coc_global_extensions = ['coc-tslint-plugin', 'coc-tsserver', 'coc-css', 'coc-html', 'coc-json', 'coc-prettier']  " list of CoC extensions needed
