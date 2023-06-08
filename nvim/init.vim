@@ -84,3 +84,10 @@ nmap <silent> <leader>qq :qa!<CR>
 nmap <silent> <leader>wq :wqa!<CR>
 nmap <silent> <leader>ww :w!<CR>
 
+function! StartUp()
+    if 0 == argc()
+        NERDTree
+    end
+endfunction
+
+autocmd VimEnter * call StartUp()
