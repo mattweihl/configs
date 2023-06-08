@@ -1,7 +1,7 @@
 autoload -Uz compinit && compinit
 
 if which oh-my-posh >/dev/null; then
-        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/cobalt2.omp.json)"
+        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/nu4a.omp.json)"
 fi
 
 alias ll="ls -alFh --color=auto"
