@@ -15,8 +15,12 @@ Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'github/copilot.vim'
 Plug 'folke/tokyonight.nvim'
 Plug 'jiangmiao/auto-pairs' 
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" CocInstall coc-json coc-tsserver
+
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
+" CocInstall coc-json coc-tsserver coc-eslint
+Plug 'lewis6991/gitsigns.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
+Plug 'romgrk/barbar.nvim'
 
 call plug#end()
 
