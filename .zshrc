@@ -36,3 +36,5 @@ SAVEHIST=1000
 
 bindkey -e 
 export CLICOLOR=1
+
+alias configs="cd $HOME/configs"
