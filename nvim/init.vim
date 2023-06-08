@@ -15,6 +15,8 @@ Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'github/copilot.vim'
 Plug 'folke/tokyonight.nvim'
 Plug 'jiangmiao/auto-pairs' 
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" CocInstall coc-json coc-tsserver
 
 call plug#end()
 
@@ -59,15 +61,19 @@ set statusline+=%=
 set statusline+=\ ascii:\ %b\ hex:\ 0x%B\ row:\ %l\ col:\ %c\ percent:\ %p%%
 set laststatus=3
 
-autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | execute 'OSCYankReg "' | endif
+autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | execute 'OSCYankRegister"' | endif
 
-if !exists('*reloadConfig')
+if !exists('*ReloadConfig')
     function! ReloadConfig()
-        echo "Reloaded configuration"
+        echohl WarningMsg
+        echom "Reloaded configuration"
+        echohl None
+        sleep 1
         source $MYVIMRC
     endfunction
 endif
 nmap <silent> <leader>rr :call ReloadConfig()<CR>
+
 
 nmap <silent> <leader>q :q!<CR>
 nmap <silent> <leader>qq :qa!<CR>
