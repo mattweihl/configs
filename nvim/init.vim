@@ -46,8 +46,8 @@ set incsearch
 set ignorecase
 set smartcase
 set autoindent
-set shiftwidth=4
-set softtabstop=4
+set shiftwidth=2
+set softtabstop=2
 set expandtab
 set list
 set listchars=tab:␉·
