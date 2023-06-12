@@ -6,7 +6,7 @@ syntax on
 runtime macros/matchit.vim
 
 " Plugins
-call plug#begin('~/configs/nvim/plugged')
+call plug#begin()
 
 Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 Plug 'ryanoasis/vim-devicons'
