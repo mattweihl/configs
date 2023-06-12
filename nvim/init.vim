@@ -68,7 +68,16 @@ set statusline+=%=
 set statusline+=\ ascii:\ %b\ hex:\ 0x%B\ row:\ %l\ col:\ %c\ percent:\ %p%%
 set laststatus=3
 
-autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | execute 'OSCYankRegister"' | endif
+"autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | execute 'OSCYankRegister"' | endif
+
+autocmd TextYankPost * if v:event.operator == 'y' && v:event.regname == ''
+                        \ | if exists(':OSCYankRegister') == 2
+                        \ |     execute 'OSCYankRegister"'
+                        \ | elseif exists(':OSCYankReg') == 2
+                        \ |     execute 'OSCYankReg"'
+                        \ | endif
+                        \ | endif
+
 
 if !exists('*ReloadConfig')
     function! ReloadConfig()
