@@ -9,6 +9,7 @@ alias la="ls -A --color=auto"
 alias l="ll"
 alias c="cd $CODE_LOCATION"
 alias gs="git status"
+alias gb='git branch'
 alias dt="cd $DESKTOP"
 
 if [ -d "$HOME/Dropbox" ]; then
