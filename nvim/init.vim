@@ -25,7 +25,8 @@ Plug 'sheerun/vim-polyglot'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'ellisonleao/gruvbox.nvim'
-
+Plug 'navarasu/onedark.nvim'
+Plug 'sainnhe/everforest'
 call plug#end()
 
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
@@ -40,8 +41,9 @@ nmap <C-s> :w<CR>
 nmap <C-w> :q<CR>
 
 set background=dark
-"colorscheme tokyonight-night
-colorscheme gruvbox
+colorscheme everforest
+"colorscheme tokyonight-storm
+"colorscheme gruvbox
 set backspace=indent,eol,start
 set hidden                    
 set ruler                     
@@ -262,4 +264,8 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 lua require'config'
+
+
+"This unsets the "last search pattern" register by hitting return
+nnoremap <CR> :noh<CR><CR>
 
