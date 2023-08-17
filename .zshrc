@@ -1,8 +1,10 @@
 autoload -Uz compinit && compinit
 
-if which oh-my-posh >/dev/null; then
-        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/M365Princess.omp.json)"
-fi
+#if which oh-my-posh >/dev/null; then
+#        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/tokyonight_storm.omp.json)"
+#fi
+
+export PROMPT="%n@%m %1~ %# "
 
 alias ll="ls -alFh --color=auto"
 alias la="ls -A --color=auto"
