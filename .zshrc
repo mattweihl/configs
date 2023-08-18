@@ -1,5 +1,8 @@
 autoload -Uz compinit && compinit
 
+export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
+
+
 #if which oh-my-posh >/dev/null; then
 #        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/tokyonight_storm.omp.json)"
 #fi
