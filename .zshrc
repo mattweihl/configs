@@ -1,6 +1,6 @@
 autoload -Uz compinit && compinit
 
-export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
+export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 
 #if which oh-my-posh >/dev/null; then
