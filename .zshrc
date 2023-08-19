@@ -1,13 +1,11 @@
 autoload -Uz compinit && compinit
 
-export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
-
-
 #if which oh-my-posh >/dev/null; then
 #        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/tokyonight_storm.omp.json)"
 #fi
 
 export PROMPT="%n@%m %1~ %# "
+export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 alias ll="ls -alFh --color=auto"
 alias la="ls -A --color=auto"
@@ -16,6 +14,7 @@ alias c="cd $CODE_LOCATION"
 alias gs="git status"
 alias gb='git branch'
 alias dt="cd $DESKTOP"
+alias configs="cd $HOME/configs"
 
 if [ -d "$HOME/Dropbox" ]; then
     alias db="cd ~/Dropbox"
@@ -27,7 +26,7 @@ then
 fi
 
 export EDITOR="nvim"
-export LSCOLORS=GxFxCxDxBxegedabagaced
+#export LSCOLORS=GxFxCxDxBxegedabagaced
 
 autoload edit-command-line
 zle -N edit-command-line
@@ -42,5 +41,3 @@ SAVEHIST=1000
 
 bindkey -e 
 export CLICOLOR=1
-
-alias configs="cd $HOME/configs"
