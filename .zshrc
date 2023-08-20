@@ -4,8 +4,12 @@ autoload -Uz compinit && compinit
 #        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/tokyonight_storm.omp.json)"
 #fi
 
-export PROMPT="%n@%m %1~ %# "
+#export PROMPT="%n@%m %1~ %# "
 export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
+
+setopt PROMPT_SUBST
+export PROMPT='%F{green}%t%f %F{blue}%~%f %F{red}${vcs_info_msg_0_}%f$ '
+
 
 alias ll="ls -alFh --color=auto"
 alias la="ls -A --color=auto"
