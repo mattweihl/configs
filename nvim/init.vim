@@ -15,7 +15,6 @@ Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'github/copilot.vim'
 Plug 'folke/tokyonight.nvim'
 Plug 'jiangmiao/auto-pairs' 
-
 Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 " CocInstall coc-json coc-tsserver coc-eslint
 Plug 'lewis6991/gitsigns.nvim'
@@ -24,9 +23,13 @@ Plug 'romgrk/barbar.nvim'
 Plug 'sheerun/vim-polyglot'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'LinArcX/telescope-command-palette.nvim'
 Plug 'ellisonleao/gruvbox.nvim'
 Plug 'navarasu/onedark.nvim'
 Plug 'sainnhe/everforest'
+Plug 'nvim-lualine/lualine.nvim'
+" If you want to have icons in your statusline choose one of these
+Plug 'nvim-tree/nvim-web-devicons'
 call plug#end()
 
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
@@ -40,9 +43,9 @@ nmap <C-n> :NERDTreeToggle<CR>
 " nmap <C-w> :q<CR>
 
 set background=dark
-colorscheme everforest
+"colorscheme everforest
 "colorscheme tokyonight-storm
-"colorscheme gruvbox
+colorscheme gruvbox
 set backspace=indent,eol,start
 set hidden                    
 set ruler                     
@@ -104,13 +107,13 @@ nmap <silent> <leader>qq :qa!<CR>
 nmap <silent> <leader>wq :wqa!<CR>
 nmap <silent> <leader>ww :w!<CR>
 
-function! StartUp()
-    if 0 == argc()
-        NERDTree
-    end
-endfunction
-
-autocmd VimEnter * call StartUp()
+"function! StartUp()
+"    if 0 == argc()
+"        NERDTree
+"    end
+"endfunction
+"
+"autocmd VimEnter * call StartUp()
 
 " Use tab for trigger completion with characters ahead and navigate
 " NOTE: There's always complete item selected by default, you may want to enable
