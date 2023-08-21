@@ -24,9 +24,14 @@ if [ -d "$HOME/Dropbox" ]; then
     alias db="cd ~/Dropbox"
 fi
 
-if command -v nvim &> /dev/null
+#if command -v nvim &> /dev/null
+#then
+#    alias vim="nvim"
+#fi
+
+if command -v lvim &> /dev/null
 then
-    alias vim="nvim"
+    alias vim="lvim"
 fi
 
 export EDITOR="nvim"

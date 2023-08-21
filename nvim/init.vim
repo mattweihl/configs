@@ -34,11 +34,10 @@ nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
-
 inoremap jk <ESC>
 nmap <C-n> :NERDTreeToggle<CR>
-nmap <C-s> :w<CR>
-nmap <C-w> :q<CR>
+" nmap <C-s> :w<CR>
+" nmap <C-w> :q<CR>
 
 set background=dark
 colorscheme everforest
