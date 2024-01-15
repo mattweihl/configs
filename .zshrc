@@ -5,6 +5,7 @@ autoload -Uz compinit && compinit
 #fi
 
 #export PROMPT="%n@%m %1~ %# "
+#
 export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 setopt PROMPT_SUBST
@@ -50,3 +51,7 @@ SAVEHIST=1000
 
 bindkey -e 
 export CLICOLOR=1
+
+if [ -n "$TMUX" ]; then
+    alias e='tmux split-window -h nvim $@'
+fi

@@ -43,9 +43,9 @@ nmap <C-n> :NERDTreeToggle<CR>
 " nmap <C-w> :q<CR>
 
 set background=dark
-"colorscheme everforest
+colorscheme everforest
 "colorscheme tokyonight-storm
-colorscheme gruvbox
+"colorscheme gruvbox
 set backspace=indent,eol,start
 set hidden                    
 set ruler                     
