@@ -21,8 +21,8 @@ alias gb='git branch'
 alias dt="cd $DESKTOP"
 alias configs="cd $HOME/configs"
 
-if [ -d "$HOME/Dropbox" ]; then
-    alias db="cd ~/Dropbox"
+if [ -d "$HOME/iCloud" ]; then
+    alias icloud="cd ~/iCloud"
 fi
 
 if command -v nvim &> /dev/null
