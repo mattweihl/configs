@@ -30,6 +30,7 @@ Plug 'sainnhe/everforest'
 Plug 'nvim-lualine/lualine.nvim'
 " If you want to have icons in your statusline choose one of these
 Plug 'nvim-tree/nvim-web-devicons'
+Plug 'cocopon/iceberg.vim'
 call plug#end()
 
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
@@ -43,7 +44,8 @@ nmap <C-n> :NERDTreeToggle<CR>
 " nmap <C-w> :q<CR>
 
 set background=dark
-colorscheme everforest
+"colorscheme everforest
+colorscheme iceberg 
 "colorscheme tokyonight-storm
 "colorscheme gruvbox
 set backspace=indent,eol,start
