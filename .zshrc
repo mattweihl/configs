@@ -1,4 +1,4 @@
-autoload -Uz compinit && compinit
+# autoload -Uz compinit && compinit
 
 #if which oh-my-posh >/dev/null; then
 #        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/tokyonight_storm.omp.json)"
@@ -55,3 +55,5 @@ export CLICOLOR=1
 if [ -n "$TMUX" ]; then
     alias e='tmux split-window -h nvim $@'
 fi
+
+source $HOME/configs/zsh-autocomplete/zsh-autocomplete.plugin.zsh
