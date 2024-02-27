@@ -56,4 +56,4 @@ if [ -n "$TMUX" ]; then
     alias e='tmux split-window -h nvim $@'
 fi
 
-source $HOME/configs/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# source $HOME/configs/zsh-autocomplete/zsh-autocomplete.plugin.zsh
