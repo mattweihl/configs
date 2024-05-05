@@ -28,7 +28,6 @@ Plug 'ellisonleao/gruvbox.nvim'
 Plug 'navarasu/onedark.nvim'
 Plug 'sainnhe/everforest'
 Plug 'nvim-lualine/lualine.nvim'
-" If you want to have icons in your statusline choose one of these
 Plug 'nvim-tree/nvim-web-devicons'
 Plug 'cocopon/iceberg.vim'
 call plug#end()
@@ -45,9 +44,10 @@ nmap <C-n> :NERDTreeToggle<CR>
 
 set background=dark
 "colorscheme everforest
-colorscheme iceberg 
+"colorscheme iceberg 
 "colorscheme tokyonight-storm
 "colorscheme gruvbox
+colorscheme onehalfdark
 set backspace=indent,eol,start
 set hidden                    
 set ruler                     

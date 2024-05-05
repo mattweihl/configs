@@ -1,11 +1,8 @@
-# autoload -Uz compinit && compinit
 
 #if which oh-my-posh >/dev/null; then
 #        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/tokyonight_storm.omp.json)"
 #fi
 
-#export PROMPT="%n@%m %1~ %# "
-#
 export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 setopt PROMPT_SUBST
@@ -30,13 +27,7 @@ then
     alias vim="nvim"
 fi
 
-#if command -v lvim &> /dev/null
-#then
-#    alias vim="lvim"
-#fi
-
 export EDITOR="nvim"
-#export LSCOLORS=GxFxCxDxBxegedabagaced
 
 autoload edit-command-line
 zle -N edit-command-line
@@ -55,5 +46,3 @@ export CLICOLOR=1
 if [ -n "$TMUX" ]; then
     alias e='tmux split-window -h nvim $@'
 fi
-
-# source $HOME/configs/zsh-autocomplete/zsh-autocomplete.plugin.zsh
