@@ -1,13 +1,7 @@
-
-#if which oh-my-posh >/dev/null; then
-#        eval "$(oh-my-posh init zsh --config $HOME/configs/oh-my-posh-themes/tokyonight_storm.omp.json)"
-#fi
-
 export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 setopt PROMPT_SUBST
 export PROMPT='%F{green}%t%f %F{blue}%~%f %F{red}${vcs_info_msg_0_}%f$ '
-
 
 alias ll="ls -alFh --color=auto"
 alias la="ls -A --color=auto"
@@ -22,12 +16,12 @@ if [ -d "$HOME/iCloud" ]; then
     alias icloud="cd ~/iCloud"
 fi
 
+export EDITOR='vim'
 if command -v nvim &> /dev/null
 then
     alias vim="nvim"
+    export EDITOR="nvim"
 fi
-
-export EDITOR="nvim"
 
 autoload edit-command-line
 zle -N edit-command-line
