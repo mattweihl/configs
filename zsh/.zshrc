@@ -14,18 +14,18 @@ alias configs="cd $HOME/configs"
 
 
 export EDITOR='vim'
-if command -v lvim &> /dev/null
-then
-    alias vim="lvim"
-    export EDITOR="lvim"
-fi
 
-
-#if command -v nvim &> /dev/null
+#if command -v lvim &> /dev/null
 #then
-#    alias vim="nvim"
-#    export EDITOR="nvim"
+#    alias vim="lvim"
+#    export EDITOR="lvim"
 #fi
+
+if command -v nvim &> /dev/null
+then
+    alias vim="nvim"
+    export EDITOR="nvim"
+fi
 
 autoload edit-command-line
 zle -N edit-command-line
