@@ -37,3 +37,4 @@ end)
 lvim.builtin.cmp.mapping["<Tab>"] = on_tab
 
 lvim.leader = "\\"
+lvim.colorscheme = "slate"
