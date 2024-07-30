@@ -12,9 +12,6 @@ alias gb='git branch'
 alias dt="cd $DESKTOP"
 alias configs="cd $HOME/configs"
 
-if [ -d "$HOME/iCloud" ]; then
-    alias icloud="cd ~/iCloud"
-fi
 
 export EDITOR='vim'
 if command -v nvim &> /dev/null

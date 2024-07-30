@@ -5,7 +5,6 @@ syntax on
 
 runtime macros/matchit.vim
 
-" Plugins
 call plug#begin()
 
 Plug 'ojroques/vim-oscyank', {'branch': 'main'}
@@ -39,14 +38,9 @@ nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
 inoremap jk <ESC>
 nmap <C-n> :NERDTreeToggle<CR>
-" nmap <C-s> :w<CR>
-" nmap <C-w> :q<CR>
 
 set background=dark
-"colorscheme everforest
-"colorscheme iceberg 
-"colorscheme tokyonight-storm
-"colorscheme gruvbox
+
 colorscheme onehalfdark
 set backspace=indent,eol,start
 set hidden                    
@@ -81,8 +75,6 @@ set statusline+=%=
 set statusline+=\ ascii:\ %b\ hex:\ 0x%B\ row:\ %l\ col:\ %c\ percent:\ %p%%
 set laststatus=3
 
-"autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | execute 'OSCYankRegister"' | endif
-
 autocmd TextYankPost * if v:event.operator == 'y' && v:event.regname == ''
                         \ | if exists(':OSCYankRegister') == 2
                         \ |     execute 'OSCYankRegister"'
@@ -90,7 +82,6 @@ autocmd TextYankPost * if v:event.operator == 'y' && v:event.regname == ''
                         \ |     execute 'OSCYankReg"'
                         \ | endif
                         \ | endif
-
 
 if !exists('*ReloadConfig')
     function! ReloadConfig()
@@ -103,19 +94,10 @@ if !exists('*ReloadConfig')
 endif
 nmap <silent> <leader>rr :call ReloadConfig()<CR>
 
-
 nmap <silent> <leader>q :q!<CR>
 nmap <silent> <leader>qq :qa!<CR>
 nmap <silent> <leader>wq :wqa!<CR>
 nmap <silent> <leader>ww :w!<CR>
-
-"function! StartUp()
-"    if 0 == argc()
-"        NERDTree
-"    end
-"endfunction
-"
-"autocmd VimEnter * call StartUp()
 
 " Use tab for trigger completion with characters ahead and navigate
 " NOTE: There's always complete item selected by default, you may want to enable
@@ -273,5 +255,4 @@ lua require'config'
 "This unsets the "last search pattern" register by hitting return
 nnoremap <CR> :noh<CR><CR>
 
-let NERDTreeShowHidden=1
-
+let NERDTreeShowHidden=0
