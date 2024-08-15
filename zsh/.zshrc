@@ -12,7 +12,6 @@ alias gb='git branch'
 alias dt="cd $DESKTOP"
 alias configs="cd $HOME/configs"
 
-
 export EDITOR='vim'
 
 #if command -v lvim &> /dev/null
@@ -20,6 +19,11 @@ export EDITOR='vim'
 #    alias vim="lvim"
 #    export EDITOR="lvim"
 #fi
+
+if command -v fzf &> /dev/null
+then
+    source <(fzf --zsh)
+fi
 
 if command -v nvim &> /dev/null
 then

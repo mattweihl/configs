@@ -106,4 +106,5 @@ require('lualine').setup {
   extensions = {}
 }
 require('telescope').load_extension('command_palette')
+require("ibl").setup()
 

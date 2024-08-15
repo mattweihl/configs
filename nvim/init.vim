@@ -15,7 +15,6 @@ Plug 'github/copilot.vim'
 Plug 'folke/tokyonight.nvim'
 Plug 'jiangmiao/auto-pairs' 
 Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
-" CocInstall coc-json coc-tsserver coc-eslint
 Plug 'lewis6991/gitsigns.nvim'
 Plug 'nvim-tree/nvim-web-devicons'
 Plug 'romgrk/barbar.nvim'
@@ -29,7 +28,10 @@ Plug 'sainnhe/everforest'
 Plug 'nvim-lualine/lualine.nvim'
 Plug 'nvim-tree/nvim-web-devicons'
 Plug 'cocopon/iceberg.vim'
+Plug 'lukas-reineke/indent-blankline.nvim'
 call plug#end()
+
+"let mapleader=" "
 
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
@@ -256,3 +258,4 @@ lua require'config'
 nnoremap <CR> :noh<CR><CR>
 
 let NERDTreeShowHidden=0
+
