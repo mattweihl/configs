@@ -29,19 +29,29 @@ alias gb='git branch'
 alias dt="cd $DESKTOP"
 alias configs="cd $HOME/configs"
 
-export EDITOR='vim'
+function tmux_dev() {
+  # First check to see if a session called 'dev' already is running
+  # If so, we will attach to it.
+  # If not, we will create a new session called 'dev'
+  # TODO: eventually hook into tmux-resurrect and tmux-continuum to restore the session
 
-#if command -v lvim &> /dev/null
-#then
-#    alias vim="lvim"
-#    export EDITOR="lvim"
-#fi
+  if tmux has-session -t dev 2>/dev/null; then
+    tmux attach -t dev
+  else
+    tmux new-session -s dev
+  fi
+}
+
+alias dev="tmux_dev"
+
+export EDITOR='vim'
 
 if command -v fzf &> /dev/null
 then
     source <(fzf --zsh)
 fi
 
+# Make neovim is installed first before making it the default editor and aliasing vim to neovim
 if command -v nvim &> /dev/null
 then
     alias vim="nvim"
