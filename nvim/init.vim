@@ -44,6 +44,7 @@ nmap <C-n> :NERDTreeToggle<CR>
 set background=dark
 
 colorscheme onehalfdark
+
 set backspace=indent,eol,start
 set hidden                    
 set ruler                     
