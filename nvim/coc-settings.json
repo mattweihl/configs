@@ -4,4 +4,5 @@
     "typescript.validate.enable": false,
     "javascript.preferences.quoteStyle": "single",
     "tsserver.maxTsServerMemory": 2048,
+    "typescript.suggestionActions.enabled": true,
 }
