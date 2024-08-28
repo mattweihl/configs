@@ -1,9 +1,3 @@
-export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
-
-setopt PROMPT_SUBST
-#export PROMPT='%F{green}%t%f %F{blue}%~%f %F{red}${vcs_info_msg_0_}%f$ '
-export PS1='%F{blue}%~ %(?.%F{green}.%F{red})%#%f '
-
 if command -v brew &>/dev/null; then
   theme_file="$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme"
   if [[ -f "$theme_file" ]]; then
@@ -19,6 +13,12 @@ if command -v brew &>/dev/null; then
   fi
 fi
 
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
+
+setopt PROMPT_SUBST
+export PROMPT='%F{green}%t%f %F{blue}%~%f %F{red}${vcs_info_msg_0_}%f$ '
 
 alias ll="ls -alFh --color=auto"
 alias la="ls -A --color=auto"
@@ -75,3 +75,4 @@ export CLICOLOR=1
 if [ -n "$TMUX" ]; then
     alias e='tmux split-window -h nvim $@'
 fi
+
