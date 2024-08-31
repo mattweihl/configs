@@ -11,7 +11,7 @@ Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 Plug 'ryanoasis/vim-devicons'
 Plug 'scrooloose/nerdtree'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
-Plug 'github/copilot.vim'
+"rPlug 'github/copilot.vim'
 Plug 'folke/tokyonight.nvim'
 Plug 'jiangmiao/auto-pairs' 
 Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
