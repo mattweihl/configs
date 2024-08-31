@@ -12,6 +12,12 @@
 #
 #[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# Check to see if we're not in the Apple Terminal and oh-my-posh is installed
+# we don't want to run oh-my-posh in the Apple Terminal because of its limited character support
+if [ "$TERM_PROGRAM" != "Apple_Terminal" ] && command -v oh-my-posh &> /dev/null; then
+  eval "$(oh-my-posh init zsh --config $HOME/configs/zsh/oh-my-posh/gruvbox.omp.json)"
+fi
+
 export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 setopt PROMPT_SUBST
