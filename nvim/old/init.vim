@@ -1,3 +1,5 @@
+set nocompatible
+
 filetype plugin indent on
 syntax on
 
@@ -5,32 +7,32 @@ runtime macros/matchit.vim
 
 call plug#begin()
 
-" UI and Appearance
+Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 Plug 'ryanoasis/vim-devicons'
-Plug 'nvim-tree/nvim-web-devicons'
-Plug 'romgrk/barbar.nvim'
-Plug 'nvim-lualine/lualine.nvim'
-Plug 'lukas-reineke/indent-blankline.nvim'
-Plug 'ellisonleao/gruvbox.nvim'
+Plug 'scrooloose/nerdtree'
 Plug 'sonph/onehalf', { 'rtp': 'vim' }
 Plug 'folke/tokyonight.nvim'
-
-" File Explorer and Search
-Plug 'scrooloose/nerdtree'
+Plug 'jiangmiao/auto-pairs' 
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
+Plug 'lewis6991/gitsigns.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
+Plug 'romgrk/barbar.nvim'
+Plug 'sheerun/vim-polyglot'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'LinArcX/telescope-command-palette.nvim'
-
-" Code Navigation and Editing
-Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
-Plug 'jiangmiao/auto-pairs'
-Plug 'sheerun/vim-polyglot'
-Plug 'lewis6991/gitsigns.nvim'
-
-" Other
-Plug 'ojroques/vim-oscyank', {'branch': 'main'}
+Plug 'ellisonleao/gruvbox.nvim'
+Plug 'navarasu/onedark.nvim'
+Plug 'sainnhe/everforest'
+Plug 'nvim-lualine/lualine.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
+Plug 'cocopon/iceberg.vim'
+Plug 'lukas-reineke/indent-blankline.nvim'
+"Plug 'github/copilot.vim'
 
 call plug#end()
+
+"let mapleader=" "
 
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
@@ -41,6 +43,8 @@ inoremap jk <ESC>
 nmap <C-n> :NERDTreeToggle<CR>
 
 set background=dark
+
+"colorscheme onehalfdark
 colorscheme gruvbox
 
 set backspace=indent,eol,start
@@ -61,8 +65,6 @@ set list
 set listchars=tab:␉·
 set clipboard^=unnamed,unnamedplus
 set nobackup
-set nowritebackup
-set updatetime=300
 set history=1000
 set wildmode=list:longest
 set wildignore=*.docx,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx
@@ -71,6 +73,12 @@ set encoding=utf-8
 set fileencoding=utf-8
 set shortmess=FI
 set smarttab
+
+set statusline=
+set statusline+=\ %F\ %M\ %Y\ %R
+set statusline+=%=
+set statusline+=\ ascii:\ %b\ hex:\ 0x%B\ row:\ %l\ col:\ %c\ percent:\ %p%%
+set laststatus=3
 
 autocmd TextYankPost * if v:event.operator == 'y' && v:event.regname == ''
                         \ | if exists(':OSCYankRegister') == 2
@@ -91,11 +99,10 @@ if !exists('*ReloadConfig')
 endif
 nmap <silent> <leader>rr :call ReloadConfig()<CR>
 
-nnoremap <leader>q :q!<CR>
-nnoremap <leader>qq :qa!<CR>
-nnoremap <leader>wq :wqa!<CR>
-nnoremap <leader>ww :w!<CR>
-
+nmap <silent> <leader>q :q!<CR>
+nmap <silent> <leader>qq :qa!<CR>
+nmap <silent> <leader>wq :wqa!<CR>
+nmap <silent> <leader>ww :w!<CR>
 
 " Use tab for trigger completion with characters ahead and navigate
 " NOTE: There's always complete item selected by default, you may want to enable
@@ -125,6 +132,9 @@ else
   inoremap <silent><expr> <c-@> coc#refresh()
 endif
 
+set nobackup
+set nowritebackup
+set updatetime=300
 
 " Use `[g` and `]g` to navigate diagnostics
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list
@@ -245,6 +255,7 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 lua require'config'
+
 
 "This unsets the "last search pattern" register by hitting return
 nnoremap <CR> :noh<CR><CR>
