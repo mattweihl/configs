@@ -46,7 +46,7 @@ nmap <C-n> :NERDTreeToggle<CR>
 
 set background=dark
 
-colorscheme desert
+colorscheme gruvbox
 
 set backspace=indent,eol,start
 set hidden                    
