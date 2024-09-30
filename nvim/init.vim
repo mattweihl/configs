@@ -1,5 +1,3 @@
-set nocompatible
-
 filetype plugin indent on
 syntax on
 
@@ -8,26 +6,30 @@ runtime macros/matchit.vim
 call plug#begin()
 
 Plug 'ojroques/vim-oscyank', {'branch': 'main'}
-Plug 'ryanoasis/vim-devicons'
 Plug 'scrooloose/nerdtree'
-Plug 'sonph/onehalf', { 'rtp': 'vim' }
-Plug 'folke/tokyonight.nvim'
 Plug 'jiangmiao/auto-pairs' 
 Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'lewis6991/gitsigns.nvim'
-Plug 'nvim-tree/nvim-web-devicons'
 Plug 'romgrk/barbar.nvim'
 Plug 'sheerun/vim-polyglot'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'LinArcX/telescope-command-palette.nvim'
+Plug 'nvim-lualine/lualine.nvim'
+" Plug 'lukas-reineke/indent-blankline.nvim'
+
+" Icons
+Plug 'ryanoasis/vim-devicons'
+Plug 'nvim-tree/nvim-web-devicons'
+
+" Colorschemes 
+Plug 'sonph/onehalf', { 'rtp': 'vim' }
+Plug 'folke/tokyonight.nvim'
 Plug 'ellisonleao/gruvbox.nvim'
 Plug 'navarasu/onedark.nvim'
 Plug 'sainnhe/everforest'
-Plug 'nvim-lualine/lualine.nvim'
-Plug 'nvim-tree/nvim-web-devicons'
 Plug 'cocopon/iceberg.vim'
-Plug 'lukas-reineke/indent-blankline.nvim'
+
 "Plug 'github/copilot.vim'
 
 call plug#end()
@@ -44,7 +46,7 @@ nmap <C-n> :NERDTreeToggle<CR>
 
 set background=dark
 
-colorscheme everforest
+colorscheme desert
 
 set backspace=indent,eol,start
 set hidden                    
@@ -72,12 +74,6 @@ set encoding=utf-8
 set fileencoding=utf-8
 set shortmess=FI
 set smarttab
-
-set statusline=
-set statusline+=\ %F\ %M\ %Y\ %R
-set statusline+=%=
-set statusline+=\ ascii:\ %b\ hex:\ 0x%B\ row:\ %l\ col:\ %c\ percent:\ %p%%
-set laststatus=3
 
 autocmd TextYankPost * if v:event.operator == 'y' && v:event.regname == ''
                         \ | if exists(':OSCYankRegister') == 2
