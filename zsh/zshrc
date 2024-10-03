@@ -10,7 +10,6 @@ alias c="cd $CODE_LOCATION"
 alias gs="git status"
 alias gb='git branch'
 alias dt="cd $DESKTOP"
-alias configs="cd $HOME/configs"
 
 function tmux_dev() {
   if tmux has-session -t dev 2>/dev/null; then
