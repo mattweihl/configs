@@ -11,27 +11,15 @@ alias gs="git status"
 alias gb='git branch'
 alias dt="cd $DESKTOP"
 
-function tmux_dev() {
-  if tmux has-session -t dev 2>/dev/null; then
-    tmux attach -t dev
-  else
-    tmux new-session -s dev
-  fi
-}
-
-alias dev="tmux_dev"
-
-export EDITOR='vim'
 
 if command -v fzf &> /dev/null
 then
     source <(fzf --zsh)
 fi
 
-# Make neovim is installed first before making it the default editor and aliasing vim to neovim
+export EDITOR='vim'
 if command -v nvim &> /dev/null
 then
-    alias vim="nvim"
     export EDITOR="nvim"
 fi
 
