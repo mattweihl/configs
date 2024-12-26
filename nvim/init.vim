@@ -255,5 +255,5 @@ lua require'config'
 "This unsets the "last search pattern" register by hitting return
 nnoremap <CR> :noh<CR><CR>
 
-let NERDTreeShowHidden=0
+let NERDTreeShowHidden=1
 
