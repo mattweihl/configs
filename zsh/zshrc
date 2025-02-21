@@ -11,7 +11,6 @@ alias gs="git status"
 alias gb='git branch'
 alias dt="cd $DESKTOP"
 
-
 if command -v fzf &> /dev/null
 then
     source <(fzf --zsh)
@@ -21,6 +20,7 @@ export EDITOR='vim'
 if command -v nvim &> /dev/null
 then
     export EDITOR="nvim"
+    alias vim='nvim'
 fi
 
 autoload edit-command-line
