@@ -1,4 +1,10 @@
-require('telescope').setup{
+--[[
+Neovim Lua Configuration
+--]]
+
+-- Telescope Configuration
+-- ----------------------------------------------------------------------------
+require('telescope').setup {
   defaults = {
     vimgrep_arguments = {
       'rg',
@@ -18,7 +24,10 @@ require('telescope').setup{
   pickers = {
     find_files = {
       find_command = {
-        'rg', '--files', '--hidden', '--no-ignore', '--glob=!node_modules/*', '--glob=!node-offline-mirror/*', '--glob=!node-packages/*'
+        'rg', '--files', '--hidden', '--no-ignore', 
+        '--glob=!node_modules/*', 
+        '--glob=!node-offline-mirror/*', 
+        '--glob=!node-packages/*'
       }
     },
   },
@@ -49,7 +58,7 @@ require('telescope').setup{
         { "commands", ":lua require('telescope.builtin').commands()" },
         { "command history", ":lua require('telescope.builtin').command_history()" },
         { "registers (A-e)", ":lua require('telescope.builtin').registers()" },
-        { "colorshceme", ":lua require('telescope.builtin').colorscheme()", 1 },
+        { "colorscheme", ":lua require('telescope.builtin').colorscheme()", 1 },
         { "vim options", ":lua require('telescope.builtin').vim_options()" },
         { "keymaps", ":lua require('telescope.builtin').keymaps()" },
         { "buffers", ":Telescope buffers" },
@@ -65,12 +74,17 @@ require('telescope').setup{
   }
 }
 
+-- Load Telescope Extensions
+require('telescope').load_extension('command_palette')
+
+-- Lualine Configuration
+-- ----------------------------------------------------------------------------
 require('lualine').setup {
   options = {
     icons_enabled = true,
     theme = 'auto',
-    component_separators = { left = '', right = ''},
-    section_separators = { left = '', right = ''},
+    component_separators = { left = '', right = ''},
+    section_separators = { left = '', right = ''},
     disabled_filetypes = {
       statusline = {},
       winbar = {},
@@ -105,6 +119,12 @@ require('lualine').setup {
   inactive_winbar = {},
   extensions = {}
 }
-require('telescope').load_extension('command_palette')
+
+-- Gitsigns Configuration (initialize but don't configure yet)
+-- ----------------------------------------------------------------------------
+require('gitsigns').setup()
+
+-- Indent-blankline (commented out but ready to use)
+-- ----------------------------------------------------------------------------
 -- require("ibl").setup()
 
