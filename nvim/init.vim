@@ -22,6 +22,7 @@ Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'lewis6991/gitsigns.nvim'
 Plug 'romgrk/barbar.nvim'
 Plug 'sheerun/vim-polyglot'
+Plug 'folke/trouble.nvim'
 
 " Telescope and dependencies
 Plug 'nvim-lua/plenary.nvim'
@@ -51,7 +52,7 @@ call plug#end()
 " Appearance
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set background=dark
-colorscheme tokyonight-storm 
+colorscheme tokyonight-moon 
 set number
 set cursorline
 set list
