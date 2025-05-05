@@ -52,7 +52,7 @@ call plug#end()
 " Appearance
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set background=dark
-colorscheme tokyonight-moon 
+colorscheme tokyonight-night 
 set number
 set cursorline
 set list
