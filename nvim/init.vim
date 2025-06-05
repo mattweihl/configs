@@ -52,7 +52,7 @@ call plug#end()
 " Appearance
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set background=dark
-colorscheme tokyonight-night 
+colorscheme gruvbox 
 set number
 set cursorline
 set list
