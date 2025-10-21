@@ -45,14 +45,19 @@ Plug 'navarasu/onedark.nvim'
 Plug 'sainnhe/everforest'
 Plug 'cocopon/iceberg.vim'
 
+" Theme switcher
+Plug 'zaldih/themery.nvim'
+
 " AI assistants
 "Plug 'github/copilot.vim'
+Plug 'xTacobaco/cursor-agent.nvim'
 call plug#end()
 
 " Appearance
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set background=dark
-colorscheme gruvbox 
+"  colorscheme gruvbox 
+colorscheme everforest
 set number
 set cursorline
 set list
@@ -126,6 +131,10 @@ nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+
+" Cursor Agent
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <leader>ca <cmd>CursorAgentToggle<cr>
 
 " OSC Yank (for terminal copy)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
