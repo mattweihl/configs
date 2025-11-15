@@ -44,6 +44,7 @@ Plug 'ellisonleao/gruvbox.nvim'
 Plug 'navarasu/onedark.nvim'
 Plug 'sainnhe/everforest'
 Plug 'cocopon/iceberg.vim'
+Plug 'folke/tokyonight.nvim'
 
 " Theme switcher
 Plug 'zaldih/themery.nvim'
@@ -55,9 +56,9 @@ call plug#end()
 
 " Appearance
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set background=dark
+set background=light
 "  colorscheme gruvbox 
-colorscheme everforest
+colorscheme tokyonight-day
 set number
 set cursorline
 set list
