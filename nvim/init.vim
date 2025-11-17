@@ -57,8 +57,7 @@ call plug#end()
 " Appearance
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set background=light
-"  colorscheme gruvbox 
-colorscheme tokyonight-day
+colorscheme gruvbox 
 set number
 set cursorline
 set list
