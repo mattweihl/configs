@@ -265,3 +265,6 @@ let NERDTreeShowHidden=1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 lua require'config'
 
+" Disable AutoPairs by default
+let g:AutoPairs = {}
+
