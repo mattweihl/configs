@@ -44,20 +44,15 @@ Plug 'ellisonleao/gruvbox.nvim'
 Plug 'navarasu/onedark.nvim'
 Plug 'sainnhe/everforest'
 Plug 'cocopon/iceberg.vim'
-Plug 'folke/tokyonight.nvim'
-
-" Theme switcher
-Plug 'zaldih/themery.nvim'
 
 " AI assistants
-"Plug 'github/copilot.vim'
 Plug 'xTacobaco/cursor-agent.nvim'
 call plug#end()
 
 " Appearance
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set background=light
-colorscheme gruvbox 
+" set background=light
+colorscheme retrobox 
 set number
 set cursorline
 set list
