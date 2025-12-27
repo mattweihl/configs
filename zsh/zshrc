@@ -1,7 +1,29 @@
 export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 setopt PROMPT_SUBST
-export PROMPT='%F{green}%t%f %F{blue}%~%f %F{red}${vcs_info_msg_0_}%f$ '
+autoload -Uz add-zsh-hook vcs_info
+zmodload zsh/datetime 2>/dev/null  # provides strftime
+
+zstyle ':vcs_info:git:*' formats '(%b)'
+
+_prompt_update() {
+  TIME_SAFE=$(strftime '%I:%M%p' $EPOCHSECONDS)
+  TIME_SAFE=${TIME_SAFE#0}
+
+  vcs_info
+  local msg=$vcs_info_msg_0_
+
+  # Keep PROMPT_SUBST safe-ish: prevent prompt escapes and substitutions from VCS text
+  msg=${msg//\%/%%}
+  msg=${msg//\$/\\$}
+  msg=${msg//\`/\\\`}   # avoid `...` command substitution
+
+  VCS_SAFE=$msg
+}
+
+add-zsh-hook precmd _prompt_update
+
+PROMPT=$'%F{green}${TIME_SAFE}%f %F{blue}%~%f%F{red}${VCS_SAFE:+ ${VCS_SAFE}}%f\n$ '
 
 alias ll="ls -alFh --color=auto"
 alias la="ls -A --color=auto"
