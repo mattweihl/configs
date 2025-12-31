@@ -52,7 +52,7 @@ call plug#end()
 " Appearance
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " set background=light
-colorscheme retrobox 
+colorscheme gruvbox 
 set number
 set cursorline
 set list
