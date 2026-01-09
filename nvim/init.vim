@@ -31,7 +31,6 @@ Plug 'LinArcX/telescope-command-palette.nvim'
 
 " UI enhancements
 Plug 'nvim-lualine/lualine.nvim'
-" Plug 'lukas-reineke/indent-blankline.nvim'
 
 " Icons
 Plug 'ryanoasis/vim-devicons'
@@ -45,8 +44,6 @@ Plug 'navarasu/onedark.nvim'
 Plug 'sainnhe/everforest'
 Plug 'cocopon/iceberg.vim'
 
-" AI assistants
-Plug 'xTacobaco/cursor-agent.nvim'
 call plug#end()
 
 " Appearance
@@ -126,10 +123,6 @@ nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-
-" Cursor Agent
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <leader>ca <cmd>CursorAgentToggle<cr>
 
 " OSC Yank (for terminal copy)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
