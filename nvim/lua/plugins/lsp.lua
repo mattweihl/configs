@@ -11,25 +11,22 @@ return {
     end,
   },
 
-  -- Bridge mason with lspconfig
+  -- Bridge mason with native LSP
   {
     "williamboman/mason-lspconfig.nvim",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "williamboman/mason.nvim",
-      "neovim/nvim-lspconfig",
       "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
-      local lspconfig = require("lspconfig")
-      local cmp_lsp = require("cmp_nvim_lsp")
-      local capabilities = cmp_lsp.default_capabilities()
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       -- Shared on_attach for all LSP servers
       local on_attach = function(client, bufnr)
         local opts = { buffer = bufnr, silent = true }
 
-        -- Navigation (same keybindings as old CoC config)
+        -- Navigation
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
         vim.keymap.set("n", "gy", vim.lsp.buf.type_definition, vim.tbl_extend("force", opts, { desc = "Go to type definition" }))
         vim.keymap.set("n", "gi", vim.lsp.buf.implementation, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
@@ -65,37 +62,27 @@ return {
         end
       end
 
-      -- Disable automatic_enable so we control setup ourselves
-      require("mason-lspconfig").setup({
-        ensure_installed = {
-          "ts_ls",
-          "pyright",
-          "html",
-          "cssls",
-          "tailwindcss",
-          "emmet_ls",
-          "eslint",
-          "lua_ls",
-          "jsonls",
-        },
-        automatic_enable = false,
+      -- LspAttach autocmd to run on_attach for all servers
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client then
+            on_attach(client, args.buf)
+          end
+        end,
       })
 
-      -- Default config shared by all servers
-      local default_config = {
-        capabilities = capabilities,
-        on_attach = on_attach,
-      }
-
-      -- Server-specific overrides
+      -- Configure LSP servers using native vim.lsp.config (Neovim 0.11+)
       local server_configs = {
         ts_ls = {
+          capabilities = capabilities,
           settings = {
             typescript = { preferences = { quoteStyle = "single" } },
             javascript = { preferences = { quoteStyle = "single" } },
           },
         },
         pyright = {
+          capabilities = capabilities,
           settings = {
             python = {
               analysis = {
@@ -106,6 +93,7 @@ return {
           },
         },
         lua_ls = {
+          capabilities = capabilities,
           settings = {
             Lua = {
               runtime = { version = "LuaJIT" },
@@ -119,39 +107,74 @@ return {
           },
         },
         emmet_ls = {
+          capabilities = capabilities,
           filetypes = {
             "html", "css", "scss", "javascript", "javascriptreact",
             "typescript", "typescriptreact", "svelte", "vue",
           },
         },
         eslint = {
-          on_attach = function(client, bufnr)
-            on_attach(client, bufnr)
-            vim.api.nvim_create_autocmd("BufWritePre", {
-              buffer = bufnr,
-              command = "EslintFixAll",
-            })
-          end,
+          capabilities = capabilities,
+        },
+        html = { capabilities = capabilities },
+        cssls = { capabilities = capabilities },
+        tailwindcss = { capabilities = capabilities },
+        jsonls = { capabilities = capabilities },
+        rust_analyzer = {
+          capabilities = capabilities,
+          settings = {
+            ["rust-analyzer"] = {
+              checkOnSave = { command = "clippy" },
+              cargo = { allFeatures = true },
+              procMacro = { enable = true },
+            },
+          },
+        },
+        clangd = {
+          capabilities = capabilities,
+          cmd = { "clangd", "--background-index", "--clang-tidy", "--header-insertion=iwyu" },
+        },
+        jdtls = {
+          capabilities = capabilities,
         },
       }
 
-      -- Setup each installed server
-      local installed = require("mason-lspconfig").get_installed_servers()
-      for _, server in ipairs(installed) do
-        local config = vim.tbl_deep_extend("force", default_config, server_configs[server] or {})
-        lspconfig[server].setup(config)
+      -- Register each server config with native API
+      for server, config in pairs(server_configs) do
+        vim.lsp.config(server, config)
       end
 
-      -- Also setup servers that might not be installed via mason yet
-      -- (handles first-run before mason installs them)
-      for server, config in pairs(server_configs) do
-        local merged = vim.tbl_deep_extend("force", default_config, config)
-        if not vim.list_contains(installed, server) then
-          pcall(function()
-            lspconfig[server].setup(merged)
-          end)
-        end
-      end
+      -- ESLint fix on save
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client and client.name == "eslint" then
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              buffer = args.buf,
+              command = "EslintFixAll",
+            })
+          end
+        end,
+      })
+
+      -- Mason-lspconfig: install servers and auto-enable them
+      require("mason-lspconfig").setup({
+        ensure_installed = {
+          "ts_ls",
+          "pyright",
+          "html",
+          "cssls",
+          "tailwindcss",
+          "emmet_ls",
+          "eslint",
+          "lua_ls",
+          "jsonls",
+          "rust_analyzer",
+          "clangd",
+          "jdtls",
+        },
+        automatic_enable = true,
+      })
 
       -- Diagnostic display settings (Neovim 0.11+ signs API)
       local nf = vim.g.have_nerd_font

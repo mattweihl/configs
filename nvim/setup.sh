@@ -76,7 +76,7 @@ if [ "$1" = "install" ]; then
 
   echo ""
   echo "[4/4] Installing treesitter parsers (this takes a minute)..."
-  PARSERS="javascript typescript tsx python html css scss json jsonc bash yaml toml regex gitignore diff"
+  PARSERS="javascript typescript tsx python html css scss json jsonc bash yaml toml regex gitignore diff rust c cpp java"
   for parser in $PARSERS; do
     echo "  Installing $parser..."
     nvim --headless \

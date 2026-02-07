@@ -30,6 +30,10 @@ return {
           markdown = { "prettier" },
           python = { "isort", "black" },
           lua = { "stylua" },
+          rust = { "rustfmt" },
+          c = { "clang-format" },
+          cpp = { "clang-format" },
+          java = { "google-java-format" },
         },
         format_on_save = function(bufnr)
           -- Skip if formatter is not installed (prevents freezing)
@@ -81,6 +85,8 @@ return {
           "isort",
           "ruff",
           "stylua",
+          "clang-format",
+          "google-java-format",
         },
         auto_update = false,
         run_on_start = true,

@@ -15,6 +15,9 @@ return {
         "vim", "vimdoc",
         "regex",
         "gitignore", "diff",
+        "rust",
+        "c", "cpp",
+        "java",
       }
       vim.cmd("TSInstall! " .. table.concat(parsers, " "))
     end,

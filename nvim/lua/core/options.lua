@@ -13,7 +13,7 @@ vim.g.have_nerd_font = false
 
 -- Line numbers
 opt.number = true
-opt.relativenumber = true
+opt.relativenumber = false
 
 -- Appearance
 opt.cursorline = true
