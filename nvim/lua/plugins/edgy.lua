@@ -22,7 +22,7 @@ return {
             return vim.b[buf].neo_tree_source == "git_status"
           end,
           pinned = true,
-          open = "Neotree position=right git_status",
+          open = "Neotree position=left git_status",
         },
         -- DAP UI panels
         { title = "Scopes", ft = "dapui_scopes", size = { height = 0.35 } },

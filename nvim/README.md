@@ -145,7 +145,7 @@ Leader key is **Space**. Press `<Space>?` to open the which-key modal showing al
 | `<Space>rn` | Normal | Rename symbol |
 | `<Space>ca` | Normal/Visual | Code action |
 | `<Space>cl` | Normal | Code lens |
-| `<Space>d` | Normal | Line diagnostics |
+| `<Space>cd` | Normal | Line diagnostics |
 | `[g` / `]g` | Normal | Previous/next diagnostic |
 | `<Space>cf` | Normal/Visual | Format file or selection |
 

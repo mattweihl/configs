@@ -44,7 +44,7 @@ return {
         vim.keymap.set("n", "<leader>cl", vim.lsp.codelens.run, vim.tbl_extend("force", opts, { desc = "Code lens" }))
 
         -- Diagnostics
-        vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Line diagnostics" }))
+        vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Line diagnostics" }))
 
         -- Highlight symbol under cursor
         if client.server_capabilities.documentHighlightProvider then

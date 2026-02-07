@@ -22,7 +22,7 @@ return {
       {
         "<leader>sr",
         function()
-          require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
+          require("grug-far").open({ prefills = { search = require("grug-far").get_current_visual_selection() } })
         end,
         mode = "v",
         desc = "Search visual selection",

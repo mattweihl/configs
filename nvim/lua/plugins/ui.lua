@@ -30,40 +30,22 @@ return {
     config = function()
       local nf = vim.g.have_nerd_font
 
-      -- Clickable panel buttons for the statusline
-      local panel_buttons = {
-        function()
-          if nf then
-            return " 󰙅  󰈞  󰊢  "
-          else
-            return "[Files] [Search] [Git] [Debug]"
-          end
-        end,
-        on_click = function(clicks, button, modifiers, pos)
-          -- Determine which icon was clicked based on cursor column within component
-          -- Each icon occupies ~4 chars with spacing
-          if nf then
-            if pos <= 4 then
-              vim.cmd("Neotree toggle")
-            elseif pos <= 8 then
-              require("grug-far").open()
-            elseif pos <= 12 then
-              vim.cmd("DiffviewOpen")
-            else
-              require("dapui").toggle()
-            end
-          else
-            if pos <= 7 then
-              vim.cmd("Neotree toggle")
-            elseif pos <= 15 then
-              require("grug-far").open()
-            elseif pos <= 20 then
-              vim.cmd("DiffviewOpen")
-            else
-              require("dapui").toggle()
-            end
-          end
-        end,
+      -- Clickable panel buttons — each is a separate component so on_click works
+      local btn_files = {
+        function() return nf and "󰙅 " or "[Files]" end,
+        on_click = function() vim.cmd("Neotree toggle") end,
+      }
+      local btn_search = {
+        function() return nf and "󰈞 " or "[Search]" end,
+        on_click = function() require("grug-far").open() end,
+      }
+      local btn_git = {
+        function() return nf and "󰊢 " or "[Git]" end,
+        on_click = function() vim.cmd("DiffviewOpen") end,
+      }
+      local btn_debug = {
+        function() return nf and" " or "[Debug]" end,
+        on_click = function() require("dapui").toggle() end,
       }
 
       require("lualine").setup({
@@ -98,7 +80,7 @@ return {
           },
           lualine_c = { { "filename", path = 1 } },
           lualine_x = { "encoding", "fileformat", "filetype" },
-          lualine_y = { panel_buttons, "progress" },
+          lualine_y = { btn_files, btn_search, btn_git, btn_debug, "progress" },
           lualine_z = { "location" },
         },
       })
