@@ -4,7 +4,7 @@ return {
     branch = "v3.x",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
+      { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
       "MunifTanjim/nui.nvim",
     },
     keys = {
@@ -35,8 +35,14 @@ return {
           },
         },
         default_component_configs = {
+          icon = {
+            folder_closed = vim.g.have_nerd_font and "" or ">",
+            folder_open = vim.g.have_nerd_font and "" or "v",
+            folder_empty = vim.g.have_nerd_font and "󰜌" or "-",
+            default = vim.g.have_nerd_font and "*" or " ",
+          },
           git_status = {
-            symbols = {
+            symbols = vim.g.have_nerd_font and {
               added = "✚",
               modified = "",
               deleted = "✖",
@@ -46,6 +52,16 @@ return {
               unstaged = "󰄱",
               staged = "",
               conflict = "",
+            } or {
+              added = "+",
+              modified = "~",
+              deleted = "x",
+              renamed = ">",
+              untracked = "?",
+              ignored = ".",
+              unstaged = "U",
+              staged = "S",
+              conflict = "!",
             },
           },
         },

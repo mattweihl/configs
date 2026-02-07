@@ -24,14 +24,17 @@ return {
   {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = {
+      { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
+    },
     config = function()
+      local nf = vim.g.have_nerd_font
       require("lualine").setup({
         options = {
-          icons_enabled = true,
+          icons_enabled = nf,
           theme = "auto",
-          component_separators = { left = "", right = "" },
-          section_separators = { left = "", right = "" },
+          component_separators = nf and { left = "", right = "" } or { left = "|", right = "|" },
+          section_separators = nf and { left = "", right = "" } or { left = "", right = "" },
           globalstatus = true,
         },
         sections = {
@@ -46,27 +49,29 @@ return {
     end,
   },
 
-  -- Buffer tabs (kept from old config)
+  -- Buffer tabs
   {
     "romgrk/barbar.nvim",
     event = "VeryLazy",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = {
+      { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
+    },
     init = function()
       vim.g.barbar_auto_setup = false
     end,
     config = function()
       require("barbar").setup({
-        animation = false, -- faster
+        animation = false,
         auto_hide = false,
         clickable = true,
         icons = {
           buffer_index = false,
-          filetype = { enabled = true },
+          filetype = { enabled = vim.g.have_nerd_font },
           separator = { left = "▎", right = "" },
           modified = { button = "●" },
-          pinned = { button = "📌", filename = true },
+          pinned = { button = vim.g.have_nerd_font and "" or "*", filename = true },
           diagnostics = {
-            [vim.diagnostic.severity.ERROR] = { enabled = true, icon = " " },
+            [vim.diagnostic.severity.ERROR] = { enabled = true, icon = vim.g.have_nerd_font and " " or "E " },
             [vim.diagnostic.severity.WARN] = { enabled = false },
           },
         },
@@ -112,9 +117,10 @@ return {
     end,
   },
 
-  -- Icons
+  -- Icons (only loaded when Nerd Font is available)
   {
     "nvim-tree/nvim-web-devicons",
+    enabled = vim.g.have_nerd_font,
     lazy = true,
     config = function()
       require("nvim-web-devicons").setup({ default = true })
@@ -132,7 +138,12 @@ return {
       { "<leader>xq", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix list" },
     },
     config = function()
-      require("trouble").setup()
+      require("trouble").setup({
+        icons = {
+          folder_closed = vim.g.have_nerd_font and " " or "> ",
+          folder_open = vim.g.have_nerd_font and " " or "v ",
+        },
+      })
     end,
   },
 

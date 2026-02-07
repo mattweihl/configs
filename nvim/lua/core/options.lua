@@ -8,6 +8,9 @@ local opt = vim.opt
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Set to true if your terminal has a Nerd Font installed
+vim.g.have_nerd_font = false
+
 -- Line numbers
 opt.number = true
 opt.relativenumber = true

@@ -154,14 +154,15 @@ return {
       end
 
       -- Diagnostic display settings (Neovim 0.11+ signs API)
+      local nf = vim.g.have_nerd_font
       vim.diagnostic.config({
         virtual_text = { spacing = 4, prefix = "●" },
         signs = {
           text = {
-            [vim.diagnostic.severity.ERROR] = " ",
-            [vim.diagnostic.severity.WARN] = " ",
-            [vim.diagnostic.severity.HINT] = "󰌵 ",
-            [vim.diagnostic.severity.INFO] = " ",
+            [vim.diagnostic.severity.ERROR] = nf and " " or "E",
+            [vim.diagnostic.severity.WARN] = nf and " " or "W",
+            [vim.diagnostic.severity.HINT] = nf and "󰌵 " or "H",
+            [vim.diagnostic.severity.INFO] = nf and " " or "I",
           },
         },
         underline = true,

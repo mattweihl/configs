@@ -3,11 +3,12 @@ return {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },
     config = function()
+      local nf = vim.g.have_nerd_font
       require("gitsigns").setup({
         signs = {
           add = { text = "│" },
           change = { text = "│" },
-          delete = { text = "󰍵" },
+          delete = { text = nf and "󰍵" or "_" },
           topdelete = { text = "‾" },
           changedelete = { text = "~" },
         },
