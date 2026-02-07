@@ -8,8 +8,9 @@ local opt = vim.opt
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- Set to true if your terminal has a Nerd Font installed
-vim.g.have_nerd_font = false
+-- Nerd Font support: set NVIM_NERD_FONT=1 in your shell profile to enable
+-- e.g. export NVIM_NERD_FONT=1 in ~/.zshrc or ~/.bashrc
+vim.g.have_nerd_font = vim.env.NVIM_NERD_FONT == "1"
 
 -- Line numbers
 opt.number = true

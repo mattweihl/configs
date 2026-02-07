@@ -12,6 +12,23 @@ return {
       { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Toggle file explorer" },
       { "<leader>ge", "<cmd>Neotree git_status<cr>", desc = "Git explorer" },
     },
+    -- Load neo-tree early when nvim opens a directory (e.g. nvim .)
+    -- so its built-in netrw hijack can intercept cleanly
+    init = function()
+      if vim.fn.argc(-1) > 0 then
+        vim.api.nvim_create_autocmd("BufEnter", {
+          group = vim.api.nvim_create_augroup("NeoTreeDirectoryHijack", { clear = true }),
+          once = true,
+          callback = function()
+            if package.loaded["neo-tree"] then return end
+            local stat = vim.uv.fs_stat(vim.fn.argv(0))
+            if stat and stat.type == "directory" then
+              require("neo-tree")
+            end
+          end,
+        })
+      end
+    end,
     config = function()
       require("neo-tree").setup({
         close_if_last_window = true,
@@ -19,6 +36,7 @@ return {
         enable_git_status = true,
         enable_diagnostics = true,
         filesystem = {
+          hijack_netrw_behavior = "open_default",
           filtered_items = {
             visible = true,
             hide_dotfiles = false,
@@ -34,25 +52,17 @@ return {
             ["<space>"] = "none",
           },
         },
-        default_component_configs = {
+        -- Only override defaults when Nerd Font is off (ASCII fallbacks).
+        -- When Nerd Font is on, neo-tree's built-in icons work out of the box.
+        default_component_configs = not vim.g.have_nerd_font and {
           icon = {
-            folder_closed = vim.g.have_nerd_font and "" or ">",
-            folder_open = vim.g.have_nerd_font and "" or "v",
-            folder_empty = vim.g.have_nerd_font and "󰜌" or "-",
-            default = vim.g.have_nerd_font and "*" or " ",
+            folder_closed = ">",
+            folder_open = "v",
+            folder_empty = "-",
+            default = " ",
           },
           git_status = {
-            symbols = vim.g.have_nerd_font and {
-              added = "✚",
-              modified = "",
-              deleted = "✖",
-              renamed = "󰁕",
-              untracked = "",
-              ignored = "",
-              unstaged = "󰄱",
-              staged = "",
-              conflict = "",
-            } or {
+            symbols = {
               added = "+",
               modified = "~",
               deleted = "x",
@@ -64,7 +74,7 @@ return {
               conflict = "!",
             },
           },
-        },
+        } or {},
       })
     end,
   },

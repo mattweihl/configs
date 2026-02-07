@@ -34,12 +34,12 @@ The setup script creates a single symlink: `~/.config/nvim -> ~/Configs/nvim`
 
 Nerd Font icons are **off by default** for compatibility with terminals like macOS Terminal.app.
 
-To enable, edit `lua/core/options.lua`:
-```lua
-vim.g.have_nerd_font = true
+To enable, add this to your shell profile (`~/.zshrc` or `~/.bashrc`):
+```bash
+export NVIM_NERD_FONT=1
 ```
 
-All icon-using plugins (neo-tree, lualine, barbar, gitsigns, diagnostics, devicons) respect this toggle automatically.
+This keeps the config repo unchanged across machines — just set the env var on machines that have a Nerd Font installed. All icon-using plugins (neo-tree, lualine, barbar, gitsigns, diagnostics, devicons) respect this toggle automatically.
 
 ## Supported Languages
 
