@@ -122,6 +122,7 @@ return {
         jsonls = { capabilities = capabilities },
         rust_analyzer = {
           capabilities = capabilities,
+          filetypes = { "rust" },
           settings = {
             ["rust-analyzer"] = {
               checkOnSave = { command = "clippy" },
@@ -132,10 +133,12 @@ return {
         },
         clangd = {
           capabilities = capabilities,
+          filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
           cmd = { "clangd", "--background-index", "--clang-tidy", "--header-insertion=iwyu" },
         },
         jdtls = {
           capabilities = capabilities,
+          filetypes = { "java" },
         },
       }
 
