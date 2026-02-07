@@ -55,3 +55,16 @@ autocmd("FileType", {
     vim.opt_local.softtabstop = 4
   end,
 })
+
+-- Auto-reload files changed externally (e.g. cursor-agent in another tmux pane)
+augroup("AutoReload", { clear = true })
+autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  group = "AutoReload",
+  command = "checktime",
+})
+autocmd("FileChangedShellPost", {
+  group = "AutoReload",
+  callback = function()
+    vim.notify("File changed on disk. Buffer reloaded.", vim.log.levels.INFO)
+  end,
+})

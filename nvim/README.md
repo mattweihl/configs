@@ -39,7 +39,7 @@ To enable, add this to your shell profile (`~/.zshrc` or `~/.bashrc`):
 export NVIM_NERD_FONT=1
 ```
 
-This keeps the config repo unchanged across machines — just set the env var on machines that have a Nerd Font installed. All icon-using plugins (neo-tree, lualine, barbar, gitsigns, diagnostics, devicons) respect this toggle automatically.
+This keeps the config repo unchanged across machines — just set the env var on machines that have a Nerd Font installed. All icon-using plugins (neo-tree, lualine, barbar, gitsigns, dap, diffview, diagnostics, devicons) respect this toggle automatically.
 
 ## Supported Languages
 
@@ -149,6 +149,14 @@ Leader key is **Space**. Press `<Space>?` to open the which-key modal showing al
 | `[g` / `]g` | Normal | Previous/next diagnostic |
 | `<Space>cf` | Normal/Visual | Format file or selection |
 
+### Search & Replace
+
+| Key | Mode | Action |
+|---|---|---|
+| `<Space>sr` | Normal | Open search & replace |
+| `<Space>sw` | Normal | Search word under cursor |
+| `<Space>sr` | Visual | Search visual selection |
+
 ### Git
 
 | Key | Mode | Action |
@@ -159,6 +167,25 @@ Leader key is **Space**. Press `<Space>?` to open the which-key modal showing al
 | `<Space>hp` | Normal | Preview hunk inline |
 | `<Space>hb` | Normal | Blame line (full) |
 | `<Space>hd` | Normal | Diff this |
+| `<Space>gd` | Normal | Open diff view (all changes) |
+| `<Space>gh` | Normal | File history (current file) |
+| `<Space>gH` | Normal | File history (entire repo) |
+| `<Space>gq` | Normal | Close diff view |
+
+### Debugger
+
+| Key | Mode | Action |
+|---|---|---|
+| `<Space>db` | Normal | Toggle breakpoint |
+| `<Space>dB` | Normal | Conditional breakpoint |
+| `<Space>dc` | Normal | Continue / start |
+| `<Space>di` | Normal | Step into |
+| `<Space>do` | Normal | Step over |
+| `<Space>dO` | Normal | Step out |
+| `<Space>dr` | Normal | Toggle REPL |
+| `<Space>dl` | Normal | Run last |
+| `<Space>dt` | Normal | Terminate |
+| `<Space>du` | Normal | Toggle DAP UI |
 
 ### File Explorer (Neo-tree)
 
@@ -197,12 +224,24 @@ nvim/
 │       ├── format-lint.lua     # Formatting (conform) + linting (nvim-lint)
 │       ├── neo-tree.lua        # File explorer
 │       ├── ui.lua              # Colorscheme, statusline, tabs, icons
-│       ├── git.lua             # Gitsigns
+│       ├── git.lua             # Gitsigns + diffview
+│       ├── dap.lua             # Debugger (DAP + DAP UI + Mason DAP)
+│       ├── grug-far.lua        # Project-wide search & replace
+│       ├── edgy.lua            # Panel layout manager
 │       ├── editor.lua          # Autopairs, comments, surround, multi-cursor
 │       ├── terminal.lua        # Integrated terminal + lazygit
 │       └── which-key.lua       # Keybinding hints modal
 └── README.md
 ```
+
+## External File Changes (AI Agents / Tmux)
+
+Buffers auto-reload when files are changed externally (e.g. by cursor-agent running in another tmux pane). This triggers on:
+- Switching back to the nvim tmux pane (`FocusGained`)
+- Switching buffers (`BufEnter`)
+- Idling for 250ms (`CursorHold`)
+
+A notification appears when a buffer is reloaded from disk.
 
 ## Tmux Compatibility
 
@@ -223,6 +262,9 @@ set-option -g set-clipboard on
 | `:ConformInfo` | Check formatter status for current file |
 | `:LspInfo` | Check active LSP servers |
 | `:TSInstall {lang}` | Install a treesitter parser |
+| `:GrugFar` | Open search & replace |
+| `:DiffviewOpen` | Open git diff view |
+| `:DiffviewFileHistory` | Git file history |
 
 ## Colorschemes
 
