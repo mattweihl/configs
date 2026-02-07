@@ -146,7 +146,7 @@ return {
       -- (handles first-run before mason installs them)
       for server, config in pairs(server_configs) do
         local merged = vim.tbl_deep_extend("force", default_config, config)
-        if not vim.tbl_contains(installed, server) then
+        if not vim.list_contains(installed, server) then
           pcall(function()
             lspconfig[server].setup(merged)
           end)

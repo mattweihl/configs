@@ -89,20 +89,25 @@ return {
 
   -- Inline color preview (CSS, Tailwind, etc.)
   {
-    "norcalli/nvim-colorizer.lua",
+    "NvChad/nvim-colorizer.lua",
     event = { "BufReadPost", "BufNewFile" },
     config = function()
       require("colorizer").setup({
-        "css", "scss", "html", "javascript", "javascriptreact",
-        "typescript", "typescriptreact", "lua", "vim",
-      }, {
-        RGB = true,
-        RRGGBB = true,
-        names = false,
-        RRGGBBAA = true,
-        css = true,
-        css_fn = true,
-        mode = "background",
+        filetypes = {
+          "css", "scss", "html", "javascript", "javascriptreact",
+          "typescript", "typescriptreact", "lua", "vim",
+        },
+        user_default_options = {
+          RGB = true,
+          RRGGBB = true,
+          names = false,
+          RRGGBBAA = true,
+          css = true,
+          css_fn = true,
+          mode = "background",
+          tailwind = true,
+          always_update = false,
+        },
       })
     end,
   },

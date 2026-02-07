@@ -47,6 +47,6 @@ map("n", "<leader>bp", "<cmd>BufferPin<CR>", { desc = "Pin buffer" })
 -- Select all
 map("n", "<C-a>", "ggVG", { desc = "Select all" })
 
--- Diagnostic navigation (same as old CoC bindings)
-map("n", "[g", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-map("n", "]g", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+-- Diagnostic navigation
+map("n", "[g", function() vim.diagnostic.jump({ count = -1 }) end, { desc = "Previous diagnostic" })
+map("n", "]g", function() vim.diagnostic.jump({ count = 1 }) end, { desc = "Next diagnostic" })

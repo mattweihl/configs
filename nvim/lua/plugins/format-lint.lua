@@ -28,7 +28,7 @@ return {
           jsonc = { "prettier" },
           yaml = { "prettier" },
           markdown = { "prettier" },
-          python = { "black", "isort" },
+          python = { "isort", "black" },
           lua = { "stylua" },
         },
         format_on_save = function(bufnr)

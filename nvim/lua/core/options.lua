@@ -63,9 +63,6 @@ opt.tabstop = 2
 opt.expandtab = true
 opt.smarttab = true
 
--- Performance
-opt.synmaxcol = 240
-
 -- Clipboard: use OSC 52 for SSH/tmux compatibility
 -- Works across macOS, Linux, SSH sessions, and tmux
 opt.clipboard = "unnamedplus"

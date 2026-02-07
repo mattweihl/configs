@@ -37,7 +37,7 @@ return {
         dir = "git_dir",
         direction = "float",
         float_opts = { border = "rounded" },
-        on_open = function(term)
+        on_open = function()
           vim.cmd("startinsert!")
         end,
       })
@@ -48,18 +48,19 @@ return {
 
       vim.keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<cr>", { desc = "Toggle terminal", silent = true })
 
-      -- Terminal mode keymaps (escape terminal with same mapping)
-      function _G.set_terminal_keymaps()
-        local opts = { buffer = 0 }
-        vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], opts)
-        vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
-        vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]], opts)
-        vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]], opts)
-        vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]], opts)
-        vim.keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]], opts)
-      end
-
-      vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
+      -- Terminal mode keymaps
+      vim.api.nvim_create_autocmd("TermOpen", {
+        pattern = "term://*",
+        callback = function()
+          local opts = { buffer = 0 }
+          vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], opts)
+          vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
+          vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]], opts)
+          vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]], opts)
+          vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]], opts)
+          vim.keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]], opts)
+        end,
+      })
     end,
   },
 }
