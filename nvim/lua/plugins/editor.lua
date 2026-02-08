@@ -92,6 +92,41 @@ return {
     },
   },
 
+  -- Floating terminal (VS Code: Ctrl+`)
+  {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    keys = {
+      { "<C-`>", desc = "Toggle terminal" },
+      { "<leader>tf", desc = "Float terminal" },
+      { "<leader>th", desc = "Horizontal terminal" },
+      { "<leader>tv", desc = "Vertical terminal" },
+    },
+    config = function()
+      require("toggleterm").setup({
+        open_mapping = "<C-`>",
+        direction = "float",
+        float_opts = { border = "rounded" },
+        shade_terminals = true,
+      })
+
+      local map = vim.keymap.set
+      map("n", "<leader>tf", "<cmd>ToggleTerm direction=float<cr>", { desc = "Float terminal" })
+      map("n", "<leader>th", "<cmd>ToggleTerm direction=horizontal size=12<cr>", { desc = "Horizontal terminal" })
+      map("n", "<leader>tv", "<cmd>ToggleTerm direction=vertical size=80<cr>", { desc = "Vertical terminal" })
+
+      -- Esc to exit terminal mode
+      vim.api.nvim_create_autocmd("TermOpen", {
+        pattern = "term://*toggleterm#*",
+        callback = function()
+          local opts = { buffer = 0 }
+          vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], opts)
+          vim.keymap.set("t", "<C-`>", "<cmd>ToggleTerm<cr>", opts)
+        end,
+      })
+    end,
+  },
+
   -- Flash (quick navigation/jump)
   {
     "folke/flash.nvim",
