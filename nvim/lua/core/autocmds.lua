@@ -56,6 +56,33 @@ autocmd("FileType", {
   end,
 })
 
+-- Large file guard — disable expensive features for files >1MB
+augroup("LargeFile", { clear = true })
+autocmd("BufReadPre", {
+  group = "LargeFile",
+  callback = function(args)
+    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(args.buf))
+    if ok and stats and stats.size > 1024 * 1024 then
+      vim.b[args.buf].large_file = true
+      vim.opt_local.syntax = ""
+      vim.opt_local.foldmethod = "manual"
+      vim.opt_local.cursorline = false
+      vim.opt_local.swapfile = false
+      vim.opt_local.undofile = false
+      -- Disable treesitter highlighting for this buffer
+      vim.schedule(function()
+        pcall(vim.treesitter.stop, args.buf)
+      end)
+      -- Detach LSP clients (they choke on huge files)
+      vim.schedule(function()
+        for _, client in pairs(vim.lsp.get_clients({ bufnr = args.buf })) do
+          vim.lsp.buf_detach_client(args.buf, client.id)
+        end
+      end)
+    end
+  end,
+})
+
 -- Right-click context menu (extends Neovim 0.11 built-in PopUp menu)
 local nf = vim.g.have_nerd_font
 
