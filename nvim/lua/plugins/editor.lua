@@ -84,6 +84,14 @@ return {
     end,
   },
 
+  -- Undo tree visualizer
+  {
+    "mbbill/undotree",
+    keys = {
+      { "<leader>u", "<cmd>UndotreeToggle<cr>", desc = "Toggle undo tree" },
+    },
+  },
+
   -- Flash (quick navigation/jump)
   {
     "folke/flash.nvim",

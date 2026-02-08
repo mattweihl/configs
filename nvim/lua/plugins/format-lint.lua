@@ -60,7 +60,7 @@ return {
       local lint = require("lint")
 
       lint.linters_by_ft = {
-        python = { "ruff" },
+        python = { "ruff", "flake8" },
         -- JS/TS linting handled by eslint LSP server
       }
 
@@ -84,6 +84,7 @@ return {
           "black",
           "isort",
           "ruff",
+          "flake8",
           "stylua",
           "clang-format",
           "google-java-format",

@@ -30,7 +30,11 @@ alias la="ls -A --color=auto"
 alias l="ll"
 alias c="cd $CODE_LOCATION"
 alias gs="git status"
-alias gb='git branch'
+alias gb="git branch"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
+alias gd="git diff"
 alias dt="cd $DESKTOP"
 
 if command -v fzf &> /dev/null
@@ -54,12 +58,15 @@ autoload -U select-word-style
 select-word-style bash
 
 HISTFILE=$HOME/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
+HISTSIZE=50000
+SAVEHIST=50000
 setopt APPEND_HISTORY
 setopt INC_APPEND_HISTORY
 setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt AUTO_CD
 
-bindkey -e 
+bindkey -e
 export CLICOLOR=1
 

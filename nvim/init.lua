@@ -22,7 +22,7 @@ require("core.autocmds")
 -- Load plugins via lazy.nvim
 require("lazy").setup("plugins", {
   defaults = { lazy = true },
-  install = { colorscheme = { "gruvbox" } },
+  install = { colorscheme = { "vscode", "gruvbox" } },
   checker = { enabled = false },
   change_detection = { notify = false },
   performance = {

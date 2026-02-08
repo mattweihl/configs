@@ -24,6 +24,7 @@ return {
       { "<leader>ft", "<cmd>Telescope colorscheme<cr>", desc = "Colorschemes" },
       { "<leader>fo", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document symbols" },
       { "<leader>fw", "<cmd>Telescope lsp_workspace_symbols<cr>", desc = "Workspace symbols" },
+      { "<leader>f.", "<cmd>Telescope resume<cr>", desc = "Resume last search" },
     },
     config = function()
       local telescope = require("telescope")
@@ -57,10 +58,7 @@ return {
         pickers = {
           find_files = {
             find_command = {
-              "rg", "--files", "--hidden", "--no-ignore",
-              "--glob=!node_modules/*",
-              "--glob=!node-offline-mirror/*",
-              "--glob=!node-packages/*",
+              "rg", "--files", "--hidden",
               "--glob=!.git/*",
             },
           },

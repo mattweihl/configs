@@ -1,15 +1,27 @@
 return {
   -- Colorscheme
   {
-    "ellisonleao/gruvbox.nvim",
+    "Mofiqul/vscode.nvim",
     lazy = false,
     priority = 1000,
+    config = function()
+      require("vscode").setup({
+        style = "dark",
+        transparent = false,
+      })
+      require("vscode").load()
+    end,
+  },
+
+  -- Keep gruvbox available for :colorscheme gruvbox
+  {
+    "ellisonleao/gruvbox.nvim",
+    lazy = true,
     config = function()
       require("gruvbox").setup({
         contrast = "hard",
         transparent_mode = false,
       })
-      vim.cmd.colorscheme("gruvbox")
     end,
   },
 
