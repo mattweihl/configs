@@ -15,15 +15,6 @@ return {
           pinned = true,
           open = "Neotree position=left filesystem",
         },
-        {
-          title = "Git Status",
-          ft = "neo-tree",
-          filter = function(buf)
-            return vim.b[buf].neo_tree_source == "git_status"
-          end,
-          pinned = true,
-          open = "Neotree position=left git_status",
-        },
         -- DAP UI panels
         { title = "Scopes", ft = "dapui_scopes", size = { height = 0.35 } },
         { title = "Breakpoints", ft = "dapui_breakpoints", size = { height = 0.15 } },
@@ -37,9 +28,7 @@ return {
         { ft = "dapui_console", title = "Console" },
       },
       -- Right panels
-      right = {
-        { ft = "grug-far", title = "Search & Replace", size = { width = 60 } },
-      },
+      right = {},
     },
   },
 }

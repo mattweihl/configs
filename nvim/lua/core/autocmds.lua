@@ -74,7 +74,7 @@ vim.cmd("amenu PopUp." .. (nf and "\\ " or "") .. "Toggle\\ Breakpoint       <cm
 
 -- Search / Git
 vim.cmd("amenu PopUp.-git_sep- <Nop>")
-vim.cmd("amenu PopUp." .. (nf and "󰈞\\ " or "") .. "Search\\ Word             <cmd>lua require('grug-far').open({ prefills = { search = vim.fn.expand('<cword>') } })<CR>")
+vim.cmd("amenu PopUp." .. (nf and "󰈞\\ " or "") .. "Search\\ Word             <cmd>lua require('telescope.builtin').grep_string()<CR>")
 vim.cmd("amenu PopUp." .. (nf and "󰊢\\ " or "") .. "Git\\ Blame               <cmd>lua require('gitsigns').blame_line({ full = true })<CR>")
 
 -- Auto-reload files changed externally (e.g. cursor-agent in another tmux pane)

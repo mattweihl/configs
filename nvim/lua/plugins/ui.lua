@@ -30,11 +30,7 @@ return {
       }
       local btn_search = {
         function() return nf and "󰈞 " or "[Search]" end,
-        on_click = function() require("grug-far").open() end,
-      }
-      local btn_git = {
-        function() return nf and "󰊢 " or "[Git]" end,
-        on_click = function() require("gitsigns").diffthis() end,
+        on_click = function() require("telescope.builtin").live_grep() end,
       }
       local btn_debug = {
         function() return nf and" " or "[Debug]" end,
@@ -52,18 +48,8 @@ return {
         sections = {
           lualine_a = { "mode" },
           lualine_b = {
-            {
-              "branch",
-              on_click = function()
-                require("gitsigns").diffthis()
-              end,
-            },
-            {
-              "diff",
-              on_click = function()
-                require("gitsigns").diffthis()
-              end,
-            },
+            "branch",
+            "diff",
             {
               "diagnostics",
               on_click = function()
@@ -73,7 +59,7 @@ return {
           },
           lualine_c = { { "filename", path = 1 } },
           lualine_x = { "encoding", "fileformat", "filetype" },
-          lualine_y = { btn_files, btn_search, btn_git, btn_debug, "progress" },
+          lualine_y = { btn_files, btn_search, btn_debug, "progress" },
           lualine_z = { "location" },
         },
       })

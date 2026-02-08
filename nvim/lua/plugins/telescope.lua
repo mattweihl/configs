@@ -19,7 +19,7 @@ return {
       { "<leader>fs", "<cmd>Telescope grep_string<cr>", desc = "Grep word under cursor" },
       { "<leader>fd", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
       { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
-      { "<leader>fc", "<cmd>Telescope command_palette<cr>", desc = "Command palette" },
+      { "<leader>p", "<cmd>Telescope command_palette<cr>", desc = "Command palette" },
       { "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Keymaps" },
       { "<leader>ft", "<cmd>Telescope colorscheme<cr>", desc = "Colorschemes" },
       { "<leader>fo", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document symbols" },

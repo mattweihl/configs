@@ -151,14 +151,6 @@ Leader key is **Space**. Press `<Space>?` to open the which-key modal showing al
 | `[g` / `]g` | Normal | Previous/next diagnostic |
 | `<Space>cf` | Normal/Visual | Format file or selection |
 
-### Search & Replace
-
-| Key | Mode | Action |
-|---|---|---|
-| `<Space>sr` | Normal | Open search & replace |
-| `<Space>sw` | Normal | Search word under cursor |
-| `<Space>sr` | Visual | Search visual selection |
-
 ### Git
 
 | Key | Mode | Action |
@@ -214,7 +206,6 @@ nvim/
 │       ├── ui.lua              # Colorscheme, statusline, tabs, icons
 │       ├── git.lua             # Gitsigns
 │       ├── dap.lua             # Debugger (DAP + DAP UI + Mason DAP)
-│       ├── grug-far.lua        # Project-wide search & replace
 │       ├── edgy.lua            # Panel layout manager
 │       ├── editor.lua          # Autopairs, comments, surround, multi-cursor
 │       └── which-key.lua       # Keybinding hints modal
@@ -249,7 +240,6 @@ set-option -g set-clipboard on
 | `:ConformInfo` | Check formatter status for current file |
 | `:LspInfo` | Check active LSP servers |
 | `:TSInstall {lang}` | Install a treesitter parser |
-| `:GrugFar` | Open search & replace |
 
 ## Colorscheme
 

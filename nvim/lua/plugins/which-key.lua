@@ -37,7 +37,6 @@ return {
         { "<leader>g", group = "Git" },
         { "<leader>h", group = "Git hunks" },
         { "<leader>r", group = "Rename/Refactor" },
-        { "<leader>s", group = "Search/Replace" },
         { "<leader>w", group = "Write/Quit" },
         { "<leader>x", group = "Diagnostics/Trouble" },
       })
