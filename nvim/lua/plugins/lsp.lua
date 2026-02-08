@@ -73,9 +73,15 @@ return {
       })
 
       -- Configure LSP servers using native vim.lsp.config (Neovim 0.11+)
+      -- Common root markers
+      local web_root = { "package.json", "tsconfig.json", "jsconfig.json", ".git" }
+
       local server_configs = {
         ts_ls = {
           capabilities = capabilities,
+          cmd = { "typescript-language-server", "--stdio" },
+          filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
+          root_markers = web_root,
           settings = {
             typescript = { preferences = { quoteStyle = "single" } },
             javascript = { preferences = { quoteStyle = "single" } },
@@ -83,6 +89,9 @@ return {
         },
         pyright = {
           capabilities = capabilities,
+          cmd = { "pyright-langserver", "--stdio" },
+          filetypes = { "python" },
+          root_markers = { "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "pyrightconfig.json", ".git" },
           settings = {
             python = {
               analysis = {
@@ -94,6 +103,9 @@ return {
         },
         lua_ls = {
           capabilities = capabilities,
+          cmd = { "lua-language-server" },
+          filetypes = { "lua" },
+          root_markers = { ".luarc.json", ".luarc.jsonc", ".stylua.toml", "stylua.toml", ".git" },
           settings = {
             Lua = {
               runtime = { version = "LuaJIT" },
@@ -108,21 +120,51 @@ return {
         },
         emmet_ls = {
           capabilities = capabilities,
+          cmd = { "emmet-ls", "--stdio" },
           filetypes = {
             "html", "css", "scss", "javascript", "javascriptreact",
             "typescript", "typescriptreact", "svelte", "vue",
           },
+          root_markers = web_root,
         },
         eslint = {
           capabilities = capabilities,
+          cmd = { "vscode-eslint-language-server", "--stdio" },
+          filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
+          root_markers = { ".eslintrc", ".eslintrc.js", ".eslintrc.json", "eslint.config.js", "eslint.config.mjs", "package.json", ".git" },
+          handlers = {
+            ["textDocument/diagnostic"] = function() end,
+          },
         },
-        html = { capabilities = capabilities },
-        cssls = { capabilities = capabilities },
-        tailwindcss = { capabilities = capabilities },
-        jsonls = { capabilities = capabilities },
+        html = {
+          capabilities = capabilities,
+          cmd = { "vscode-html-language-server", "--stdio" },
+          filetypes = { "html", "templ" },
+          root_markers = { "package.json", ".git" },
+        },
+        cssls = {
+          capabilities = capabilities,
+          cmd = { "vscode-css-language-server", "--stdio" },
+          filetypes = { "css", "scss", "less" },
+          root_markers = { "package.json", ".git" },
+        },
+        tailwindcss = {
+          capabilities = capabilities,
+          cmd = { "tailwindcss-language-server", "--stdio" },
+          filetypes = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "svelte", "vue" },
+          root_markers = { "tailwind.config.js", "tailwind.config.cjs", "tailwind.config.mjs", "tailwind.config.ts", "package.json" },
+        },
+        jsonls = {
+          capabilities = capabilities,
+          cmd = { "vscode-json-language-server", "--stdio" },
+          filetypes = { "json", "jsonc" },
+          root_markers = { ".git" },
+        },
         rust_analyzer = {
           capabilities = capabilities,
+          cmd = { "rust-analyzer" },
           filetypes = { "rust" },
+          root_markers = { "Cargo.toml", "rust-project.json", ".git" },
           settings = {
             ["rust-analyzer"] = {
               checkOnSave = { command = "clippy" },
@@ -133,12 +175,15 @@ return {
         },
         clangd = {
           capabilities = capabilities,
-          filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
           cmd = { "clangd", "--background-index", "--clang-tidy", "--header-insertion=iwyu" },
+          filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
+          root_markers = { "compile_commands.json", "compile_flags.txt", ".clangd", ".git" },
         },
         jdtls = {
           capabilities = capabilities,
+          cmd = { "jdtls" },
           filetypes = { "java" },
+          root_markers = { "pom.xml", "build.gradle", ".git" },
         },
       }
 

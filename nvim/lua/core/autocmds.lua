@@ -56,6 +56,27 @@ autocmd("FileType", {
   end,
 })
 
+-- Right-click context menu (extends Neovim 0.11 built-in PopUp menu)
+local nf = vim.g.have_nerd_font
+
+-- LSP actions
+vim.cmd("amenu PopUp.-lsp_sep- <Nop>")
+vim.cmd("amenu PopUp." .. (nf and "\\ " or "") .. "Go\\ to\\ Definition       <cmd>lua vim.lsp.buf.definition()<CR>")
+vim.cmd("amenu PopUp." .. (nf and "\\ " or "") .. "Find\\ References          <cmd>lua vim.lsp.buf.references()<CR>")
+vim.cmd("amenu PopUp." .. (nf and "󰏫\\ " or "") .. "Rename\\ Symbol            <cmd>lua vim.lsp.buf.rename()<CR>")
+vim.cmd("amenu PopUp." .. (nf and "\\ " or "") .. "Code\\ Action               <cmd>lua vim.lsp.buf.code_action()<CR>")
+
+-- Tools
+vim.cmd("amenu PopUp.-tools_sep- <Nop>")
+vim.cmd("amenu PopUp." .. (nf and "\\ " or "") .. "Format\\ File              <cmd>lua require('conform').format()<CR>")
+vim.cmd("amenu PopUp." .. (nf and "\\ " or "") .. "Line\\ Diagnostics        <cmd>lua vim.diagnostic.open_float()<CR>")
+vim.cmd("amenu PopUp." .. (nf and "\\ " or "") .. "Toggle\\ Breakpoint       <cmd>lua require('dap').toggle_breakpoint()<CR>")
+
+-- Search / Git
+vim.cmd("amenu PopUp.-git_sep- <Nop>")
+vim.cmd("amenu PopUp." .. (nf and "󰈞\\ " or "") .. "Search\\ Word             <cmd>lua require('grug-far').open({ prefills = { search = vim.fn.expand('<cword>') } })<CR>")
+vim.cmd("amenu PopUp." .. (nf and "󰊢\\ " or "") .. "Git\\ Blame               <cmd>lua require('gitsigns').blame_line({ full = true })<CR>")
+
 -- Auto-reload files changed externally (e.g. cursor-agent in another tmux pane)
 augroup("AutoReload", { clear = true })
 autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {

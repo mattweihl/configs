@@ -11,6 +11,9 @@ bash ~/Configs/nvim/setup.sh
 # Symlink + install everything (plugins, LSPs, formatters, parsers)
 bash ~/Configs/nvim/setup.sh install
 
+# Use old config (vimscript + CoC)
+bash ~/Configs/nvim/setup.sh old install
+
 # Clean slate (remove symlink + all nvim data)
 bash ~/Configs/nvim/setup.sh uninstall
 ```
@@ -27,7 +30,6 @@ The setup script creates a single symlink: `~/.config/nvim -> ~/Configs/nvim`
 - Python 3 + pip (for black, isort, ruff, pyright)
 
 **Optional:**
-- [lazygit](https://github.com/jesseduffield/lazygit) (for `<leader>tg`)
 - A [Nerd Font](https://www.nerdfonts.com/) (off by default, see below)
 
 ### Nerd Font Support
@@ -39,7 +41,7 @@ To enable, add this to your shell profile (`~/.zshrc` or `~/.bashrc`):
 export NVIM_NERD_FONT=1
 ```
 
-This keeps the config repo unchanged across machines — just set the env var on machines that have a Nerd Font installed. All icon-using plugins (neo-tree, lualine, barbar, gitsigns, dap, diffview, diagnostics, devicons) respect this toggle automatically.
+This keeps the config repo unchanged across machines — just set the env var on machines that have a Nerd Font installed. All icon-using plugins (neo-tree, lualine, barbar, gitsigns, dap, diagnostics, devicons) respect this toggle automatically.
 
 ## Supported Languages
 
@@ -167,10 +169,6 @@ Leader key is **Space**. Press `<Space>?` to open the which-key modal showing al
 | `<Space>hp` | Normal | Preview hunk inline |
 | `<Space>hb` | Normal | Blame line (full) |
 | `<Space>hd` | Normal | Diff this |
-| `<Space>gd` | Normal | Open diff view (all changes) |
-| `<Space>gh` | Normal | File history (current file) |
-| `<Space>gH` | Normal | File history (entire repo) |
-| `<Space>gq` | Normal | Close diff view |
 
 ### Debugger
 
@@ -195,16 +193,6 @@ Leader key is **Space**. Press `<Space>?` to open the which-key modal showing al
 | `<Space>e` | Normal | Toggle file explorer |
 | `<Space>ge` | Normal | Git status explorer |
 
-### Terminal
-
-| Key | Mode | Action |
-|---|---|---|
-| `` <C-`> `` | Normal/Terminal | Toggle terminal |
-| `<Space>tt` | Normal | Toggle terminal |
-| `<Space>tg` | Normal | Lazygit (floating) |
-| `<Esc>` / `jk` | Terminal | Exit terminal mode |
-| `<C-h/j/k/l>` | Terminal | Navigate to window |
-
 ## File Structure
 
 ```
@@ -224,12 +212,11 @@ nvim/
 │       ├── format-lint.lua     # Formatting (conform) + linting (nvim-lint)
 │       ├── neo-tree.lua        # File explorer
 │       ├── ui.lua              # Colorscheme, statusline, tabs, icons
-│       ├── git.lua             # Gitsigns + diffview
+│       ├── git.lua             # Gitsigns
 │       ├── dap.lua             # Debugger (DAP + DAP UI + Mason DAP)
 │       ├── grug-far.lua        # Project-wide search & replace
 │       ├── edgy.lua            # Panel layout manager
 │       ├── editor.lua          # Autopairs, comments, surround, multi-cursor
-│       ├── terminal.lua        # Integrated terminal + lazygit
 │       └── which-key.lua       # Keybinding hints modal
 └── README.md
 ```
@@ -263,11 +250,7 @@ set-option -g set-clipboard on
 | `:LspInfo` | Check active LSP servers |
 | `:TSInstall {lang}` | Install a treesitter parser |
 | `:GrugFar` | Open search & replace |
-| `:DiffviewOpen` | Open git diff view |
-| `:DiffviewFileHistory` | Git file history |
 
-## Colorschemes
+## Colorscheme
 
-Default is **gruvbox**. Additional themes installed: tokyonight, onedark, everforest, iceberg, catppuccin.
-
-Switch with `:colorscheme {name}` or `<Space>ft` to browse.
+Default is **gruvbox** (hard contrast). Browse available themes with `<Space>ft`.

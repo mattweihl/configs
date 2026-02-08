@@ -33,14 +33,12 @@ return {
       -- Bottom panels
       bottom = {
         { ft = "trouble", title = "Diagnostics", size = { height = 10 } },
-        { ft = "toggleterm", title = "Terminal", size = { height = 15 } },
         { ft = "dap-repl", title = "REPL" },
         { ft = "dapui_console", title = "Console" },
       },
       -- Right panels
       right = {
         { ft = "grug-far", title = "Search & Replace", size = { width = 60 } },
-        { ft = "DiffviewFiles", title = "Diff View", size = { width = 35 } },
       },
     },
   },

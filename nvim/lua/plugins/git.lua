@@ -1,32 +1,4 @@
 return {
-  -- Diff viewer
-  {
-    "sindrets/diffview.nvim",
-    cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
-    keys = {
-      { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Open diff view" },
-      { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history (current)" },
-      { "<leader>gH", "<cmd>DiffviewFileHistory<cr>", desc = "File history (repo)" },
-      { "<leader>gq", "<cmd>DiffviewClose<cr>", desc = "Close diff view" },
-    },
-    config = function()
-      local nf = vim.g.have_nerd_font
-      require("diffview").setup({
-        enhanced_diff_hl = true,
-        icons = {
-          folder_closed = nf and "" or ">",
-          folder_open = nf and "" or "v",
-        },
-        signs = {
-          fold_closed = nf and "" or ">",
-          fold_open = nf and "" or "v",
-          done = nf and "" or "ok",
-        },
-      })
-    end,
-  },
-
-  -- Git signs
   {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },

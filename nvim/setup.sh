@@ -3,19 +3,30 @@
 # Run this on any new machine (macOS or Linux) to link the config and install everything
 #
 # Usage:
-#   bash ~/Configs/nvim/setup.sh              # symlink only
-#   bash ~/Configs/nvim/setup.sh install      # symlink + install all plugins/parsers/LSPs/formatters
-#   bash ~/Configs/nvim/setup.sh uninstall    # remove symlink + all nvim data (clean slate)
+#   bash ~/Configs/nvim/setup.sh                  # symlink new (lua) config
+#   bash ~/Configs/nvim/setup.sh install          # symlink new config + install plugins/parsers/LSPs
+#   bash ~/Configs/nvim/setup.sh old              # symlink old (vimscript + CoC) config
+#   bash ~/Configs/nvim/setup.sh old install      # symlink old config + install plugins
+#   bash ~/Configs/nvim/setup.sh uninstall        # remove symlink + all nvim data (clean slate)
 
 set -e
 
 CONFIGS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-NVIM_CONFIG="$CONFIGS_DIR/nvim"
+NVIM_NEW="$CONFIGS_DIR/nvim"
+NVIM_OLD="$CONFIGS_DIR/nvim/nvim_old"
 TARGET="$HOME/.config/nvim"
 
 # --- Uninstall ---
 if [ "$1" = "uninstall" ]; then
   echo "=== Neovim Config Uninstall ==="
+  echo ""
+
+  # Show which config is currently linked
+  if [ -L "$TARGET" ]; then
+    current="$(readlink "$TARGET")"
+    echo "Current symlink: $TARGET -> $current"
+  fi
+
   echo ""
   echo "This will remove:"
   echo "  - $TARGET (symlink)"
@@ -41,9 +52,30 @@ if [ "$1" = "uninstall" ]; then
   exit 0
 fi
 
+# --- Determine which config to use ---
+USE_OLD=false
+if [ "$1" = "old" ]; then
+  USE_OLD=true
+  shift  # consume "old" so $1 becomes "install" if provided
+fi
+
+if $USE_OLD; then
+  NVIM_SOURCE="$NVIM_OLD"
+  CONFIG_LABEL="old (vimscript + CoC)"
+else
+  NVIM_SOURCE="$NVIM_NEW"
+  CONFIG_LABEL="new (lua + lazy.nvim)"
+fi
+
+# Verify source exists
+if [ ! -d "$NVIM_SOURCE" ]; then
+  echo "Error: config directory not found: $NVIM_SOURCE"
+  exit 1
+fi
+
 # --- Setup ---
-echo "=== Neovim Config Setup ==="
-echo "  Source: $NVIM_CONFIG"
+echo "=== Neovim Config Setup ($CONFIG_LABEL) ==="
+echo "  Source: $NVIM_SOURCE"
 echo "  Target: $TARGET"
 echo ""
 
@@ -53,55 +85,82 @@ if [ -e "$TARGET" ] && [ ! -L "$TARGET" ]; then
   echo "[1/4] Backing up existing config to $TARGET.bak"
   mv "$TARGET" "$TARGET.bak"
 elif [ -L "$TARGET" ]; then
-  echo "[1/4] Removing existing symlink"
+  current="$(readlink "$TARGET")"
+  echo "[1/4] Removing existing symlink ($current)"
   rm "$TARGET"
 else
   echo "[1/4] No existing config found"
 fi
 
-ln -s "$NVIM_CONFIG" "$TARGET"
-echo "  Symlink created: $TARGET -> $NVIM_CONFIG"
+ln -s "$NVIM_SOURCE" "$TARGET"
+echo "  Symlink created: $TARGET -> $NVIM_SOURCE"
 
 # --- Install everything ---
 if [ "$1" = "install" ]; then
-  echo ""
-  echo "[2/4] Installing plugins via lazy.nvim..."
-  nvim --headless "+Lazy! sync" +qa
-  echo "  Plugins installed."
+  if $USE_OLD; then
+    # Old config: vim-plug + CoC
+    echo ""
+    echo "[2/4] Installing plugins via vim-plug..."
+    nvim --headless +PlugInstall +qa 2>/dev/null || nvim +PlugInstall +qa
+    echo "  Plugins installed."
 
-  echo ""
-  echo "[3/4] Installing LSP servers and formatters via Mason..."
-  nvim --headless -c "Lazy load mason-tool-installer.nvim" -c "MasonToolsInstall" -c "sleep 45" -c "qa"
-  echo "  Mason tools installed."
+    echo ""
+    echo "[3/4] Skipped (no Mason in old config)"
+    echo "[4/4] Skipped (no Treesitter in old config)"
 
-  echo ""
-  echo "[4/4] Installing treesitter parsers (this takes a minute)..."
-  PARSERS="javascript typescript tsx python html css scss json jsonc bash yaml toml regex gitignore diff rust c cpp java"
-  for parser in $PARSERS; do
-    echo "  Installing $parser..."
-    nvim --headless \
-      -c "Lazy load nvim-treesitter" \
-      -c "TSInstall! $parser" \
-      -c "sleep 15" \
-      -c "qa" 2>/dev/null || echo "  Warning: $parser may need manual install (:TSInstall $parser)"
-  done
-  echo "  Treesitter parsers installed."
+    echo ""
+    echo "=== All done! (old config) ==="
+    echo "Installed: vim-plug plugins"
+    echo ""
+    echo "Inside nvim, run :CocInstall for any language extensions you need."
+  else
+    # New config: lazy.nvim + Mason + Treesitter
+    echo ""
+    echo "[2/4] Installing plugins via lazy.nvim..."
+    nvim --headless "+Lazy! sync" +qa
+    echo "  Plugins installed."
 
-  echo ""
-  echo "=== All done! ==="
-  echo "Installed: plugins, LSP servers, formatters/linters, treesitter parsers"
-  echo ""
-  echo "Verify inside nvim:"
-  echo "  :Lazy          -- plugin status"
-  echo "  :Mason         -- LSP/formatter status"
-  echo "  :checkhealth   -- overall health check"
+    echo ""
+    echo "[3/4] Installing LSP servers and formatters via Mason..."
+    nvim --headless -c "Lazy load mason-tool-installer.nvim" -c "MasonToolsInstall" -c "sleep 45" -c "qa"
+    echo "  Mason tools installed."
+
+    echo ""
+    echo "[4/4] Installing treesitter parsers (this takes a minute)..."
+    PARSERS="javascript typescript tsx python html css scss json jsonc bash yaml toml regex gitignore diff rust c cpp java"
+    for parser in $PARSERS; do
+      echo "  Installing $parser..."
+      nvim --headless \
+        -c "Lazy load nvim-treesitter" \
+        -c "TSInstall! $parser" \
+        -c "sleep 15" \
+        -c "qa" 2>/dev/null || echo "  Warning: $parser may need manual install (:TSInstall $parser)"
+    done
+    echo "  Treesitter parsers installed."
+
+    echo ""
+    echo "=== All done! ==="
+    echo "Installed: plugins, LSP servers, formatters/linters, treesitter parsers"
+    echo ""
+    echo "Verify inside nvim:"
+    echo "  :Lazy          -- plugin status"
+    echo "  :Mason         -- LSP/formatter status"
+    echo "  :checkhealth   -- overall health check"
+  fi
 else
   echo ""
   echo "Symlink created. To install everything, run:"
-  echo "  bash ~/Configs/nvim/setup.sh install"
+  if $USE_OLD; then
+    echo "  bash ~/Configs/nvim/setup.sh old install"
+  else
+    echo "  bash ~/Configs/nvim/setup.sh install"
+  fi
   echo ""
-  echo "Or install manually inside nvim:"
-  echo "  :Lazy sync              -- install plugins"
-  echo "  :MasonToolsInstall      -- install LSPs + formatters"
-  echo "  :TSInstall all          -- install treesitter parsers"
+  echo "To switch configs:"
+  echo "  bash ~/Configs/nvim/setup.sh uninstall"
+  if $USE_OLD; then
+    echo "  bash ~/Configs/nvim/setup.sh install        # switch to new config"
+  else
+    echo "  bash ~/Configs/nvim/setup.sh old install    # switch to old config"
+  fi
 fi

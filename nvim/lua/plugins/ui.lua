@@ -13,13 +13,6 @@ return {
     end,
   },
 
-  -- Extra colorschemes (lazy-loaded, available via :colorscheme)
-  { "folke/tokyonight.nvim", lazy = true },
-  { "navarasu/onedark.nvim", lazy = true },
-  { "sainnhe/everforest", lazy = true },
-  { "cocopon/iceberg.vim", lazy = true },
-  { "catppuccin/nvim", name = "catppuccin", lazy = true },
-
   -- Status line
   {
     "nvim-lualine/lualine.nvim",
@@ -41,7 +34,7 @@ return {
       }
       local btn_git = {
         function() return nf and "󰊢 " or "[Git]" end,
-        on_click = function() vim.cmd("DiffviewOpen") end,
+        on_click = function() require("gitsigns").diffthis() end,
       }
       local btn_debug = {
         function() return nf and" " or "[Debug]" end,
@@ -62,13 +55,13 @@ return {
             {
               "branch",
               on_click = function()
-                vim.cmd("DiffviewOpen")
+                require("gitsigns").diffthis()
               end,
             },
             {
               "diff",
               on_click = function()
-                vim.cmd("DiffviewOpen")
+                require("gitsigns").diffthis()
               end,
             },
             {
@@ -130,31 +123,6 @@ return {
     end,
   },
 
-  -- Inline color preview (CSS, Tailwind, etc.)
-  {
-    "NvChad/nvim-colorizer.lua",
-    event = { "BufReadPost", "BufNewFile" },
-    config = function()
-      require("colorizer").setup({
-        filetypes = {
-          "css", "scss", "html", "javascript", "javascriptreact",
-          "typescript", "typescriptreact", "lua", "vim",
-        },
-        user_default_options = {
-          RGB = true,
-          RRGGBB = true,
-          names = false,
-          RRGGBBAA = true,
-          css = true,
-          css_fn = true,
-          mode = "background",
-          tailwind = true,
-          always_update = false,
-        },
-      })
-    end,
-  },
-
   -- Icons (only loaded when Nerd Font is available)
   {
     "nvim-tree/nvim-web-devicons",
@@ -185,24 +153,4 @@ return {
     end,
   },
 
-  -- Notifications
-  {
-    "rcarriga/nvim-notify",
-    event = "VeryLazy",
-    config = function()
-      local notify = require("notify")
-      notify.setup({
-        timeout = 2000,
-        max_height = function()
-          return math.floor(vim.o.lines * 0.75)
-        end,
-        max_width = function()
-          return math.floor(vim.o.columns * 0.75)
-        end,
-        render = "compact",
-        stages = "fade",
-      })
-      vim.notify = notify
-    end,
-  },
 }
