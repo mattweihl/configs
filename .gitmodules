@@ -1,9 +1,0 @@
-[submodule "ohmyzsh"]
-	path = ohmyzsh
-	url = git@github.com:ohmyzsh/ohmyzsh.git
-[submodule ".tmux"]
-	path = .tmux
-	url = https://github.com/gpakosz/.tmux
-[submodule "zsh-autocomplete"]
-	path = zsh-autocomplete
-	url = https://github.com/marlonrichert/zsh-autocomplete.git
