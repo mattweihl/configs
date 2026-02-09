@@ -105,12 +105,26 @@ if [ "$1" = "install" ]; then
     echo "  Plugins installed."
 
     echo ""
-    echo "[3/4] Skipped (no Mason in old config)"
+    echo "[3/4] Building coc.nvim..."
+    COC_DIR="$HOME/.local/share/nvim/plugged/coc.nvim"
+    if [ -d "$COC_DIR" ]; then
+      if command -v npm &> /dev/null; then
+        cd "$COC_DIR"
+        npm ci --silent
+        echo "  coc.nvim built successfully."
+      else
+        echo "  Warning: npm not found. Install Node.js and run 'cd $COC_DIR && npm ci' manually."
+      fi
+    else
+      echo "  Warning: coc.nvim not found at $COC_DIR"
+    fi
+
+    echo ""
     echo "[4/4] Skipped (no Treesitter in old config)"
 
     echo ""
     echo "=== All done! (old config) ==="
-    echo "Installed: vim-plug plugins"
+    echo "Installed: vim-plug plugins, coc.nvim"
     echo ""
     echo "Inside nvim, run :CocInstall for any language extensions you need."
   else
