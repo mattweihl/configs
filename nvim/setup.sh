@@ -3,17 +3,20 @@
 # Run this on any new machine (macOS or Linux) to link the config and install everything
 #
 # Usage:
-#   bash ~/Configs/nvim/setup.sh                  # symlink new (lua) config
-#   bash ~/Configs/nvim/setup.sh install          # symlink new config + install plugins/parsers/LSPs
+#   bash ~/Configs/nvim/setup.sh                  # symlink full (lua) config
+#   bash ~/Configs/nvim/setup.sh install          # symlink full config + install plugins/parsers/LSPs
 #   bash ~/Configs/nvim/setup.sh old              # symlink old (vimscript + CoC) config
 #   bash ~/Configs/nvim/setup.sh old install      # symlink old config + install plugins
+#   bash ~/Configs/nvim/setup.sh simple           # symlink simple (minimal lua) config
+#   bash ~/Configs/nvim/setup.sh simple install   # symlink simple config + install plugins
 #   bash ~/Configs/nvim/setup.sh uninstall        # remove symlink + all nvim data (clean slate)
 
 set -e
 
-CONFIGS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-NVIM_NEW="$CONFIGS_DIR/nvim"
-NVIM_OLD="$CONFIGS_DIR/nvim/nvim_old"
+NVIM_DIR="$(cd "$(dirname "$0")" && pwd)"
+NVIM_FULL="$NVIM_DIR/nvim_full"
+NVIM_OLD="$NVIM_DIR/nvim_old"
+NVIM_SIMPLE="$NVIM_DIR/nvim_simple"
 TARGET="$HOME/.config/nvim"
 
 # --- Uninstall ---
@@ -53,18 +56,24 @@ if [ "$1" = "uninstall" ]; then
 fi
 
 # --- Determine which config to use ---
-USE_OLD=false
+CONFIG_TYPE="new"
 if [ "$1" = "old" ]; then
-  USE_OLD=true
+  CONFIG_TYPE="old"
   shift  # consume "old" so $1 becomes "install" if provided
+elif [ "$1" = "simple" ]; then
+  CONFIG_TYPE="simple"
+  shift  # consume "simple" so $1 becomes "install" if provided
 fi
 
-if $USE_OLD; then
+if [ "$CONFIG_TYPE" = "old" ]; then
   NVIM_SOURCE="$NVIM_OLD"
   CONFIG_LABEL="old (vimscript + CoC)"
+elif [ "$CONFIG_TYPE" = "simple" ]; then
+  NVIM_SOURCE="$NVIM_SIMPLE"
+  CONFIG_LABEL="simple (minimal lua)"
 else
-  NVIM_SOURCE="$NVIM_NEW"
-  CONFIG_LABEL="new (lua + lazy.nvim)"
+  NVIM_SOURCE="$NVIM_FULL"
+  CONFIG_LABEL="full (lua + lazy.nvim)"
 fi
 
 # Verify source exists
@@ -97,7 +106,7 @@ echo "  Symlink created: $TARGET -> $NVIM_SOURCE"
 
 # --- Install everything ---
 if [ "$1" = "install" ]; then
-  if $USE_OLD; then
+  if [ "$CONFIG_TYPE" = "old" ]; then
     # Old config: vim-plug + CoC
     echo ""
     echo "[2/4] Installing plugins via vim-plug..."
@@ -127,8 +136,35 @@ if [ "$1" = "install" ]; then
     echo "Installed: vim-plug plugins, coc.nvim"
     echo ""
     echo "Inside nvim, run :CocInstall for any language extensions you need."
+    echo "Inside nvim, run :CocInstall for any language extensions you need."
+  elif [ "$CONFIG_TYPE" = "simple" ]; then
+    # Simple config: lazy.nvim + minimal Treesitter (no LSP)
+    echo ""
+    echo "[2/3] Installing plugins via lazy.nvim..."
+    nvim --headless "+Lazy! sync" +qa
+    echo "  Plugins installed."
+
+    echo ""
+    echo "[3/3] Installing treesitter parsers..."
+    PARSERS="javascript typescript tsx python html css json lua bash yaml"
+    for parser in $PARSERS; do
+      echo "  Installing $parser..."
+      nvim --headless \
+        -c "Lazy load nvim-treesitter" \
+        -c "TSInstall! $parser" \
+        -c "sleep 15" \
+        -c "qa" 2>/dev/null || echo "  Warning: $parser may need manual install (:TSInstall $parser)"
+    done
+    echo "  Treesitter parsers installed."
+
+    echo ""
+    echo "=== All done! (simple config) ==="
+    echo "Installed: plugins, treesitter parsers (no LSP)"
+    echo ""
+    echo "This is a minimal text editing config without language server support."
+    echo "  :Lazy          -- plugin status"
   else
-    # New config: lazy.nvim + Mason + Treesitter
+    # Full config: lazy.nvim + Mason + Treesitter
     echo ""
     echo "[2/4] Installing plugins via lazy.nvim..."
     nvim --headless "+Lazy! sync" +qa
@@ -153,7 +189,7 @@ if [ "$1" = "install" ]; then
     echo "  Treesitter parsers installed."
 
     echo ""
-    echo "=== All done! ==="
+    echo "=== All done! (full config) ==="
     echo "Installed: plugins, LSP servers, formatters/linters, treesitter parsers"
     echo ""
     echo "Verify inside nvim:"
@@ -164,17 +200,24 @@ if [ "$1" = "install" ]; then
 else
   echo ""
   echo "Symlink created. To install everything, run:"
-  if $USE_OLD; then
+  if [ "$CONFIG_TYPE" = "old" ]; then
     echo "  bash ~/Configs/nvim/setup.sh old install"
+  elif [ "$CONFIG_TYPE" = "simple" ]; then
+    echo "  bash ~/Configs/nvim/setup.sh simple install"
   else
     echo "  bash ~/Configs/nvim/setup.sh install"
   fi
   echo ""
   echo "To switch configs:"
   echo "  bash ~/Configs/nvim/setup.sh uninstall"
-  if $USE_OLD; then
-    echo "  bash ~/Configs/nvim/setup.sh install        # switch to new config"
+  if [ "$CONFIG_TYPE" = "old" ]; then
+    echo "  bash ~/Configs/nvim/setup.sh install        # switch to full config"
+    echo "  bash ~/Configs/nvim/setup.sh simple install # switch to simple config"
+  elif [ "$CONFIG_TYPE" = "simple" ]; then
+    echo "  bash ~/Configs/nvim/setup.sh install        # switch to full config"
+    echo "  bash ~/Configs/nvim/setup.sh old install    # switch to old config"
   else
     echo "  bash ~/Configs/nvim/setup.sh old install    # switch to old config"
+    echo "  bash ~/Configs/nvim/setup.sh simple install # switch to simple config"
   fi
 fi
