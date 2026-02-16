@@ -40,3 +40,5 @@ require("lazy").setup("plugins", {
     },
   },
 })
+
+vim.opt.wrap = true
