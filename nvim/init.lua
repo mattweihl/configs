@@ -42,3 +42,4 @@ require("lazy").setup("plugins", {
 })
 
 vim.opt.wrap = true
+vim.wo.number = true
