@@ -61,8 +61,8 @@ return {
         },
       })
 
-      -- Load extensions
       telescope.load_extension("fzf")
     end,
   },
 }
+

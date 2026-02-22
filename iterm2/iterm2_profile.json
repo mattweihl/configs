@@ -671,7 +671,7 @@
     "Shortcut" : "",
     "Mouse Reporting" : true,
     "Tags" : [
-  
+
     ],
     "Blur Radius" : 0.10000000000000001,
     "Ansi 6 Color (Light)" : {
@@ -818,3 +818,4 @@
       "Green Component" : 0.10588235408067703
     }
   }
+

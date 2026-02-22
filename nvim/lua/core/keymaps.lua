@@ -1,7 +1,3 @@
---------------------------------------------------------------------------------
--- Key Mappings
---------------------------------------------------------------------------------
-
 local map = vim.keymap.set
 
 -- Escape insert mode
@@ -42,3 +38,4 @@ map("n", "]g", function() vim.diagnostic.jump({ count = 1 }) end, { desc = "Next
 
 -- Select all
 map("n", "<C-a>", "ggVG", { desc = "Select all" })
+

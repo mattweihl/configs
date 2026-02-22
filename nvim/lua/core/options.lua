@@ -1,14 +1,9 @@
---------------------------------------------------------------------------------
--- Editor Options
---------------------------------------------------------------------------------
-
 local opt = vim.opt
 
 -- Leader key
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- Nerd Font support: set NVIM_NERD_FONT=1 in your shell profile to enable
 -- e.g. export NVIM_NERD_FONT=1 in ~/.zshrc or ~/.bashrc
 vim.g.have_nerd_font = vim.env.NVIM_NERD_FONT == "1"
 
@@ -68,8 +63,8 @@ opt.expandtab = true
 opt.smarttab = true
 
 -- Clipboard: use OSC 52 for SSH/tmux compatibility
--- Works across macOS, Linux, SSH sessions, and tmux
 opt.clipboard = "unnamedplus"
 
 -- History
 opt.history = 1000
+

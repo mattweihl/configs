@@ -1,7 +1,3 @@
---------------------------------------------------------------------------------
--- Autocommands
---------------------------------------------------------------------------------
-
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 
@@ -104,7 +100,7 @@ vim.cmd("amenu PopUp.-git_sep- <Nop>")
 vim.cmd("amenu PopUp." .. (nf and "󰈞\\ " or "") .. "Search\\ Word             <cmd>lua require('telescope.builtin').grep_string()<CR>")
 vim.cmd("amenu PopUp." .. (nf and "󰊢\\ " or "") .. "Git\\ Blame               <cmd>lua require('gitsigns').blame_line({ full = true })<CR>")
 
--- Auto-reload files changed externally (e.g. cursor-agent in another tmux pane)
+-- Auto-reload files changed externally
 augroup("AutoReload", { clear = true })
 autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
   group = "AutoReload",
@@ -116,3 +112,4 @@ autocmd("FileChangedShellPost", {
     vim.notify("File changed on disk. Buffer reloaded.", vim.log.levels.INFO)
   end,
 })
+
