@@ -1,0 +1,72 @@
+export LS_COLORS=gxBxhxDxfxhxhxhxhxcxcx
+
+setopt PROMPT_SUBST
+autoload -Uz add-zsh-hook vcs_info
+zmodload zsh/datetime 2>/dev/null  # provides strftime
+
+zstyle ':vcs_info:git:*' formats '(%b)'
+
+_prompt_update() {
+  TIME_SAFE=$(strftime '%I:%M%p' $EPOCHSECONDS)
+  TIME_SAFE=${TIME_SAFE#0}
+
+  vcs_info
+  local msg=$vcs_info_msg_0_
+
+  # Keep PROMPT_SUBST safe-ish: prevent prompt escapes and substitutions from VCS text
+  msg=${msg//\%/%%}
+  msg=${msg//\$/\\$}
+  msg=${msg//\`/\\\`}   # avoid `...` command substitution
+
+  VCS_SAFE=$msg
+}
+
+add-zsh-hook precmd _prompt_update
+
+PROMPT=$'%F{green}${TIME_SAFE}%f %F{blue}%~%f%F{red}${VCS_SAFE:+ ${VCS_SAFE}}%f\n$ '
+
+alias ll="ls -alFh --color=auto"
+alias la="ls -A --color=auto"
+alias l="ll"
+alias c="cd $CODE_LOCATION"
+alias gs="git status"
+alias gb="git branch"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
+alias gd="git diff"
+alias dt="cd $DESKTOP"
+
+if command -v fzf &> /dev/null
+then
+    source <(fzf --zsh)
+fi
+
+export EDITOR='vim'
+if command -v nvim &> /dev/null
+then
+    export EDITOR="nvim"
+    alias vim='nvim'
+    alias vi='nvim'
+fi
+
+autoload edit-command-line
+zle -N edit-command-line
+bindkey '^X^e' edit-command-line
+
+autoload -U select-word-style
+select-word-style bash
+
+HISTFILE=$HOME/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt APPEND_HISTORY
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt AUTO_CD
+
+bindkey -e
+export CLICOLOR=1
+

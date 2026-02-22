@@ -1,0 +1,4 @@
+coc/commands
+.DS_Store
+coc/list-extensions-history.json
+nvim/.DS_Store
