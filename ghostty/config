@@ -1,7 +1,10 @@
 font-family = Iosevka Nerd Font Mono
 font-size = 20
-macos-icon = retro
-macos-icon-frame = chrome
+# macos-icon = retro
+macos-icon = custom
+# macos-icon-frame = chrome
 
 keybind = global:cmd+grave_accent=toggle_quick_terminal
+
+macos-custom-icon = ~/configs/ghostty/icons/ghostty-catppuccin-mocha.icns
 
