@@ -1,3 +1,7 @@
 font-family = Iosevka Nerd Font Mono
 font-size = 20
-macos-icon = blueprint
+macos-icon = retro
+macos-icon-frame = chrome
+
+keybind = global:cmd+grave_accent=toggle_quick_terminal
+
