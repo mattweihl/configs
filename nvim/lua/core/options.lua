@@ -4,7 +4,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 opt.number = true
-opt.relativenumber = true
+opt.relativenumber = false
 
 opt.cursorline = true
 opt.termguicolors = true
