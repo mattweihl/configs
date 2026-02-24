@@ -44,7 +44,7 @@ return {
         pattern = { "*.js", "*.jsx" },
         callback = function()
           vim.schedule(function()
-            vim.treesitter.start()
+            pcall(vim.treesitter.start)
           end)
         end,
       })
