@@ -33,9 +33,3 @@ require("lazy").setup("plugins", {
   },
 })
 
-vim.opt.wrap = true
-vim.opt.number = true
-vim.opt.relativenumber = true
-
-
-

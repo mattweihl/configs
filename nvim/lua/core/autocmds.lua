@@ -76,6 +76,8 @@ autocmd("BufReadPre", {
 
 vim.cmd("amenu PopUp." .. "Search\\ Word             <cmd>lua require('telescope.builtin').grep_string()<CR>")
 
+-- Detect external file changes (e.g. Cursor Agent, Claude, or another process).
+-- checktime runs on focus/enter/cursor-hold; with autoread, unmodified buffers reload automatically.
 augroup("AutoReload", { clear = true })
 autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
   group = "AutoReload",
@@ -84,7 +86,7 @@ autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
 autocmd("FileChangedShellPost", {
   group = "AutoReload",
   callback = function()
-    vim.notify("File changed on disk. Buffer reloaded.", vim.log.levels.INFO)
+    vim.notify("File changed on disk (e.g. by agent). Buffer reloaded.", vim.log.levels.INFO)
   end,
 })
 

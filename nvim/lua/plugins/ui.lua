@@ -22,7 +22,7 @@ return {
 
       require("lualine").setup({
         options = {
-          icons_enabled = nf,
+          icons_enabled = true,
           theme = "auto",
           component_separators = { left = "", right = "" },
           section_separators = { left = "", right = "" },
@@ -71,6 +71,7 @@ return {
       wk.add({
         { "<leader>b", group = "Buffer" },
         { "<leader>c", group = "Code" },
+        { "<leader>d", group = "Diagnostics" },
         { "<leader>f", group = "Find/File" },
         { "<leader>w", group = "Write/Quit" },
       })

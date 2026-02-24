@@ -4,7 +4,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 opt.number = true
-opt.relativenumber = false
+opt.relativenumber = true
 
 opt.cursorline = true
 opt.termguicolors = true
@@ -29,12 +29,15 @@ opt.wildmode = "list:longest"
 opt.wildignore:append("*.docx,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx")
 opt.splitbelow = true
 opt.splitright = true
-opt.wrap = false
+opt.wrap = true
 opt.linebreak = true
 
 opt.backup = false
 opt.writebackup = false
 opt.swapfile = false
+
+-- Reload buffer when file changes on disk (e.g. Cursor Agent / Claude editing the file).
+opt.autoread = true
 
 opt.undofile = true
 
