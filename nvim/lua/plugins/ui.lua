@@ -1,14 +1,28 @@
 return {
   {
-    "Mofiqul/vscode.nvim",
+    "ellisonleao/gruvbox.nvim",
     lazy = false,
     priority = 1000,
     config = function()
-      require("vscode").setup({
-        style = "dark",
-        transparent = false,
+      require("gruvbox").setup({
+        terminal_colors = true,
+        undercurl = true,
+        underline = true,
+        bold = true,
+        italic = {
+          strings = true,
+          emphasis = true,
+          comments = true,
+          operators = false,
+          folds = true,
+        },
+        strikethrough = true,
+        inverse = true,
+        contrast = "",
+        transparent_mode = false,
       })
-      require("vscode").load()
+      vim.o.background = "light"
+      vim.cmd("colorscheme gruvbox")
     end,
   },
 

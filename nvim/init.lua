@@ -14,7 +14,7 @@ require("core.autocmds")
 
 require("lazy").setup("plugins", {
   defaults = { lazy = true },
-  install = { colorscheme = { "vscode" } },
+  install = { colorscheme = { "gruvbox" } },
   checker = { enabled = false },
   change_detection = { notify = false },
   performance = {
