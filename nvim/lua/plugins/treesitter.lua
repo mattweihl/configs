@@ -34,7 +34,7 @@ return {
       },
     },
     init = function()
-      vim.opt.runtimepath:prepend(vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/runtime")
+      vim.opt.runtimepath:append(vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/runtime")
 
       vim.treesitter.language.register("bash", "sh")
       vim.treesitter.language.register("bash", "zsh")
