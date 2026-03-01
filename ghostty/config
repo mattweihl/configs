@@ -8,4 +8,5 @@ keybind = global:cmd+grave_accent=toggle_quick_terminal
 shell-integration-features = ssh-terminfo
 shell-integration-features = ssh-env
 
-theme = Gruvbox Light Hard
+theme = Gruvbox Material Dark
+
