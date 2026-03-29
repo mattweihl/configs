@@ -1,0 +1,60 @@
+font-family = Iosevka Nerd Font Mono
+font-size = 18
+macos-icon = custom
+macos-custom-icon = ~/configs/ghostty/icons/ghostty-black.icns
+
+keybind = global:cmd+ctrl+t=toggle_quick_terminal
+
+shell-integration-features = ssh-terminfo,ssh-env
+
+theme = Dracula+
+
+window-width = 98
+window-height = 25
+
+# ── Splits (Ctrl-A leader, tmux-style) ─────────────────────
+
+# Split horizontal / vertical (matches tmux " and %)
+keybind = ctrl+a>shift+apostrophe=new_split:down
+keybind = ctrl+a>shift+five=new_split:right
+
+# Close pane (matches your C-w rebind)
+keybind = ctrl+a>ctrl+w=close_surface
+
+# Navigate splits (vim-style hjkl)
+keybind = ctrl+a>h=goto_split:left
+keybind = ctrl+a>j=goto_split:down
+keybind = ctrl+a>k=goto_split:up
+keybind = ctrl+a>l=goto_split:right
+
+# Cycle splits (like tmux o)
+keybind = ctrl+a>o=goto_split:next
+
+# Zoom/unzoom current split (like tmux z)
+keybind = ctrl+a>z=toggle_split_zoom
+
+# Resize splits (arrow keys, 10px increments)
+keybind = ctrl+a>shift+h=resize_split:left,40
+keybind = ctrl+a>shift+j=resize_split:down,40
+keybind = ctrl+a>shift+k=resize_split:up,40
+keybind = ctrl+a>shift+l=resize_split:right,40
+
+# Equalize split sizes (like tmux select-layout even)
+keybind = ctrl+a>equal=equalize_splits
+
+# New tab (matches tmux c for new-window)
+keybind = ctrl+a>c=new_tab
+
+# Tab navigation
+keybind = ctrl+a>n=next_tab
+keybind = ctrl+a>p=previous_tab
+
+# Reload config (matches your tmux r bind)
+keybind = ctrl+a>r=reload_config
+
+# Escape hatch — if you fat-finger ctrl+a and want to bail
+keybind = ctrl+a>escape=end_key_sequence
+
+unfocused-split-opacity = 0.9
+
+
