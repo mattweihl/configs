@@ -5,6 +5,8 @@ macos-custom-icon = ~/configs/ghostty/icons/ghostty-black.icns
 
 keybind = global:cmd+ctrl+t=toggle_quick_terminal
 
+keybind = cmd+slash=text:\x1f
+
 shell-integration-features = ssh-terminfo,ssh-env
 
 theme = Dracula+

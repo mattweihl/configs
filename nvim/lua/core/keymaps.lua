@@ -90,3 +90,14 @@ end
 
 map({ "n", "t" }, "<C-t>", toggle_terminal, { desc = "Toggle terminal" })
 
+-- Cmd+/ comment toggle (Ghostty remaps cmd+/ to Ctrl+/, which sends 0x1f = <C-_>)
+map("n", "<C-_>", function()
+  require("Comment.api").toggle.linewise.current()
+end, { desc = "Toggle comment (Cmd+/)" })
+
+map("v", "<C-_>", function()
+  local esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+  vim.api.nvim_feedkeys(esc, "nx", false)
+  require("Comment.api").toggle.linewise(vim.fn.visualmode())
+end, { desc = "Toggle comment (Cmd+/)" })
+
