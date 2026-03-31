@@ -71,12 +71,24 @@ fi
 if command -v claude &> /dev/null
 then
   claude() {
-    [ -n "$TMUX" ] && tmux rename-window "claude"
-    command claude "$@"
+    if [ -n "$TMUX" ]; then
+      tmux set-option -w automatic-rename off
+      tmux rename-window "claude"
+      command claude "$@"
+      tmux set-option -w automatic-rename on
+    else
+      command claude "$@"
+    fi
   }
   clawd() {
-    [ -n "$TMUX" ] && tmux rename-window "clawd"
-    command claude --dangerously-skip-permissions "$@"
+    if [ -n "$TMUX" ]; then
+      tmux set-option -w automatic-rename off
+      tmux rename-window "clawd"
+      command claude --dangerously-skip-permissions "$@"
+      tmux set-option -w automatic-rename on
+    else
+      command claude --dangerously-skip-permissions "$@"
+    fi
   }
 fi
 
