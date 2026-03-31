@@ -14,11 +14,6 @@ map("n", "<leader>qq", ":qa!<CR>", { desc = "Quit all", silent = true })
 map("n", "<leader>wq", ":wqa!<CR>", { desc = "Save and quit all", silent = true })
 map("n", "<leader>ww", ":w!<CR>", { desc = "Save", silent = true })
 
-map("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
-map("n", "<C-j>", "<C-w>j", { desc = "Move to below window" })
-map("n", "<C-k>", "<C-w>k", { desc = "Move to above window" })
-map("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
-
 map("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height", silent = true })
 map("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height", silent = true })
 map("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
