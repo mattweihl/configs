@@ -25,6 +25,7 @@ return {
       "williamboman/mason.nvim",
       "neovim/nvim-lspconfig",
       "b0o/schemastore.nvim",
+      "saghen/blink.cmp",
     },
     opts = {
       ensure_installed = {
@@ -51,7 +52,7 @@ return {
     config = function(_, opts)
       require("mason-lspconfig").setup(opts)
 
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       vim.lsp.config("*", {
         capabilities = capabilities,

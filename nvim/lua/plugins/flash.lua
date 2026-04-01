@@ -1,0 +1,16 @@
+return {
+  "folke/flash.nvim",
+  event = "VeryLazy",
+  keys = {
+    { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash jump" },
+    { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash treesitter select" },
+  },
+  opts = {
+    modes = {
+      -- Enhance f/F/t/T with flash labels when there are multiple matches
+      char = { enabled = true },
+      -- Don't hijack regular / search by default
+      search = { enabled = false },
+    },
+  },
+}

@@ -19,7 +19,7 @@ return {
         mappings = {
           ["<space>"] = "none",
           ["<2-LeftMouse>"] = "open",
-          ["<RightMouse>"] = "show_file_details",
+          ["<RightMouse>"] = "noop",
           ["a"] = {
             "add",
             config = {
@@ -36,16 +36,14 @@ return {
           ["?"] = "show_help",
         },
       },
-      commands = {
-        show_file_details = function(state)
-          local node = state.tree:get_node()
-          if node then
-            vim.cmd("Neotree action=focus")
-            require("neo-tree.sources.filesystem.commands").show_file_details(state)
-          end
-        end,
+      event_handlers = {
+        {
+          event = "file_added",
+          handler = function(file_path)
+            vim.cmd("edit " .. vim.fn.fnameescape(file_path))
+          end,
+        },
       },
-      event_handlers = {},
       filesystem = {
         filtered_items = {
           visible = true,

@@ -99,11 +99,15 @@ autocmd("BufReadPre", {
 })
 
 
--- Dynamic right-click context menu (adapts based on LSP availability)
+-- Dynamic right-click context menu (adapts based on LSP availability and buffer type)
 local function build_right_click_menu()
-  -- Clear any existing PopUp menu items
   pcall(vim.cmd, "aunmenu PopUp")
 
+  if vim.bo.filetype == "neo-tree" then
+    return -- handled separately via vim.ui.select
+  end
+
+  -- Normal buffer context menu
   local has_lsp = #vim.lsp.get_clients({ bufnr = 0 }) > 0
 
   if has_lsp then
@@ -112,7 +116,7 @@ local function build_right_click_menu()
     vim.cmd("amenu PopUp.Go\\ to\\ Implementations    <cmd>lua vim.lsp.buf.implementation()<CR>")
     vim.cmd("amenu PopUp.Go\\ to\\ References          <cmd>lua vim.lsp.buf.references()<CR>")
     vim.cmd("amenu PopUp.-sep1- :")
-    vim.cmd("amenu PopUp.Find\\ All\\ References       <cmd>Telescope lsp_references<CR>")
+    vim.cmd("amenu PopUp.Find\\ All\\ References       <cmd>FzfLua lsp_references<CR>")
     vim.cmd("amenu PopUp.Show\\ Call\\ Hierarchy       <cmd>lua vim.lsp.buf.incoming_calls()<CR>")
     vim.cmd("amenu PopUp.-sep2- :")
     vim.cmd("amenu PopUp.Rename\\ Symbol               <cmd>lua vim.lsp.buf.rename()<CR>")
@@ -125,12 +129,68 @@ local function build_right_click_menu()
   vim.cmd([[amenu PopUp.Copy        "+y]])
   vim.cmd([[amenu PopUp.Paste       "+gP]])
   vim.cmd("amenu PopUp.-sep4- :")
-  vim.cmd("amenu PopUp.Command\\ Palette              <cmd>Telescope commands<CR>")
+  vim.cmd("amenu PopUp.Command\\ Palette              <cmd>FzfLua commands<CR>")
+end
+
+local function neo_tree_context_menu()
+  local Menu = require("nui.menu")
+  local event = require("nui.utils.autocmd").event
+
+  local items = {
+    Menu.item("  New File", { key = "a" }),
+    Menu.item("  Rename", { key = "r" }),
+    Menu.item("  Delete", { key = "d" }),
+    Menu.separator(""),
+    Menu.item("  Copy", { key = "y" }),
+    Menu.item("  Cut", { key = "x" }),
+    Menu.item("  Paste", { key = "p" }),
+    Menu.separator(""),
+    Menu.item("  Move", { key = "m" }),
+  }
+
+  local mouse = vim.fn.getmousepos()
+  local menu = Menu({
+    relative = "editor",
+    position = {
+      row = mouse.screenrow,
+      col = mouse.screencol,
+    },
+    size = { width = 20 },
+    border = {
+      style = "rounded",
+      padding = { 0, 1 },
+    },
+    win_options = {
+      cursorline = true,
+      winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:PmenuSel",
+    },
+  }, {
+    lines = items,
+    keymap = {
+      focus_next = { "j", "<Down>" },
+      focus_prev = { "k", "<Up>" },
+      close = { "<Esc>", "q", "<RightMouse>" },
+      submit = { "<CR>", "<LeftMouse>" },
+    },
+    on_submit = function(item)
+      vim.api.nvim_feedkeys(item.key, "m", false)
+    end,
+  })
+
+  menu:mount()
+  menu:on(event.BufLeave, function()
+    menu:unmount()
+  end)
 end
 
 vim.keymap.set("n", "<RightMouse>", function()
   vim.api.nvim_feedkeys(vim.keycode("<LeftMouse>"), "n", false)
   vim.schedule(function()
+    if vim.bo.filetype == "neo-tree" then
+      neo_tree_context_menu()
+      return
+    end
+
     build_right_click_menu()
     vim.cmd("popup! PopUp")
   end)

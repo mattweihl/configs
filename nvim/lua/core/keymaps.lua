@@ -13,6 +13,14 @@ map("n", "<leader>q", ":q!<CR>", { desc = "Quit", silent = true })
 map("n", "<leader>qq", ":qa!<CR>", { desc = "Quit all", silent = true })
 map("n", "<leader>wq", ":wqa!<CR>", { desc = "Save and quit all", silent = true })
 map("n", "<leader>ww", ":w!<CR>", { desc = "Save", silent = true })
+map("n", "<leader>R", function()
+  -- Re-source core config modules
+  for _, mod in ipairs({ "core.options", "core.keymaps", "core.autocmds" }) do
+    package.loaded[mod] = nil
+    require(mod)
+  end
+  vim.notify("Config reloaded")
+end, { desc = "Reload config" })
 
 map("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height", silent = true })
 map("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height", silent = true })
