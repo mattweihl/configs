@@ -9,7 +9,19 @@ map("n", "<CR>", function()
   vim.cmd("noh")
 end, { desc = "Clear search highlight", silent = true })
 
-map("n", "<leader>q", ":q!<CR>", { desc = "Quit", silent = true })
+map("n", "<leader>q", function()
+  if #vim.api.nvim_list_wins() > 1 then
+    vim.cmd("close!")
+  else
+    -- Last window: switch to alternate buffer or create empty
+    local bufs = vim.fn.getbufinfo({ buflisted = 1 })
+    if #bufs > 1 then
+      vim.cmd("bnext | bdelete! #")
+    else
+      vim.cmd("q!")
+    end
+  end
+end, { desc = "Close split/buffer", silent = true })
 map("n", "<leader>qq", ":qa!<CR>", { desc = "Quit all", silent = true })
 map("n", "<leader>wq", ":wqa!<CR>", { desc = "Save and quit all", silent = true })
 map("n", "<leader>ww", ":w!<CR>", { desc = "Save", silent = true })
@@ -26,6 +38,36 @@ map("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height", silent =
 map("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height", silent = true })
 map("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width", silent = true })
 map("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width", silent = true })
+
+-- Splits (VSCode-style editor groups)
+map("n", "<leader>\\", "<cmd>vsplit<cr>", { desc = "Split right" })
+map("n", "<leader>-", "<cmd>split<cr>", { desc = "Split down" })
+map("n", "<leader>sx", "<cmd>close<cr>", { desc = "Close split" })
+map("n", "<leader>so", "<cmd>only<cr>", { desc = "Close other splits" })
+
+-- Navigate splits
+map("n", "<leader>sh", "<cmd>wincmd h<cr>", { desc = "Move to left split" })
+map("n", "<leader>sj", "<cmd>wincmd j<cr>", { desc = "Move to below split" })
+map("n", "<leader>sk", "<cmd>wincmd k<cr>", { desc = "Move to above split" })
+map("n", "<leader>sl", "<cmd>wincmd l<cr>", { desc = "Move to right split" })
+
+-- Focus split by number (VSCode: Cmd+1/2/3/4)
+map("n", "<leader>1", "1<C-w>w", { desc = "Focus split 1" })
+map("n", "<leader>2", "2<C-w>w", { desc = "Focus split 2" })
+map("n", "<leader>3", "3<C-w>w", { desc = "Focus split 3" })
+map("n", "<leader>4", "4<C-w>w", { desc = "Focus split 4" })
+
+-- Zoom toggle (VSCode: Toggle Editor Group Sizes)
+map("n", "<leader>sm", function()
+  if vim.t.zoomed then
+    vim.cmd("wincmd =")
+    vim.t.zoomed = false
+  else
+    vim.cmd("wincmd |")
+    vim.cmd("wincmd _")
+    vim.t.zoomed = true
+  end
+end, { desc = "Toggle zoom split" })
 
 map("n", "<A-j>", ":m .+1<CR>==", { desc = "Move line down", silent = true })
 map("n", "<A-k>", ":m .-2<CR>==", { desc = "Move line up", silent = true })

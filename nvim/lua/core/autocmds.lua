@@ -112,6 +112,7 @@ local function build_right_click_menu()
 
   if has_lsp then
     vim.cmd("amenu PopUp.Go\\ to\\ Definition         <cmd>lua vim.lsp.buf.definition()<CR>")
+    vim.cmd("amenu PopUp.Go\\ to\\ Definition\\ (Split) <cmd>vsplit | lua vim.lsp.buf.definition()<CR>")
     vim.cmd("amenu PopUp.Go\\ to\\ Type\\ Definition  <cmd>lua vim.lsp.buf.type_definition()<CR>")
     vim.cmd("amenu PopUp.Go\\ to\\ Implementations    <cmd>lua vim.lsp.buf.implementation()<CR>")
     vim.cmd("amenu PopUp.Go\\ to\\ References          <cmd>lua vim.lsp.buf.references()<CR>")

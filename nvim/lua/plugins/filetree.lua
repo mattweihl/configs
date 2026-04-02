@@ -13,12 +13,16 @@ return {
     opts = {
       close_if_last_window = true,
       popup_border_style = "rounded",
+      open_files_do_not_replace_types = { "terminal", "Trouble", "qf" },
       window = {
         position = "left",
         width = 30,
         mappings = {
           ["<space>"] = "none",
-          ["<2-LeftMouse>"] = "open",
+          ["<cr>"] = "open_drop",
+          ["<2-LeftMouse>"] = "open_drop",
+          ["s"] = "open_vsplit",
+          ["S"] = "open_split",
           ["<RightMouse>"] = "noop",
           ["a"] = {
             "add",

@@ -40,6 +40,14 @@ return {
             ["<C-k>"] = "preview-page-up",
           },
         },
+        actions = {
+          files = {
+            ["enter"] = fzf.actions.file_edit,
+            ["ctrl-v"] = fzf.actions.file_vsplit, -- open to the side (VSCode: Ctrl+Enter)
+            ["ctrl-x"] = fzf.actions.file_split,
+            ["ctrl-t"] = fzf.actions.file_tabedit,
+          },
+        },
         files = {
           cmd = "rg --files --hidden --glob=!.git/*",
           file_ignore_patterns = { "node_modules/", "__pycache__/", "%.pyc" },

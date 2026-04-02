@@ -97,6 +97,7 @@ return {
         { "<leader>c", group = "Code" },
         { "<leader>d", group = "Diagnostics" },
         { "<leader>f", group = "Find" },
+        { "<leader>s", group = "Splits" },
         { "<leader>F", desc = "Format buffer" },
         { "<leader>g", group = "Git" },
         { "<leader>h", group = "Hunks" },
