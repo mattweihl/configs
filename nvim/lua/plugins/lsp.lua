@@ -13,62 +13,63 @@ return {
         },
       },
     },
-    config = function(_, opts)
-      require("mason").setup(opts)
-    end,
   },
 
   {
-    "williamboman/mason-lspconfig.nvim",
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    event = "VeryLazy",
+    dependencies = { "williamboman/mason.nvim" },
+    opts = {
+      ensure_installed = {
+        -- LSP servers
+        "typescript-language-server",
+        "html-lsp",
+        "css-lsp",
+        "pyright",
+        "vscode-eslint-language-server",
+        "jdtls",
+        "marksman",
+        "texlab",
+        "bash-language-server",
+        "yaml-language-server",
+        "json-lsp",
+        "lua-language-server",
+        "vim-language-server",
+        "sqlls",
+        "dockerfile-language-server",
+        "docker-compose-language-service",
+        "terraform-ls",
+        -- Formatters & linters
+        "prettier",
+        "black",
+        "flake8",
+        "ruff",
+        "sql-formatter",
+      },
+    },
+  },
+
+  {
+    -- Loading nvim-lspconfig adds its lsp/ directory to runtimepath, providing
+    -- cmd/filetypes/root_markers for servers activated by vim.lsp.enable().
+    "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "williamboman/mason.nvim",
-      "neovim/nvim-lspconfig",
       "b0o/schemastore.nvim",
       "saghen/blink.cmp",
     },
-    opts = {
-      ensure_installed = {
-        "ts_ls",
-        "html",
-        "cssls",
-        "pyright",
-        "eslint",
-        "jdtls",   -- Java
-        "marksman", -- Markdown
-        "texlab",  -- LaTeX
-        "bashls",  -- Bash / Zsh
-        "yamlls",  -- YAML
-        "jsonls",  -- JSON
-        "lua_ls",  -- Lua
-        "vimls",   -- Vimscript
-        "sqlls",   -- SQL
-        "dockerls",                        -- Dockerfile
-        "docker_compose_language_service", -- docker-compose.yml
-        "terraformls",                     -- Terraform (requires terraform CLI)
-        -- "tailwindcss",                  -- Uncomment when confirmed project uses Tailwind (resource-heavy)
-      },
-    },
-    config = function(_, opts)
-      require("mason-lspconfig").setup(opts)
-
-      local capabilities = require("blink.cmp").get_lsp_capabilities()
-
+    config = function()
       vim.lsp.config("*", {
-        capabilities = capabilities,
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
       })
 
-      vim.lsp.config("eslint", {
-        settings = {
-          workingDirectories = { mode = "auto" },
-        },
-      })
-
+      -- Schemastore requires must live here (not in lsp/ files) because
+      -- Neovim's lsp/ auto-discovery runs outside lazy.nvim's load order.
       vim.lsp.config("jsonls", {
         settings = {
           json = {
             schemas = require("schemastore").json.schemas(),
-            validate = { enable = true },
           },
         },
       })
@@ -76,33 +77,31 @@ return {
       vim.lsp.config("yamlls", {
         settings = {
           yaml = {
-            schemaStore = { enable = false, url = "" },
             schemas = require("schemastore").yaml.schemas(),
           },
         },
       })
 
-      vim.lsp.config("terraformls", {
-        init_options = {
-          ignoreSingleFileWarning = true,
-        },
+      vim.lsp.enable({
+        "ts_ls",
+        "html",
+        "cssls",
+        "pyright",
+        "eslint",
+        "jdtls",
+        "marksman",
+        "texlab",
+        "bashls",
+        "yamlls",
+        "jsonls",
+        "lua_ls",
+        "vimls",
+        "sqlls",
+        "dockerls",
+        "docker_compose_language_service",
+        "terraformls",
       })
 
-      vim.lsp.config("lua_ls", {
-        settings = {
-          Lua = {
-            runtime = { version = "LuaJIT" },
-            workspace = {
-              library = {
-                vim.env.VIMRUNTIME,
-                "${3rd}/luv/library",
-              },
-            },
-          },
-        },
-      })
-
-      -- Keymaps and behavior on LSP attach (no setup_handlers in mason-lspconfig v2).
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
           local bufnr = args.buf
@@ -128,7 +127,6 @@ return {
 
           map("n", "<leader>e", vim.diagnostic.open_float, "Line diagnostics")
           map("n", "<leader>dl", vim.diagnostic.setloclist, "Diagnostics to loclist")
-
         end,
       })
 

@@ -14,7 +14,7 @@ require("core.autocmds")
 
 require("lazy").setup("plugins", {
   defaults = { lazy = true },
-  install = { colorscheme = { "gruvbox" } },
+  install = { colorscheme = { "jellybeans-nvim" } },
   checker = { enabled = false },
   change_detection = { notify = false },
   performance = {

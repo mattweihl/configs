@@ -1,29 +1,39 @@
 return {
   {
-    "ellisonleao/gruvbox.nvim",
+    "metalelf0/jellybeans-nvim",
+    dependencies = { "rktjmp/lush.nvim" },
     lazy = false,
     priority = 1000,
     config = function()
-      require("gruvbox").setup({
-        terminal_colors = true,
-        undercurl = true,
-        underline = true,
-        bold = true,
-        italic = {
-          strings = true,
-          emphasis = true,
-          comments = true,
-          operators = false,
-          folds = true,
-        },
-        strikethrough = true,
-        inverse = true,
-        contrast = "",
-        transparent_mode = false,
-      })
-      vim.o.background = "dark"
-      vim.cmd("colorscheme gruvbox")
+      vim.cmd("colorscheme jellybeans-nvim")
     end,
+  },
+
+  {
+    "ellisonleao/gruvbox.nvim",
+    lazy = true,
+    -- To restore as default, set lazy = false, priority = 1000, and uncomment:
+    -- config = function()
+    --   require("gruvbox").setup({
+    --     terminal_colors = true,
+    --     undercurl = true,
+    --     underline = true,
+    --     bold = true,
+    --     italic = {
+    --       strings = true,
+    --       emphasis = true,
+    --       comments = true,
+    --       operators = false,
+    --       folds = true,
+    --     },
+    --     strikethrough = true,
+    --     inverse = true,
+    --     contrast = "",
+    --     transparent_mode = false,
+    --   })
+    --   vim.o.background = "dark"
+    --   vim.cmd("colorscheme gruvbox")
+    -- end,
   },
 
   {
