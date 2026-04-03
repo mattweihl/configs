@@ -113,6 +113,18 @@ end
 map({ "n", "v" }, "<leader>yr", yank_with_path(false), { desc = "Yank with relative path" })
 map({ "n", "v" }, "<leader>ya", yank_with_path(true), { desc = "Yank with absolute path" })
 
+local function yank_path_only(use_absolute)
+  return function()
+    local bufname = vim.api.nvim_buf_get_name(0)
+    local path = use_absolute and bufname or vim.fn.fnamemodify(bufname, ":~:.")
+    vim.fn.setreg("+", path)
+    vim.notify("Yanked " .. (use_absolute and "absolute" or "relative") .. " path")
+  end
+end
+
+map("n", "<leader>yR", yank_path_only(false), { desc = "Yank relative path only" })
+map("n", "<leader>yA", yank_path_only(true), { desc = "Yank absolute path only" })
+
 -- Terminal toggle (<C-t>) — VSCode-style bottom terminal
 -- Note: overrides vim's <C-t> (tag stack pop), which is unused with LSP navigation (<C-o> instead)
 local term_buf = nil

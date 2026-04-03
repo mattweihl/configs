@@ -112,7 +112,7 @@ local function build_right_click_menu()
 
   if has_lsp then
     vim.cmd("amenu PopUp.Go\\ to\\ Definition         <cmd>lua vim.lsp.buf.definition()<CR>")
-    vim.cmd("amenu PopUp.Go\\ to\\ Definition\\ (Split) <cmd>vsplit | lua vim.lsp.buf.definition()<CR>")
+    vim.cmd("amenu PopUp.Go\\ to\\ Definition\\ (Split) <cmd>lua vim.cmd('vsplit'); vim.lsp.buf.definition()<CR>")
     vim.cmd("amenu PopUp.Go\\ to\\ Type\\ Definition  <cmd>lua vim.lsp.buf.type_definition()<CR>")
     vim.cmd("amenu PopUp.Go\\ to\\ Implementations    <cmd>lua vim.lsp.buf.implementation()<CR>")
     vim.cmd("amenu PopUp.Go\\ to\\ References          <cmd>lua vim.lsp.buf.references()<CR>")
@@ -183,6 +183,9 @@ local function neo_tree_context_menu()
     menu:unmount()
   end)
 end
+
+-- Remove Neovim's default MenuPopup autocmd so it doesn't conflict with our custom menu
+pcall(vim.api.nvim_del_augroup_by_name, "nvim_menu")
 
 vim.keymap.set("n", "<RightMouse>", function()
   vim.api.nvim_feedkeys(vim.keycode("<LeftMouse>"), "n", false)
