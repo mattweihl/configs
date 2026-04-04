@@ -113,20 +113,26 @@ setopt HIST_IGNORE_SPACE
 setopt HIST_FIND_NO_DUPS
 setopt AUTO_CD
 
-autoload -Uz compinit
-if [[ -n $HOME/.zcompdump(#qN.mh+24) ]]; then
-  compinit
-else
-  compinit -C
+# zsh-completions: extra completion definitions
+if [[ -d /opt/homebrew/share/zsh-completions ]]; then
+  fpath=(/opt/homebrew/share/zsh-completions $fpath)
+elif [[ -d /usr/share/zsh-completions ]]; then
+  fpath=(/usr/share/zsh-completions $fpath)
+fi
+
+# zsh-autocomplete: IDE-style completion as you type (handles compinit internally)
+zstyle '*:compinit' arguments -u
+if [[ -f /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh ]]; then
+  source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 fi
 
 bindkey -e
 export CLICOLOR=1
 
-# zsh-autosuggestions (fish-style gray suggestions, accept with right arrow)
-if [[ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-  source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-elif [[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# zsh-syntax-highlighting: colors valid/invalid commands as you type (must be last)
+if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+elif [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 
