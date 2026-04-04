@@ -1,5 +1,6 @@
 return {
   "sindrets/diffview.nvim",
+  enabled = false, -- using lazygit for diffs; re-enable to evaluate
   cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory" },
   keys = {
     { "<leader>gd", "<cmd>DiffviewOpen<CR>", desc = "Git diff (working tree)" },

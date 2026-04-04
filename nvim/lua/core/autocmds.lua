@@ -37,7 +37,9 @@ autocmd("BufWritePre", {
   pattern = "*",
   callback = function(args)
     if vim.b[args.buf].large_file then return end
-    vim.cmd("%s/\\s\\+$//e")
+    local pos = vim.api.nvim_win_get_cursor(0)
+    vim.cmd([[%s/\s\+$//e]])
+    pcall(vim.api.nvim_win_set_cursor, 0, pos)
   end,
 })
 

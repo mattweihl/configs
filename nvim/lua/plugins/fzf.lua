@@ -49,11 +49,10 @@ return {
           },
         },
         files = {
-          cmd = "rg --files --hidden --glob=!.git/*",
-          file_ignore_patterns = { "node_modules/", "__pycache__/", "%.pyc" },
+          cmd = "rg --files --hidden --glob=!.git/* --glob=!node_modules/* --glob=!__pycache__/* --glob=!*.pyc",
         },
         grep = {
-          rg_opts = "--color=never --no-heading --with-filename --line-number --column --smart-case --hidden --glob=!.git/*",
+          rg_opts = "--color=never --no-heading --with-filename --line-number --column --smart-case --hidden --glob=!.git/* --glob=!node_modules/* --glob=!__pycache__/* --glob=!*.pyc",
         },
       })
     end,

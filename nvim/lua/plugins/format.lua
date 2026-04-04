@@ -30,15 +30,7 @@ return {
       },
       format_on_save = false,
     },
-    config = function(_, opts)
-      -- Prepend Mason bin to PATH so Conform finds prettier/black/etc.
-      local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
-      if vim.fn.isdirectory(mason_bin) == 1 then
-        local sep = package.config:sub(1, 1) == "\\" and ";" or ":"
-        vim.env.PATH = mason_bin .. sep .. vim.env.PATH
-      end
-
-      require("conform").setup(opts)
-    end,
+    -- Mason prepends its bin/ to PATH on setup (PATH = "prepend" default),
+    -- so conform finds mason-installed formatters automatically.
   },
 }

@@ -55,5 +55,25 @@ opt.smarttab = true
 
 opt.clipboard = "unnamedplus"
 
+-- GUI font (Neovide / nvim-qt); ignored by terminal Neovim
+opt.guifont = "Iosevka_Nerd_Font_Mono,Menlo,monospace:h14"
+
+if vim.g.neovide then
+  -- macOS Option key sends Alt (needed for <A-j>/<A-k> line-move keymaps)
+  vim.g.neovide_input_macos_option_key_is_meta = "both"
+
+  -- Padding (pixels) — breathing room around the editor
+  vim.g.neovide_padding_top = 4
+  vim.g.neovide_padding_bottom = 4
+  vim.g.neovide_padding_left = 8
+  vim.g.neovide_padding_right = 8
+
+  -- Animations — TODO: tune these to your taste (see below)
+  vim.g.neovide_cursor_animation_length = 0.06
+  vim.g.neovide_cursor_trail_size = 0.4
+  vim.g.neovide_scroll_animation_length = 0.1
+end
+
 opt.history = 1000
+opt.exrc = true
 

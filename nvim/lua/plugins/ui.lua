@@ -101,6 +101,7 @@ return {
         { "<leader>F", desc = "Format buffer" },
         { "<leader>g", group = "Git" },
         { "<leader>h", group = "Hunks" },
+        { "<leader>i", group = "Inlay" },
         { "<leader>w", group = "Write/Quit" },
         { "<leader>x", group = "Problems" },
         { "<leader>y", group = "Yank with path" },

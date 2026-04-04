@@ -25,17 +25,17 @@ return {
         vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
       end
 
-      map("n", "]c", function()
+      vim.keymap.set("n", "]c", function()
         if vim.wo.diff then return "]c" end
         vim.schedule(function() gs.next_hunk() end)
         return "<Ignore>"
-      end, "Next hunk")
+      end, { buffer = bufnr, expr = true, desc = "Next hunk" })
 
-      map("n", "[c", function()
+      vim.keymap.set("n", "[c", function()
         if vim.wo.diff then return "[c" end
         vim.schedule(function() gs.prev_hunk() end)
         return "<Ignore>"
-      end, "Prev hunk")
+      end, { buffer = bufnr, expr = true, desc = "Prev hunk" })
 
       map("n", "<leader>hs", gs.stage_hunk, "Stage hunk")
       map("n", "<leader>hr", gs.reset_hunk, "Reset hunk")

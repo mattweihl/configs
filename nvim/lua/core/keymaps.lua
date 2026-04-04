@@ -77,8 +77,8 @@ map("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move selection up", silent = tru
 map("v", "<", "<gv", { desc = "Indent left" })
 map("v", ">", ">gv", { desc = "Indent right" })
 
-map("n", "]d", function() vim.diagnostic.jump({ count = 1 }) end, { desc = "Next diagnostic" })
-map("n", "[d", function() vim.diagnostic.jump({ count = -1 }) end, { desc = "Previous diagnostic" })
+map("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Next diagnostic" })
+map("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Previous diagnostic" })
 
 map("n", "<C-a>", "ggVG", { desc = "Select all" })
 
@@ -88,7 +88,7 @@ local function yank_with_path(use_absolute)
     local bufname = vim.api.nvim_buf_get_name(0)
     local path = use_absolute and bufname or vim.fn.fnamemodify(bufname, ":~:.")
     local mode = vim.fn.mode()
-    local start_line, end_line, lines
+    local start_line, end_line
 
     if mode == "v" or mode == "V" or mode == "\22" then
       -- Visual mode: get selection
@@ -151,6 +151,26 @@ local function toggle_terminal()
 end
 
 map({ "n", "t" }, "<C-t>", toggle_terminal, { desc = "Toggle terminal" })
+
+-- Neovide GUI keymaps (Cmd key = <D-...>)
+if vim.g.neovide then
+  map("n", "<D-s>", "<cmd>w<CR>", { desc = "Save" })
+  map("v", "<D-c>", '"+y', { desc = "Copy" })
+  map("n", "<D-v>", '"+P', { desc = "Paste" })
+  map("v", "<D-v>", '"+P', { desc = "Paste" })
+  map("c", "<D-v>", "<C-R>+", { desc = "Paste" })
+  map("i", "<D-v>", '<ESC>l"+Pli', { desc = "Paste" })
+  map("t", "<D-v>", '<C-\\><C-n>"+Pi', { desc = "Paste in terminal" })
+
+  -- Cmd+=/- to scale font (standard macOS zoom)
+  vim.g.neovide_scale_factor = 1.0
+  local function adjust_scale(delta)
+    vim.g.neovide_scale_factor = vim.g.neovide_scale_factor * delta
+  end
+  map("n", "<D-=>", function() adjust_scale(1.1) end, { desc = "Zoom in" })
+  map("n", "<D-->", function() adjust_scale(1 / 1.1) end, { desc = "Zoom out" })
+  map("n", "<D-0>", function() vim.g.neovide_scale_factor = 1.0 end, { desc = "Reset zoom" })
+end
 
 -- Cmd+/ comment toggle (Ghostty sends \x1f = <C-_> for cmd+slash)
 -- ts-comments.nvim hooks into Neovim 0.10 native gc/gcc and sets commentstring
