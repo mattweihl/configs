@@ -68,29 +68,33 @@ then
     alias vi='nvim'
 fi
 
-if command -v claude &> /dev/null
-then
-  claude() {
-    if [ -n "$TMUX" ]; then
-      tmux set-option -w automatic-rename off
-      tmux rename-window "claude"
-      command claude "$@"
-      tmux set-option -w automatic-rename on
-    else
-      command claude "$@"
-    fi
-  }
-  clawd() {
-    if [ -n "$TMUX" ]; then
-      tmux set-option -w automatic-rename off
-      tmux rename-window "clawd"
-      command claude --dangerously-skip-permissions "$@"
-      tmux set-option -w automatic-rename on
-    else
-      command claude --dangerously-skip-permissions "$@"
-    fi
-  }
-fi
+#if command -v claude &> /dev/null
+#then
+#  claude() {
+#    if [ -n "$TMUX" ]; then
+#      tmux set-option -w automatic-rename off
+#      tmux rename-window "claude"
+#      command claude "$@"
+#      tmux set-option -w automatic-rename on
+#    else
+#      command claude "$@"
+#    fi
+#  }
+#  clawd() {
+#    if [ -n "$TMUX" ]; then
+#      tmux set-option -w automatic-rename off
+#      tmux rename-window "clawd"
+#      command claude --dangerously-skip-permissions "$@"
+#      tmux set-option -w automatic-rename on
+#    else
+#      command claude --dangerously-skip-permissions "$@"
+#    fi
+#  }
+#fi
+
+alias clawd='claude --dangerously-skip-permissions'
+alias neovide='neovide --fork'
+
 
 autoload edit-command-line
 zle -N edit-command-line

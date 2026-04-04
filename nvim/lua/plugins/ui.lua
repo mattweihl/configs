@@ -105,6 +105,7 @@ return {
         { "<leader>w", group = "Write/Quit" },
         { "<leader>x", group = "Problems" },
         { "<leader>y", group = "Yank with path" },
+        { "<leader>a", group = "AI/Claude" },
       })
     end,
   },
