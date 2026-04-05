@@ -93,7 +93,7 @@ autocmd("BufReadPre", {
       -- Detach LSP clients (they choke on huge files)
       vim.schedule(function()
         for _, client in pairs(vim.lsp.get_clients({ bufnr = args.buf })) do
-          vim.lsp.buf_detach_client(args.buf, client.id)
+          client:detach(args.buf)
         end
       end)
     end

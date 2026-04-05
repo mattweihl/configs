@@ -24,7 +24,7 @@ return {
         jsonc = { "prettier" },
         markdown = { "prettier" },
         yaml = { "prettier" },
-        python = { "black" },
+        python = { "ruff_format" },
         terraform = { "terraform_fmt" },
         sql = { "sql_formatter" },
       },

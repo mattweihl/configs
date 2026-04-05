@@ -31,7 +31,12 @@ _prompt_update() {
 
 add-zsh-hook precmd _prompt_update
 
-PROMPT=$'%F{green}${TIME_SAFE}%f %F{blue}%~%f%F{red}${VCS_SAFE:+ ${VCS_SAFE}}%f\n$ '
+# Original prompt (time on left):
+# PROMPT=$'%F{green}${TIME_SAFE}%f %F{blue}%~%f%F{red}${VCS_SAFE:+ ${VCS_SAFE}}%f\n$ '
+
+# Trial: time moved to RPROMPT (auto-hides when command is long)
+PROMPT=$'%F{blue}%~%f%F{red}${VCS_SAFE:+ ${VCS_SAFE}}%f\n$ '
+RPROMPT='%F{green}${TIME_SAFE}%f'
 
 if ls --color=auto / >/dev/null 2>&1; then
   alias ll="ls -alFh --color=auto"
@@ -52,12 +57,14 @@ alias gd="git diff"
 alias history="history 1"
 
 if command -v fzf &> /dev/null; then
-    local _fzf_cache="$HOME/.cache/fzf-zsh.zsh"
+    _fzf_cache="$HOME/.cache/fzf-zsh.zsh"
     if [[ ! -f "$_fzf_cache" || "$_fzf_cache" -ot "$(command -v fzf)" ]]; then
         mkdir -p "$HOME/.cache"
-        fzf --zsh > "$_fzf_cache"
+        if ! fzf --zsh > "$_fzf_cache" 2>/dev/null; then
+            rm -f "$_fzf_cache"
+        fi
     fi
-    source "$_fzf_cache"
+    [[ -s "$_fzf_cache" ]] && source "$_fzf_cache"
 fi
 
 export EDITOR='vim'
@@ -68,29 +75,6 @@ then
     alias vi='nvim'
 fi
 
-#if command -v claude &> /dev/null
-#then
-#  claude() {
-#    if [ -n "$TMUX" ]; then
-#      tmux set-option -w automatic-rename off
-#      tmux rename-window "claude"
-#      command claude "$@"
-#      tmux set-option -w automatic-rename on
-#    else
-#      command claude "$@"
-#    fi
-#  }
-#  clawd() {
-#    if [ -n "$TMUX" ]; then
-#      tmux set-option -w automatic-rename off
-#      tmux rename-window "clawd"
-#      command claude --dangerously-skip-permissions "$@"
-#      tmux set-option -w automatic-rename on
-#    else
-#      command claude --dangerously-skip-permissions "$@"
-#    fi
-#  }
-#fi
 
 alias clawd='claude --dangerously-skip-permissions'
 alias neovide='neovide --fork'

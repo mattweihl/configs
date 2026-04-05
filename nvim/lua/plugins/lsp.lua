@@ -41,8 +41,6 @@ return {
         "terraform-ls",
         -- Formatters & linters
         "prettier",
-        "black",
-        "flake8",
         "ruff",
         "sql-formatter",
       },
