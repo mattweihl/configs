@@ -108,6 +108,9 @@ fi
 zstyle '*:compinit' arguments -u
 if [[ -f /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh ]]; then
   source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+  # Remove _expand from completers — its precmd hook resolves relative paths to absolute
+  # (fixed upstream in 399f398, not yet in a release)
+  zstyle ':completion:*' completer _complete _complete:-fuzzy _correct _approximate _ignored
 fi
 
 bindkey -e
