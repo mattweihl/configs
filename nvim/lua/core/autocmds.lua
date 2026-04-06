@@ -173,7 +173,7 @@ local function neo_tree_context_menu()
       focus_next = { "j", "<Down>" },
       focus_prev = { "k", "<Up>" },
       close = { "<Esc>", "q", "<RightMouse>" },
-      submit = { "<CR>", "<LeftMouse>" },
+      submit = { "<CR>" },
     },
     on_submit = function(item)
       vim.api.nvim_feedkeys(item.key, "m", false)
@@ -181,13 +181,23 @@ local function neo_tree_context_menu()
   })
 
   menu:mount()
+
+  -- Custom left-click: move cursor to clicked line, then submit
+  menu:map("n", "<LeftMouse>", function()
+    vim.api.nvim_feedkeys(vim.keycode("<LeftMouse>"), "n", false)
+    vim.schedule(function()
+      local ok, _ = pcall(vim.api.nvim_feedkeys, vim.keycode("<CR>"), "m", false)
+      if not ok then menu:unmount() end
+    end)
+  end, { noremap = true })
+
   menu:on(event.BufLeave, function()
     menu:unmount()
   end)
 end
 
 -- Remove Neovim's default MenuPopup autocmd so it doesn't conflict with our custom menu
-pcall(vim.api.nvim_del_augroup_by_name, "nvim_menu")
+pcall(vim.api.nvim_del_augroup_by_name, "nvim.popupmenu")
 
 vim.keymap.set("n", "<RightMouse>", function()
   vim.api.nvim_feedkeys(vim.keycode("<LeftMouse>"), "n", false)

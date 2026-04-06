@@ -19,8 +19,8 @@ return {
         width = 30,
         mappings = {
           ["<space>"] = "none",
-          ["<cr>"] = "open_drop",
-          ["<2-LeftMouse>"] = "open_drop",
+          ["<cr>"] = "open",
+          ["<2-LeftMouse>"] = "open",
           ["s"] = "open_vsplit",
           ["S"] = "open_split",
           ["<RightMouse>"] = "noop",

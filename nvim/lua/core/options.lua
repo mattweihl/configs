@@ -25,7 +25,7 @@ opt.updatetime = 250
 opt.timeoutlen = 300
 opt.wildmenu = true
 opt.wildmode = "list:longest"
-opt.wildignore:append("*.docx,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx")
+opt.wildignore:append("*.docx,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx")
 opt.splitbelow = true
 opt.splitright = true
 opt.wrap = true
