@@ -6,6 +6,7 @@ Personal dotfiles for macOS/Linux. Cloned to `~/configs` (lowercase).
 
 ```
 ghostty/          Ghostty terminal config + custom icons
+glow/             Glow markdown viewer config
 iterm2/           iTerm2 profile, keymaps, color themes (legacy/backup)
 lazygit/          Lazygit config + helper scripts
 nvim/             Neovim config (Lua, lazy.nvim)
@@ -19,6 +20,7 @@ zsh/              zshrc
 - `lazygit/` → symlinked to platform-specific lazygit config path
 - `tmux/tmux.conf` → sourced from `~/.tmux.conf` wrapper file (not symlinked)
 - `zsh/zshrc` → sourced from `~/.zshrc` wrapper file (not symlinked)
+- `glow/` → symlinked to `~/Library/Preferences/glow/` (macOS) or `~/.config/glow/` (Linux)
 
 ## Neovim
 

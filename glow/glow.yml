@@ -1,0 +1,21 @@
+# Glow markdown viewer config
+# macOS default: ~/Library/Preferences/glow/glow.yml
+# Linux default: ~/.config/glow/glow.yml
+
+# dark/light/auto/notty or path to a custom JSON style
+style: "auto"
+
+# word-wrap column width (0 = no wrap)
+width: 80
+
+# show all files including gitignored and hidden (bypasses .gitignore)
+all: true
+
+# enable mouse wheel scrolling in TUI mode
+mouse: false
+
+# use system pager instead of built-in TUI
+pager: false
+
+# show line numbers in TUI mode
+showLineNumbers: false
