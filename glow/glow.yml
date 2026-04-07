@@ -12,7 +12,7 @@ width: 80
 all: true
 
 # enable mouse wheel scrolling in TUI mode
-mouse: false
+mouse: true
 
 # use system pager instead of built-in TUI
 pager: false
