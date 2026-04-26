@@ -31,10 +31,6 @@ _prompt_update() {
 
 add-zsh-hook precmd _prompt_update
 
-# Original prompt (time on left):
-# PROMPT=$'%F{green}${TIME_SAFE}%f %F{blue}%~%f%F{red}${VCS_SAFE:+ ${VCS_SAFE}}%f\n$ '
-
-# Trial: time moved to RPROMPT (auto-hides when command is long)
 PROMPT=$'%F{blue}%~%f%F{red}${VCS_SAFE:+ ${VCS_SAFE}}%f\n$ '
 RPROMPT='%F{green}${TIME_SAFE}%f'
 
@@ -94,32 +90,6 @@ setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
 setopt HIST_FIND_NO_DUPS
 setopt AUTO_CD
-
-# zsh-completions: extra completion definitions
-#if [[ -d /opt/homebrew/share/zsh-completions ]]; then
-#  fpath=(/opt/homebrew/share/zsh-completions $fpath)
-#elif [[ -d /usr/share/zsh-completions ]]; then
-#  fpath=(/usr/share/zsh-completions $fpath)
-#fi
-#
-## zsh-autocomplete: IDE-style completion as you type (handles compinit internally)
-#zstyle '*:compinit' arguments -u
-#if [[ -f /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh ]]; then
-#  source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-#  # Remove _expand from completers — its precmd hook resolves relative paths to absolute
-#  # (fixed upstream in 399f398, not yet in a release)
-#  zstyle ':completion:*' completer _complete _complete:-fuzzy _correct _approximate _ignored
-#fi
-#
-#bindkey -e
-#export CLICOLOR=1
-#
-## zsh-syntax-highlighting: colors valid/invalid commands as you type (must be last)
-#if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-#  source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-#elif [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-#  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-#fi
 
 autoload -Uz compinit
 compinit
