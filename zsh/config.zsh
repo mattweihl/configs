@@ -74,6 +74,8 @@ fi
 alias clawd='claude --dangerously-skip-permissions'
 alias neovide='neovide --fork'
 
+bindkey -e
+
 autoload edit-command-line
 zle -N edit-command-line
 bindkey '^X^e' edit-command-line
