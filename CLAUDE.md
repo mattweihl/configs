@@ -32,5 +32,5 @@ zsh/              zshrc
 - All config files should work on both macOS and Linux where possible
 - Shell scripts in `lazygit/scripts/` use `~/configs/` as the base path
 - No completion/autocomplete plugin in nvim (intentional)
-- No format-on-save in nvim (intentional — format explicitly with `<leader>F`)
+- Format-on-save enabled in nvim (conform.nvim); `<leader>F` also available for manual formatting
 - Binary/generated files (`.icns`, `lazy-lock.json`, iTerm themes) are committed as-is

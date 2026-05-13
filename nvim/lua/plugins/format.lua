@@ -28,7 +28,10 @@ return {
         terraform = { "terraform_fmt" },
         sql = { "sql_formatter" },
       },
-      format_on_save = false,
+      format_on_save = {
+        timeout_ms = 500,
+        lsp_format = "fallback",
+      },
     },
     -- Mason prepends its bin/ to PATH on setup (PATH = "prepend" default),
     -- so conform finds mason-installed formatters automatically.
