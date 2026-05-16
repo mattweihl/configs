@@ -66,6 +66,11 @@ then
     alias vi='nvim'
 fi
 
+if command -v lazygit &> /dev/null
+then
+  alias lg='lazygit'
+fi
+
 alias clawd='claude --dangerously-skip-permissions'
 alias neovide='neovide --fork'
 
@@ -89,5 +94,50 @@ setopt HIST_FIND_NO_DUPS
 setopt AUTO_CD
 
 autoload -Uz compinit
-compinit
+# Skip the security audit unless the dump is >24h old (or missing).
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
+# pyenv: lazy-load. Shims stay on PATH so python/pip resolve; full `pyenv init`
+# (which installs pyenv-virtualenv's cd-hook) defers until `pyenv` is called.
+if [ -d "$HOME/.pyenv" ]; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
+  pyenv() {
+    unset -f pyenv
+    eval "$(command pyenv init -)"
+    pyenv "$@"
+  }
+fi
+
+# nvm: inject default node into PATH directly; defer `nvm.sh` source until use.
+export NVM_DIR="$HOME/.nvm"
+if [ -d "$NVM_DIR/versions/node" ]; then
+  DEFAULT_ALIAS=$(cat "$NVM_DIR/alias/default" 2>/dev/null)
+  if [ -d "$NVM_DIR/versions/node/$DEFAULT_ALIAS" ]; then
+    NODE_VERSION="$DEFAULT_ALIAS"
+  else
+    NODE_VERSION=$(command ls -1 "$NVM_DIR/versions/node" | tail -1)
+  fi
+  if [ -n "$NODE_VERSION" ]; then
+    export PATH="$NVM_DIR/versions/node/$NODE_VERSION/bin:$PATH"
+  fi
+fi
+
+nvm() {
+  unset -f nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  nvm "$@"
+}
+
+if [ -s "$NVM_DIR/bash_completion" ]; then
+  _nvm_lazy_completion() {
+    compdef -d nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  }
+  compdef _nvm_lazy_completion nvm
+fi
 
