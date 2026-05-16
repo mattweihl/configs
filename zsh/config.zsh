@@ -10,14 +10,10 @@ fi
 
 setopt PROMPT_SUBST
 autoload -Uz add-zsh-hook vcs_info
-zmodload zsh/datetime 2>/dev/null  # provides strftime
 
 zstyle ':vcs_info:git:*' formats '(%b)'
 
 _prompt_update() {
-  TIME_SAFE=$(strftime '%I:%M%p' $EPOCHSECONDS)
-  TIME_SAFE=${TIME_SAFE#0}
-
   vcs_info
   local msg=$vcs_info_msg_0_
 
@@ -32,7 +28,6 @@ _prompt_update() {
 add-zsh-hook precmd _prompt_update
 
 PROMPT=$'%F{blue}%~%f%F{red}${VCS_SAFE:+ ${VCS_SAFE}}%f\n$ '
-RPROMPT='%F{green}${TIME_SAFE}%f'
 
 if ls --color=auto / >/dev/null 2>&1; then
   alias ll="ls -alFh --color=auto"

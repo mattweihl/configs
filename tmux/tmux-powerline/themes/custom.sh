@@ -43,16 +43,13 @@ TMUX_POWERLINE_WINDOW_STATUS_STYLE=(
 
 # 20-char session-name truncation, matching the original tmux.conf.
 export TMUX_POWERLINE_SEG_TMUX_SESSION_INFO_FORMAT="#{=/20/…:session_name}"
-# export TMUX_POWERLINE_SEG_DATE_FORMAT="%D"
-# export TMUX_POWERLINE_SEG_TIME_FORMAT="%l:%M %p"
+export TMUX_POWERLINE_SEG_TIME_FORMAT="%l:%M %p"
 
 # Left: green session badge transitioning into the window list.
 TMUX_POWERLINE_LEFT_STATUS_SEGMENTS=(
 	"tmux_session_info 148 234"
 )
 
-# Right side intentionally empty.
 TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS=(
-	# "date 235 136"
-	# "time 235 136 ${TMUX_POWERLINE_SEPARATOR_LEFT_THIN}"
+	"time 235 136"
 )
