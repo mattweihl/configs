@@ -129,6 +129,8 @@ wt_ensure_worktree() {
     git -C "$repo_root" fetch origin --prune
   fi
 
+  git -C "$repo_root" worktree prune
+
   local existing_worktree
   existing_worktree="$(_wt_find_worktree_for_branch "$repo_root" "$branch")"
   if [[ -n "$existing_worktree" ]]; then
@@ -151,37 +153,44 @@ wt_ensure_worktree() {
   local remote_branch_ref="refs/remotes/origin/$branch"
   local local_branch_ref="refs/heads/$branch"
 
+  if git -C "$repo_root" show-ref --verify --quiet "$local_branch_ref" \
+     && git -C "$repo_root" show-ref --verify --quiet "$remote_branch_ref"; then
+    if [[ -z "$(_wt_find_worktree_for_branch "$repo_root" "$branch")" ]]; then
+      if git -C "$repo_root" merge-base --is-ancestor "$local_branch_ref" "origin/$branch" 2>/dev/null; then
+        git -C "$repo_root" branch -f "$branch" "origin/$branch"
+      else
+        echo "warning: local '$branch' has diverged from origin, using local as-is" >&2
+      fi
+    fi
+  fi
+
   if git -C "$repo_root" show-ref --verify --quiet "$local_branch_ref"; then
     git -C "$repo_root" worktree add "$target_path" "$branch"
     _wt_ensure_branch_tracks_origin "$target_path" "$branch"
-    WT_LAST_WORKTREE_PATH="$target_path"
-    WT_LAST_WORKTREE_CREATED=1
-    printf '%s\n' "$target_path"
-    return 0
-  fi
-
-  if git -C "$repo_root" show-ref --verify --quiet "$remote_branch_ref"; then
+  elif git -C "$repo_root" show-ref --verify --quiet "$remote_branch_ref"; then
     git -C "$repo_root" worktree add --track -b "$branch" "$target_path" "origin/$branch"
     _wt_ensure_branch_tracks_origin "$target_path" "$branch"
-    WT_LAST_WORKTREE_PATH="$target_path"
-    WT_LAST_WORKTREE_CREATED=1
-    printf '%s\n' "$target_path"
-    return 0
+  else
+    local base_ref
+    base_ref="$(_wt_resolve_base_ref "$repo_root" "$base_branch")" || {
+      echo "error: base branch '$base_branch' not found locally or on origin" >&2
+      return 1
+    }
+
+    git -C "$repo_root" worktree add -b "$branch" "$target_path" "$base_ref"
+    # When base_ref is a remote-tracking branch (for example origin/develop),
+    # Git can auto-configure the new branch's upstream to that base branch.
+    # Clear it so first push sets upstream to origin/<new-branch> instead.
+    git -C "$target_path" branch --unset-upstream >/dev/null 2>&1 || true
   fi
 
-  local base_ref
-  base_ref="$(_wt_resolve_base_ref "$repo_root" "$base_branch")" || {
-    echo "error: base branch '$base_branch' not found locally or on origin" >&2
-    return 1
-  }
-
-  git -C "$repo_root" worktree add -b "$branch" "$target_path" "$base_ref"
-  # When base_ref is a remote-tracking branch (for example origin/develop),
-  # Git can auto-configure the new branch's upstream to that base branch.
-  # Clear it so first push sets upstream to origin/<new-branch> instead.
-  git -C "$target_path" branch --unset-upstream >/dev/null 2>&1 || true
   WT_LAST_WORKTREE_PATH="$target_path"
   WT_LAST_WORKTREE_CREATED=1
+
+  if typeset -f wt_post_create_hook >/dev/null 2>&1; then
+    wt_post_create_hook "$target_path" "$branch" "$base_branch"
+  fi
+
   printf '%s\n' "$target_path"
 }
 
@@ -231,7 +240,27 @@ wt_remove_worktree() {
     session_name="$(wt_session_name_from_path "$worktree_path" 2>/dev/null || true)"
   fi
 
+  local wt_branch
+  wt_branch="$(git -C "$repo_root" worktree list --porcelain \
+    | awk -v wt="$worktree_path" '
+        /^worktree / { path=$2 }
+        /^branch /   { if (path == wt) { sub("refs/heads/", "", $2); print $2; exit } }
+      ')"
+
   git -C "$repo_root" worktree remove "$worktree_path"
+
+  if [[ -n "$wt_branch" ]]; then
+    if ! git -C "$repo_root" branch -d "$wt_branch" 2>/dev/null; then
+      echo "warning: branch '$wt_branch' has unmerged changes." >&2
+      printf "Force delete branch '%s'? [y/N] " "$wt_branch"
+      read -r confirm
+      if [[ "$confirm" == [yY] ]]; then
+        git -C "$repo_root" branch -D "$wt_branch"
+      else
+        echo "Kept branch '$wt_branch'."
+      fi
+    fi
+  fi
 
   if [[ "$keep_session" -eq 0 && -n "$session_name" ]] && command -v tmux >/dev/null 2>&1; then
     if tmux has-session -t "=$session_name" 2>/dev/null; then
