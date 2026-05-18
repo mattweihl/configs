@@ -74,6 +74,14 @@ fi
 alias clawd='claude --dangerously-skip-permissions'
 alias neovide='neovide --fork'
 
+agent() {
+    if [[ -n "$TMUX" ]]; then
+        "$HOME/configs/tmux/agent-tmux-wrapper.sh" "$@"
+    else
+        command agent "$@"
+    fi
+}
+
 bindkey -e
 
 autoload edit-command-line
