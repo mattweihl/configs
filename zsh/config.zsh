@@ -39,6 +39,11 @@ fi
 alias l="ll"
 c()  { cd "${CODE_LOCATION:-$HOME/code}"; }
 dt() { cd "${DESKTOP:-$HOME/Desktop}"; }
+
+if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
+  source "$HOME/configs/zsh/worktree.sh"
+fi
+
 alias gs="git status"
 alias gb="git branch"
 alias ga="git add"

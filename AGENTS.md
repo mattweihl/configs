@@ -34,3 +34,13 @@ zsh/              zshrc
 - No completion/autocomplete plugin in nvim (intentional)
 - Format-on-save enabled in nvim (conform.nvim); `<leader>F` also available for manual formatting
 - Binary/generated files (`.icns`, `lazy-lock.json`, iTerm themes) are committed as-is
+
+## Worktree + tmux workflow
+
+- Shared helpers live in `~/configs/zsh/worktree.sh` and are sourced from `~/configs/zsh/config.zsh`.
+- Work-repo wrappers stay in `~/code/configs/config.zsh` so repo-specific paths are not baked into shared dotfiles.
+- `,cwt <branch> [base-branch]` creates/reuses the worktree, runs bootstrap steps, and enters tmux by default.
+- `,cwt --no-tmux <branch> [base-branch]` creates/reuses without attaching/switching tmux.
+- `,rwt <worktree>` removes the worktree and kills its matching tmux session when present.
+- `,rwt --keep-session <worktree>` (or `--no-kill-session`) removes without killing tmux.
+- `,s` remains the browse/attach sessionizer; naming is shared with `,cwt` via helper functions.
