@@ -86,6 +86,22 @@ _wt_resolve_base_ref() {
   return 1
 }
 
+_wt_ensure_branch_tracks_origin() {
+  local repo_path="$1"
+  local branch="$2"
+  local remote_ref="origin/$branch"
+
+  if [[ -z "$repo_path" || -z "$branch" ]]; then
+    return 1
+  fi
+
+  if ! git -C "$repo_path" show-ref --verify --quiet "refs/remotes/$remote_ref"; then
+    return 0
+  fi
+
+  git -C "$repo_path" branch --set-upstream-to "$remote_ref" "$branch" >/dev/null 2>&1 || true
+}
+
 wt_ensure_worktree() {
   local repo_root="$1"
   local branch="$2"
@@ -116,6 +132,7 @@ wt_ensure_worktree() {
   local existing_worktree
   existing_worktree="$(_wt_find_worktree_for_branch "$repo_root" "$branch")"
   if [[ -n "$existing_worktree" ]]; then
+    _wt_ensure_branch_tracks_origin "$existing_worktree" "$branch"
     WT_LAST_WORKTREE_PATH="$existing_worktree"
     WT_LAST_WORKTREE_CREATED=0
     printf '%s\n' "$existing_worktree"
@@ -136,6 +153,7 @@ wt_ensure_worktree() {
 
   if git -C "$repo_root" show-ref --verify --quiet "$local_branch_ref"; then
     git -C "$repo_root" worktree add "$target_path" "$branch"
+    _wt_ensure_branch_tracks_origin "$target_path" "$branch"
     WT_LAST_WORKTREE_PATH="$target_path"
     WT_LAST_WORKTREE_CREATED=1
     printf '%s\n' "$target_path"
@@ -144,6 +162,7 @@ wt_ensure_worktree() {
 
   if git -C "$repo_root" show-ref --verify --quiet "$remote_branch_ref"; then
     git -C "$repo_root" worktree add --track -b "$branch" "$target_path" "origin/$branch"
+    _wt_ensure_branch_tracks_origin "$target_path" "$branch"
     WT_LAST_WORKTREE_PATH="$target_path"
     WT_LAST_WORKTREE_CREATED=1
     printf '%s\n' "$target_path"
@@ -157,6 +176,10 @@ wt_ensure_worktree() {
   }
 
   git -C "$repo_root" worktree add -b "$branch" "$target_path" "$base_ref"
+  # When base_ref is a remote-tracking branch (for example origin/develop),
+  # Git can auto-configure the new branch's upstream to that base branch.
+  # Clear it so first push sets upstream to origin/<new-branch> instead.
+  git -C "$target_path" branch --unset-upstream >/dev/null 2>&1 || true
   WT_LAST_WORKTREE_PATH="$target_path"
   WT_LAST_WORKTREE_CREATED=1
   printf '%s\n' "$target_path"
