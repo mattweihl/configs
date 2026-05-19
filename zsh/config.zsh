@@ -126,7 +126,9 @@ if [ -d "$HOME/.pyenv" ]; then
   }
 fi
 
-# nvm: inject default node into PATH directly; defer `nvm.sh` source until use.
+# nvm: install via Homebrew (`brew install nvm`). Node versions still live in
+# $NVM_DIR=~/.nvm; Homebrew only owns the nvm.sh script.
+# Inject default node into PATH directly; defer `nvm.sh` source until use.
 export NVM_DIR="$HOME/.nvm"
 if [ -d "$NVM_DIR/versions/node" ]; then
   DEFAULT_ALIAS=$(cat "$NVM_DIR/alias/default" 2>/dev/null)
@@ -140,17 +142,35 @@ if [ -d "$NVM_DIR/versions/node" ]; then
   fi
 fi
 
-nvm() {
-  unset -f nvm
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  nvm "$@"
-}
+if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
+  NVM_SH="/opt/homebrew/opt/nvm/nvm.sh"
+elif [ -s "/usr/local/opt/nvm/nvm.sh" ]; then
+  NVM_SH="/usr/local/opt/nvm/nvm.sh"
+fi
 
-if [ -s "$NVM_DIR/bash_completion" ]; then
-  _nvm_lazy_completion() {
-    compdef -d nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+if [ -n "${NVM_SH:-}" ]; then
+  nvm() {
+    unset -f nvm
+    \. "$NVM_SH"
+    # Re-wrap nvm so `nvm install <ver>` also sets up corepack-managed
+    # yarn/pnpm shims in the newly-installed node's bin dir.
+    functions[_nvm_orig]=$functions[nvm]
+    nvm() {
+      _nvm_orig "$@"
+      local rc=$?
+      [[ "$1" == "install" && $rc -eq 0 ]] && corepack enable >/dev/null 2>&1
+      return $rc
+    }
+    nvm "$@"
   }
-  compdef _nvm_lazy_completion nvm
+
+  NVM_COMPLETION="${NVM_SH%/*}/etc/bash_completion.d/nvm"
+  if [ -s "$NVM_COMPLETION" ]; then
+    _nvm_lazy_completion() {
+      compdef -d nvm
+      \. "$NVM_COMPLETION"
+    }
+    compdef _nvm_lazy_completion nvm
+  fi
 fi
 
