@@ -106,12 +106,13 @@ wt_ensure_worktree() {
   local repo_root="$1"
   local branch="$2"
   local base_branch="${3:-main}"
+  local worktrees_dir="${4:-}"
 
   WT_LAST_WORKTREE_CREATED=0
   WT_LAST_WORKTREE_PATH=""
 
   if [[ -z "$repo_root" || -z "$branch" ]]; then
-    echo "usage: wt_ensure_worktree <repo-root> <branch> [base-branch]" >&2
+    echo "usage: wt_ensure_worktree <repo-root> <branch> [base-branch] [worktrees-dir]" >&2
     return 1
   fi
 
@@ -143,7 +144,12 @@ wt_ensure_worktree() {
 
   local target_dir target_path
   target_dir="$(wt_branch_to_dir "$branch")"
-  target_path="$repo_root/$target_dir"
+  if [[ -n "$worktrees_dir" ]]; then
+    mkdir -p "$worktrees_dir"
+    target_path="$worktrees_dir/$target_dir"
+  else
+    target_path="$repo_root/$target_dir"
+  fi
 
   if [[ -e "$target_path" ]]; then
     echo "error: target path already exists: $target_path" >&2
@@ -197,7 +203,9 @@ wt_ensure_worktree() {
 wt_remove_worktree() {
   local repo_root="$1"
   local worktree_name="$2"
+  local worktrees_dir="${3:-}"
   shift 2 || true
+  [[ -n "${1:-}" && "$1" != --* ]] && shift
 
   local keep_session=0
   while [[ $# -gt 0 ]]; do
@@ -214,7 +222,7 @@ wt_remove_worktree() {
   done
 
   if [[ -z "$repo_root" || -z "$worktree_name" ]]; then
-    echo "usage: wt_remove_worktree <repo-root> <worktree-name-or-path> [--keep-session]" >&2
+    echo "usage: wt_remove_worktree <repo-root> <worktree-name-or-path> [worktrees-dir] [--keep-session]" >&2
     return 1
   fi
 
@@ -223,11 +231,12 @@ wt_remove_worktree() {
     return 1
   }
 
+  local resolve_dir="${worktrees_dir:-$repo_root}"
   local worktree_path
   if [[ "$worktree_name" == /* ]]; then
     worktree_path="$worktree_name"
   else
-    worktree_path="$repo_root/$worktree_name"
+    worktree_path="$resolve_dir/$worktree_name"
   fi
 
   worktree_path="$(cd "$worktree_path" 2>/dev/null && pwd -P)" || {
