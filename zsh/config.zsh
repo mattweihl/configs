@@ -88,6 +88,11 @@ alias neovide='neovide --fork'
 #}
 
 bindkey -e
+# VS Code/Cursor send CSI modifier sequences for Option/Ctrl + Arrow.
+bindkey '\e[1;3D' backward-word
+bindkey '\e[1;3C' forward-word
+bindkey '\e[1;5D' backward-word
+bindkey '\e[1;5C' forward-word
 
 autoload edit-command-line
 zle -N edit-command-line
