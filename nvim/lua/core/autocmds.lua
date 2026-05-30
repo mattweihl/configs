@@ -1,6 +1,13 @@
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 
+-- Detect `Dockerfile.<suffix>` variants (e.g. Dockerfile.ui, Dockerfile.server).
+vim.filetype.add({
+  pattern = {
+    ["Dockerfile%..*"] = "dockerfile",
+  },
+})
+
 -- When nvim opens with a directory argument (e.g. `vim .`), replace the
 -- empty directory buffer with a clean buffer and open neo-tree automatically.
 augroup("DirOpen", { clear = true })

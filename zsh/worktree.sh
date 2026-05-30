@@ -14,7 +14,14 @@ _wt_sanitize_name() {
 
 wt_branch_to_dir() {
   local branch="$1"
-  _wt_sanitize_name "$branch"
+  local max_len="${WT_DIR_MAX_LEN:-60}"
+  local sanitized
+  sanitized="$(_wt_sanitize_name "$branch")"
+  if [[ ${#sanitized} -gt $max_len ]]; then
+    sanitized="$(printf '%.*s' "$max_len" "$sanitized")"
+    sanitized="${sanitized%_}"
+  fi
+  printf '%s\n' "$sanitized"
 }
 
 wt_session_name_from_path() {
