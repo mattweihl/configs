@@ -75,5 +75,10 @@ if vim.g.neovide then
 end
 
 opt.history = 1000
-opt.exrc = true
+
+-- exrc auto-sources project-local config (.nvim.lua/.exrc) on startup. Disabled:
+-- the only benefit is per-project nvim config (unused here), and it's needless
+-- attack surface when opening repos you don't fully control. Re-enable if a
+-- project ever genuinely needs local config (nvim 0.9+ gates it behind a trust prompt).
+opt.exrc = false
 

@@ -278,6 +278,15 @@ autocmd("BufReadPost", {
   group = "FsWatch",
   callback = function(args) start_watcher(args.buf) end,
 })
+-- Re-arm after every save. Atomic-save tools (Cursor Agent, Claude) — and our own
+-- write — replace the file via temp + rename, which swaps the inode out from under
+-- the fs_event handle, leaving it watching a stale inode that never fires again.
+-- Re-pointing the watch at the current inode keeps real-time reload working past
+-- the first external edit.
+autocmd("BufWritePost", {
+  group = "FsWatch",
+  callback = function(args) start_watcher(args.buf) end,
+})
 autocmd("BufDelete", {
   group = "FsWatch",
   callback = function(args) stop_watcher(args.buf) end,

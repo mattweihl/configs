@@ -11,7 +11,7 @@ iterm2/           iTerm2 profile, keymaps, color themes (legacy/backup)
 lazygit/          Lazygit config + helper scripts
 nvim/             Neovim config (Lua, lazy.nvim)
 tmux/             tmux config
-zsh/              zshrc
+zsh/              zsh config (config.zsh) + worktree helpers
 ```
 
 ## How configs are deployed
@@ -19,7 +19,7 @@ zsh/              zshrc
 - `nvim/` → symlinked to `~/.config/nvim/`
 - `lazygit/` → symlinked to platform-specific lazygit config path
 - `tmux/tmux.conf` → sourced from `~/.tmux.conf` wrapper file (not symlinked)
-- `zsh/zshrc` → sourced from `~/.zshrc` wrapper file (not symlinked)
+- `zsh/config.zsh` → sourced from `~/.zshrc` wrapper file (not symlinked)
 - `glow/` → symlinked to `~/Library/Preferences/glow/` (macOS) or `~/.config/glow/` (Linux)
 
 ## Neovim

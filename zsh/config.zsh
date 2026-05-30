@@ -79,14 +79,6 @@ fi
 alias clawd='claude --dangerously-skip-permissions'
 alias neovide='neovide --fork'
 
-#agent() {
-#    if [[ -n "$TMUX" ]]; then
-#        "$HOME/configs/tmux/agent-tmux-wrapper.sh" "$@"
-#    else
-#        command agent "$@"
-#    fi
-#}
-
 bindkey -e
 # VS Code/Cursor send CSI modifier sequences for Option/Ctrl + Arrow.
 bindkey '\e[1;3D' backward-word
