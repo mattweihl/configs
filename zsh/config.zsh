@@ -171,3 +171,14 @@ if [ -n "${NVM_SH:-}" ]; then
   fi
 fi
 
+if command -v fzf &> /dev/null; then
+  vf() {
+    local file
+    file=$(fzf)
+
+    if [[ -n "$file" && -f "$file" ]]; then
+      vim "$file"
+    fi
+  }
+fi
+
