@@ -39,6 +39,9 @@ return {
         "dockerfile-language-server",
         "docker-compose-language-service",
         "terraform-ls",
+        -- Debug adapters
+        "js-debug-adapter",
+        "debugpy",
         -- Formatters & linters
         "prettier",
         "ruff",
