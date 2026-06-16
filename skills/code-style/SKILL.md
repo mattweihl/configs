@@ -2,6 +2,7 @@
 name: code-style
 description: Matthew Weihl's language-agnostic coding style and clean-code review preferences. Use when writing, refactoring, or reviewing code to keep naming, function design, error handling, and structure aligned with these preferences.
 disable-model-invocation: true
+always-apply: true
 ---
 
 # Code Style

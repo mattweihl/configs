@@ -1,7 +1,25 @@
 #!/usr/bin/env bash
 
 # Shared worktree helpers used by both shell commands and tmux scripts.
-# Keep this file shell-compatible (bash + zsh) so tmux-sessionizer can source it.
+# Keep this file shell-compatible (bash + zsh).
+
+# Default root for newly-created worktrees. Generic/personal usage lands here.
+# Machine- or repo-specific configs (e.g. work config) can override WT_ROOT to
+# point elsewhere; per-command arguments still take precedence (wt_resolve_root).
+WT_DEFAULT_ROOT="${WT_DEFAULT_ROOT:-$HOME/code/worktrees}"
+WT_ROOT="${WT_ROOT:-$WT_DEFAULT_ROOT}"
+
+# Resolve the worktrees root, precedence: explicit arg > $WT_ROOT > $WT_DEFAULT_ROOT.
+wt_resolve_root() {
+  local explicit="${1:-}"
+  if [[ -n "$explicit" ]]; then
+    printf '%s\n' "$explicit"
+  elif [[ -n "${WT_ROOT:-}" ]]; then
+    printf '%s\n' "$WT_ROOT"
+  else
+    printf '%s\n' "$WT_DEFAULT_ROOT"
+  fi
+}
 
 _wt_sanitize_name() {
   local value="$1"
@@ -149,14 +167,11 @@ wt_ensure_worktree() {
     return 0
   fi
 
-  local target_dir target_path
+  local target_dir target_path resolved_root
   target_dir="$(wt_branch_to_dir "$branch")"
-  if [[ -n "$worktrees_dir" ]]; then
-    mkdir -p "$worktrees_dir"
-    target_path="$worktrees_dir/$target_dir"
-  else
-    target_path="$repo_root/$target_dir"
-  fi
+  resolved_root="$(wt_resolve_root "$worktrees_dir")"
+  mkdir -p "$resolved_root"
+  target_path="$resolved_root/$target_dir"
 
   if [[ -e "$target_path" ]]; then
     echo "error: target path already exists: $target_path" >&2
@@ -238,7 +253,8 @@ wt_remove_worktree() {
     return 1
   }
 
-  local resolve_dir="${worktrees_dir:-$repo_root}"
+  local resolve_dir
+  resolve_dir="$(wt_resolve_root "$worktrees_dir")"
   local worktree_path
   if [[ "$worktree_name" == /* ]]; then
     worktree_path="$worktree_name"

@@ -43,4 +43,3 @@ zsh/              zsh config (config.zsh) + worktree helpers
 - `,cwt --no-tmux <branch> [base-branch]` creates/reuses without attaching/switching tmux.
 - `,rwt <worktree>` removes the worktree and kills its matching tmux session when present.
 - `,rwt --keep-session <worktree>` (or `--no-kill-session`) removes without killing tmux.
-- `,s` remains the browse/attach sessionizer; naming is shared with `,cwt` via helper functions.
