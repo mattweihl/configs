@@ -44,12 +44,12 @@ if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
   source "$HOME/configs/zsh/worktree.sh"
 fi
 
-alias gs="git status"
-alias gb="git branch"
-alias ga="git add"
-alias gc="git commit"
-alias gp="git push"
-alias gd="git diff"
+alias ,gs="git status"
+alias ,gb="git branch"
+alias ,ga="git add"
+alias ,gc="git commit"
+alias ,gp="git push"
+alias ,gd="git diff"
 alias history="history 1"
 
 if command -v fzf &> /dev/null; then
@@ -73,11 +73,11 @@ fi
 
 if command -v lazygit &> /dev/null
 then
-  alias lg='lazygit'
+  alias ,lg='lazygit'
 fi
 
-alias clawd='claude --dangerously-skip-permissions'
-alias neovide='neovide --fork'
+alias ,clawd='claude --dangerously-skip-permissions'
+alias ,neovide='neovide --fork'
 
 bindkey -e
 # VS Code/Cursor send CSI modifier sequences for Option/Ctrl + Arrow.
