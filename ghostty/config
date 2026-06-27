@@ -4,6 +4,9 @@ font-size = 16
 macos-icon = custom
 macos-custom-icon = ~/configs/ghostty/icons/ghostty-black.icns
 
+background-opacity = 0.99
+background-blur = true
+
 keybind = global:cmd+ctrl+t=toggle_quick_terminal
 
 keybind = cmd+slash=text:\x1f
