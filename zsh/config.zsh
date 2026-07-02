@@ -37,8 +37,12 @@ else
   alias la="ls -AG"
 fi
 alias l="ll"
-c()  { cd "${CODE_LOCATION:-$HOME/code}"; }
-dt() { cd "${DESKTOP:-$HOME/Desktop}"; }
+go_to_code()  { cd "${CODE_LOCATION:-$HOME/code}"; }
+go_to_desktop() { cd "${DESKTOP:-$HOME/Desktop}"; }
+
+alias ,c='go_to_code'
+alias ,dt='go_to_desktop'
+
 
 if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
   source "$HOME/configs/zsh/worktree.sh"
