@@ -279,18 +279,12 @@ wt_remove_worktree() {
         /^branch /   { if (path == wt) { sub("refs/heads/", "", $2); print $2; exit } }
       ')"
 
-  git -C "$repo_root" worktree remove "$worktree_path"
+  git -C "$repo_root" worktree remove --force "$worktree_path"
 
   if [[ -n "$wt_branch" ]]; then
     if ! git -C "$repo_root" branch -d "$wt_branch" 2>/dev/null; then
-      echo "warning: branch '$wt_branch' has unmerged changes." >&2
-      printf "Force delete branch '%s'? [y/N] " "$wt_branch"
-      read -r confirm
-      if [[ "$confirm" == [yY] ]]; then
-        git -C "$repo_root" branch -D "$wt_branch"
-      else
-        echo "Kept branch '$wt_branch'."
-      fi
+      echo "warning: force deleting branch '$wt_branch' (unmerged)." >&2
+      git -C "$repo_root" branch -D "$wt_branch"
     fi
   fi
 
