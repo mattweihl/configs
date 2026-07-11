@@ -4,8 +4,13 @@ return {
     build = ":TSUpdate",
     lazy = false,
     priority = 900,
-    opts = {
-      ensure_installed = {
+    init = function()
+      vim.treesitter.language.register("bash", "sh")
+      vim.treesitter.language.register("bash", "zsh")
+      vim.treesitter.language.register("javascript", "javascriptreact")
+    end,
+    config = function()
+      local ensure_installed = {
         "lua",
         "vim",
         "vimdoc",
@@ -26,39 +31,31 @@ return {
         "hcl",
         "sql",
         "graphql",
-      },
-      auto_install = true,
-      sync_install = false,
-      highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = false,
-      },
-      indent = {
-        enable = true,
-      },
-    },
-    init = function()
-      vim.opt.runtimepath:append(vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/runtime")
+      }
 
-      vim.treesitter.language.register("bash", "sh")
-      vim.treesitter.language.register("bash", "zsh")
-      vim.treesitter.language.register("javascript", "javascriptreact")
+      require("nvim-treesitter").install(ensure_installed)
 
-      vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
-        pattern = { "*.js", "*.jsx" },
+      -- On a brand-new machine, tree-sitter-cli (installed via Mason, see
+      -- lsp.lua) may still be downloading when the install above runs,
+      -- causing parser builds to fail with "tree-sitter not found". Retry
+      -- once Mason finishes so first launch doesn't need a manual restart.
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MasonToolsUpdateCompleted",
         callback = function()
-          vim.schedule(function()
-            pcall(vim.treesitter.start)
-          end)
+          require("nvim-treesitter").install(ensure_installed)
         end,
       })
-    end,
-    config = function(_, opts)
-      local ok, configs = pcall(require, "nvim-treesitter.configs")
-      if not ok then
-        return
-      end
-      configs.setup(opts)
+
+      -- Highlighting/indentation are provided by Neovim core; nvim-treesitter
+      -- only supplies parsers/queries. Start them per-buffer (silently
+      -- no-ops if no parser is installed for the filetype).
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(ev)
+          if pcall(vim.treesitter.start) then
+            vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
     end,
   },
 

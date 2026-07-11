@@ -3,6 +3,12 @@ local opt = vim.opt
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Mason installs CLI tools (LSP servers, tree-sitter-cli, etc.) here. Prepend
+-- unconditionally, before plugins load, so anything that shells out (e.g.
+-- nvim-treesitter's parser build step) can find them regardless of plugin
+-- load order/timing.
+vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
+
 opt.number = true
 opt.relativenumber = false
 

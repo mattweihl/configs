@@ -21,6 +21,8 @@ return {
     dependencies = { "williamboman/mason.nvim" },
     opts = {
       ensure_installed = {
+        -- Tree-sitter
+        "tree-sitter-cli",
         -- LSP servers
         "typescript-language-server",
         "html-lsp",
