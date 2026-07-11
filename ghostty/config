@@ -1,6 +1,6 @@
 font-family = Iosevka Nerd Font
 font-style = "Bold"
-font-size = 20
+font-size = 18
 macos-icon = custom
 macos-custom-icon = ~/configs/ghostty/icons/ghostty-black.icns
 
