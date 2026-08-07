@@ -84,7 +84,8 @@ then
   alias ,lg='lazygit'
 fi
 
-alias ,clawd='claude --dangerously-skip-permissions'
+#alias ,clawd='claude --dangerously-skip-permissions'
+alias ,clawd='claude --enable-auto-mode'
 alias ,neovide='neovide --fork'
 
 bindkey -e
