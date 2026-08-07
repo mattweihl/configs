@@ -48,6 +48,10 @@ if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
   source "$HOME/configs/zsh/worktree.sh"
 fi
 
+if [[ -r "$HOME/configs/zsh/link-skills.sh" ]]; then
+  source "$HOME/configs/zsh/link-skills.sh"
+fi
+
 alias ,gs="git status"
 alias ,gb="git branch"
 alias ,ga="git add"
