@@ -1,63 +1,10 @@
-# Configs
+@AGENTS.md
 
-Personal dotfiles for macOS/Linux. Cloned to `~/configs` (lowercase).
+<!--
+This file exists only to pull in AGENTS.md. Claude Code reads CLAUDE.md and
+never AGENTS.md, so the import above is what makes one file serve both Claude
+and Codex.
 
-## Structure
-
-```
-ghostty/          Ghostty terminal config + custom icons
-glow/             Glow markdown viewer config
-iterm2/           iTerm2 profile, keymaps, color themes (legacy/backup)
-lazygit/          Lazygit config + helper scripts
-nvim/             Neovim config (Lua, lazy.nvim)
-tmux/             tmux config + Claude Code integration scripts
-zsh/              zsh config (config.zsh) + worktree helpers
-```
-
-## tmux + Claude Code
-
-- Claude Code panes are detected in `tmux.conf` by their process name: the
-  launcher execs a version-named binary, so `pane_current_command` is e.g.
-  `2.1.226`. `automatic-rename-format` substitutes Claude's own OSC title.
-- `tmux/claude-status.sh` is driven by hooks in `~/.claude/settings.json`
-  (not in this repo) and sets a per-pane `@claude_state` that renders as a
-  glyph in the window name: `●` working, `◍` needs input, `✦` idle. It then
-  re-asserts `automatic-rename` on the window: tmux only recomputes an
-  auto-name when the pane emits output, and `◍` is by definition the moment the
-  agent has gone quiet, so the glyph would otherwise never repaint.
-- `<prefix> a` opens `tmux/claude-agents.sh`, an fzf picker over every Claude
-  pane across all sessions.
-- The `@_claude_*` formats in `tmux.conf` (pane match, glyph, label, title) are
-  the single source of truth; `claude-agents.sh` evaluates them via
-  `list-panes -f` rather than reimplementing the matching.
-- Only agents launched inside a pane drive the glyph. `claude-status.sh` targets
-  `$TMUX_PANE`, and background / daemon-resumed sessions don't inherit it, so
-  their hooks exit as a no-op. Don't try to recover the pane by walking the
-  process tree: such a session's ancestry either reaches no pane at all, or
-  reaches the *parent* agent's pane and marks a window that isn't its own.
-- Diagnostic: a pane whose window *name* tracks Claude's title live but whose
-  glyph is stuck on `✦` is the case above, not a broken hook. The title arrives
-  as an OSC escape on the tty (no env needed); the state needs `$TMUX_PANE`.
-  Same pane, two channels — verify with `tmux list-panes -a -F
-  '#{pane_id} [#{@claude_state}] #{window_name}'`.
-
-## How configs are deployed
-
-- `nvim/` → symlinked to `~/.config/nvim/`
-- `lazygit/` → symlinked to platform-specific lazygit config path
-- `tmux/tmux.conf` → sourced from `~/.tmux.conf` wrapper file (not symlinked)
-- `zsh/config.zsh` → sourced from `~/.zshrc` wrapper file (not symlinked)
-- `glow/` → symlinked to `~/Library/Preferences/glow/` (macOS) or `~/.config/glow/` (Linux)
-
-## Neovim
-
-- `init.lua` loads `core/` (options, keymaps, autocmds), then `lazy.setup("plugins")` auto-discovers `lua/plugins/*.lua`
-- 2 spaces default indent, 4 for Python (autocmd)
-
-## Conventions
-
-- All config files should work on both macOS and Linux where possible
-- Shell scripts in `lazygit/scripts/` use `~/configs/` as the base path
-- No completion/autocomplete plugin in nvim (intentional)
-- Format-on-save enabled in nvim (conform.nvim); `<leader>F` also available for manual formatting
-- Binary/generated files (`.icns`, `lazy-lock.json`, iTerm themes) are committed as-is
+Keep it that way. Anything worth saying about this repo goes in AGENTS.md, where
+every tool sees it. Nothing here has turned out to be Claude-specific yet.
+-->

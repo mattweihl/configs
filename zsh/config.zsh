@@ -48,8 +48,8 @@ if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
   source "$HOME/configs/zsh/worktree.sh"
 fi
 
-if [[ -r "$HOME/configs/zsh/link-skills.sh" ]]; then
-  source "$HOME/configs/zsh/link-skills.sh"
+if [[ -r "$HOME/configs/zsh/link-agentic-configs.sh" ]]; then
+  source "$HOME/configs/zsh/link-agentic-configs.sh"
 fi
 
 # These shadow two rarely-typed Homebrew binaries pulled in as dependencies:

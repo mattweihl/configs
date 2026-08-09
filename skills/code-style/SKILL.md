@@ -1,102 +1,50 @@
 ---
 name: code-style
-description: Matthew Weihl's language-agnostic coding style and clean-code review preferences. Use when writing, refactoring, or reviewing code to keep naming, function design, error handling, and structure aligned with these preferences.
-disable-model-invocation: true
-always-apply: true
+description: >
+  Matthew Weihl's language-agnostic code style and clean-code preferences.
+  Use when reviewing code you did not write, when judging whether existing code
+  meets these standards, or when the user asks about style, naming, function
+  design, control flow, error handling, or structure. Also use on request via
+  /code-style.
 ---
 
 # Code Style
 
-Apply these preferences across languages by translating each rule to the language's idioms.
+## Read the rules first
 
-## Core Principles
+The preferences live in one file, which this skill does not duplicate:
 
-- Optimize for readability first. Prefer clear, boring code over clever code.
-- Keep code simple. Add complexity only when it is clearly justified.
-- Leave touched code cleaner than you found it.
-- Prefer immutable data flow unless there is a strong reason not to.
-- Favor explicitness over hidden behavior.
+- `~/configs/agents/rules/code-style.md` — the complete rule set.
+- `~/configs/agents/reference/code-style-examples.md` — per-language examples.
+  Read this only when the preferred pattern is ambiguous in the language at hand.
 
-## Naming
+Read the rule file now, before you review anything.
 
-- Use descriptive names that encode intent and domain meaning.
-- Avoid abbreviations unless they are universally understood.
-- For booleans, use `is` / `has` / `should` / `can` prefixes.
-- Prefer positive boolean names by default, but choose the form that reads best in guard clauses and avoids negation.
+<!--
+Same file, two delivery paths, on purpose:
 
-## Functions
+- As a user rule (linked into ~/.claude/rules/), it loads automatically whenever
+  the agent reads a matching source file. That covers code being *written*.
+- As this skill, it can be invoked deliberately against code that no rule fired
+  for -- a pull request, a pasted diff, a repo you are reading but not editing.
 
-- Functions should do one thing and have one reason to change.
-- Target small functions. Around 35-40 lines is a soft warning threshold, not a hard limit.
-- Prefer early returns and guard clauses; avoid `else` after a terminal branch.
-- Keep nesting shallow. Max 2 levels before extracting helpers.
-- Avoid boolean function arguments. Prefer explicit mode values:
-  - In TypeScript, prefer enum-like `as const` objects plus union value types (instead of native `enum`).
-  - In other languages, use the idiomatic equivalent (`enum`, tagged union, constants, or sealed variants).
-  Use separate functions or structured options when that reads better.
-- Use positional arguments for small signatures; at 4+ arguments, switch to a structured input object/record/struct.
-- Treat 4+ arguments as a smell: verify whether the function should be split.
-- Prefer explicit `return` statements in function bodies.
+The rule file is the single source of truth. Do not copy its contents here.
+-->
 
-## Control Flow
+## Reviewing someone else's code
 
-- Simple ternaries are fine.
-- Never use nested ternaries.
-- If branching becomes complex, extract a helper function first; only use mutable temporary assignment as a fallback.
+The rule set was written for code being authored. Applying it to code you did
+not write needs a different bar:
 
-## Data and Types
+- Judge the code as it is. Do not rewrite it in your own style.
+- Separate defects from preferences. State which one each finding is.
+- A rule violation in untouched code is not a review finding. Raise it only when
+  the change under review touches it, or when it causes the bug being discussed.
+- Weight findings by blast radius: a leaked abstraction outranks a naming nit.
+- Number findings in severity order.
+- Give the concrete replacement, not the principle. "Extract the tier lookup to
+  `getDiscountRate`" beats "this function does too much".
+- Say when the code is fine. A review that finds nothing is a valid review.
 
-- Never mutate inputs.
-- Prefer creating new values instead of mutating existing ones.
-- Use language-native collection transforms by default (`map`/`filter`/`reduce` style).
-- Use loops only when transform chains become harder to read or early termination is required.
-- In typed languages, prefer named contracts over large inline structural types.
-- Keep type definitions close to usage; extract shared types only when reuse is real and coupling stays clean.
-
-## Constants and Literals
-
-- Replace literals with named constants when the meaning is not immediately obvious.
-- Keep universally obvious literals inline when they improve readability (for example, checks against 0 or 1).
-
-## Null and Optional Values
-
-- Use language shorthand for safe value access when reading nested data.
-- Use explicit checks when nullability drives control flow decisions.
-
-## Strings
-
-- Use interpolation for composition.
-- For iterative accumulation, use builder/join patterns.
-- Avoid concatenation-based assembly.
-
-## Organization
-
-- Prefer one main export per file and keep private helpers colocated.
-- Order dependencies from most distant to most local (external -> internal -> local).
-- Prefer configuration-style APIs over wrapper-heavy composition chains.
-
-## Errors
-
-- Use the language's idiomatic error mechanism.
-- Prefer exceptions for unexpected failures in languages that support them.
-- In languages that prefer explicit error returns, follow that ecosystem's conventions.
-- Never swallow errors silently.
-- Handle errors at boundaries and return/log meaningful context.
-
-## Comments
-
-- Prefer self-documenting code.
-- Add comments for intent, constraints, or non-obvious tradeoffs ("why", not "what").
-- TODOs must include context so future cleanup is actionable.
-
-## During Reviews
-
-- Review from correctness and maintainability first, style second.
-- Flag violations of these principles with concrete, actionable suggestions.
-- Use numbered findings in severity order when giving review feedback.
-- Call out missing tests for business logic changes and risky paths.
-
-## Additional Notes
-
-- Use this file as the source of truth for style decisions.
-- For language examples and edge-case translations, read [examples.md](examples.md).
+For a full structural review — abstraction health, spaghetti growth, file-size
+discipline — use the `super-code-review` skill instead. This one is about style.

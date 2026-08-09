@@ -1,0 +1,199 @@
+#!/usr/bin/env bash
+
+# Links this repo's AI-agent configuration into the places the agent tools
+# actually read it from, so a new machine needs one command and a new skill,
+# rule, or subagent needs none.
+#
+# Scope is agentic tooling only -- Claude Code, Codex, Cursor. nvim, tmux, zsh,
+# ghostty, lazygit, and glow are deployed the way they always were (see
+# AGENTS.md, "How configs are deployed"); this script does not touch them.
+#
+# Run `link-agentic-configs`. It is idempotent: it re-links only what is wrong
+# or missing, and prints "everything already linked" when there is nothing to
+# do. `link-configs` and `link-skills` are kept as aliases for muscle memory.
+#
+# What gets linked:
+#
+#   agents/AGENTS.md      -> ~/.claude/CLAUDE.md   (Claude reads CLAUDE.md only)
+#                            ~/.codex/AGENTS.md
+#   agents/rules/*.md     -> ~/.claude/rules/
+#   agents/reference/     not linked -- read on demand by absolute path. A rule
+#                         without `paths:` frontmatter loads every session, so
+#                         long reference material must not live in rules/.
+#   claude/settings.json  -> ~/.claude/settings.json
+#   claude/agents/*.md    -> ~/.claude/agents/
+#   claude/statusline.sh  } referenced by absolute path from settings.json,
+#   claude/hooks/*.sh     } so they only need the executable bit
+#   skills/*/             -> ~/.claude/skills/ and ~/.cursor/skills/
+#
+# Skill source roots are ~/configs/skills (personal) and
+# ~/code/work-configs/skills (work-specific, absent on some machines).
+#
+# Bash shebang, but config.zsh sources this into zsh. Directory contents are
+# therefore enumerated with `find`, never a glob: zsh has `nomatch` on by
+# default, so a glob that matches nothing aborts the command instead of
+# expanding to nothing the way bash does.
+
+CONFIGS_ROOT="${CONFIGS_ROOT:-$HOME/configs}"
+
+LAC_SKILL_SOURCES=(
+  "$CONFIGS_ROOT/skills"
+  "$HOME/code/work-configs/skills"
+)
+
+LAC_SKILL_TARGETS=(
+  "$HOME/.cursor/skills"
+  "$HOME/.claude/skills"
+)
+
+# MCP servers registered for Claude Code only. Claude keeps user-scope servers
+# in ~/.claude.json, which is machine state mixed with UI counters and is not
+# worth versioning -- so register them idempotently instead of linking a file.
+#
+# Codex is deliberately not covered. It reads MCP servers from a [mcp_servers.*]
+# table in ~/.codex/config.toml, which also holds hand-maintained stdio servers
+# this script has no business rewriting. Add Codex entries there by hand.
+#
+# Format: name|transport|url
+LAC_MCP_SERVERS=(
+  "context7|http|https://mcp.context7.com/mcp"
+)
+
+_lac_linked=0
+_lac_warned=0
+
+# Links src -> dest with one rule: never destroy something that is not ours.
+# An existing correct symlink is left alone, a wrong one is repointed, and a
+# real file is backed up before it is replaced.
+_lac_link() {
+  local src="$1" dest="$2"
+  local dest_dir
+  dest_dir="$(dirname "$dest")"
+
+  [[ -e "$src" ]] || return 0
+  mkdir -p "$dest_dir"
+
+  if [[ -L "$dest" ]]; then
+    [[ "$(readlink "$dest")" == "$src" ]] && return 0
+    rm "$dest"
+  elif [[ -e "$dest" ]]; then
+    local backup="$dest.bak.$(date +%Y%m%d%H%M%S)"
+    mv "$dest" "$backup"
+    echo "link-agentic-configs: $dest was a real file; backed up to $backup" >&2
+    _lac_warned=$((_lac_warned + 1))
+  fi
+
+  ln -s "$src" "$dest"
+  echo "linked ${dest/#$HOME/~}"
+  _lac_linked=$((_lac_linked + 1))
+}
+
+# Links every top-level file of one extension into a target directory.
+_lac_link_files() {
+  # _lac_link_files <source-dir> <extension> <target-dir>
+  local source_dir="$1" ext="$2" target_dir="$3" file
+  [[ -d "$source_dir" ]] || return 0
+  while IFS= read -r file; do
+    [[ -n "$file" ]] || continue
+    _lac_link "$file" "$target_dir/$(basename "$file")"
+  done < <(find "$source_dir" -maxdepth 1 -type f -name "*.$ext" | sort)
+}
+
+_lac_link_skills() {
+  local source_root target_root skill_dir skill_name
+
+  for source_root in "${LAC_SKILL_SOURCES[@]}"; do
+    [[ -d "$source_root" ]] || continue
+
+    while IFS= read -r skill_dir; do
+      [[ -n "$skill_dir" ]] || continue
+      skill_name="$(basename "$skill_dir")"
+
+      for target_root in "${LAC_SKILL_TARGETS[@]}"; do
+        _lac_link "$skill_dir" "$target_root/$skill_name"
+      done
+    done < <(find "$source_root" -mindepth 1 -maxdepth 1 -type d | sort)
+  done
+}
+
+# Removes symlinks whose target no longer exists. Without this, deleting a skill
+# or rule from the repo leaves a dangling link that the tool still tries to load.
+_lac_prune() {
+  local dir="$1" entry
+  [[ -d "$dir" ]] || return 0
+  while IFS= read -r entry; do
+    [[ -n "$entry" ]] || continue
+    rm "$entry"
+    echo "pruned dangling ${entry/#$HOME/~}"
+  done < <(find "$dir" -maxdepth 1 -type l ! -exec test -e {} \; -print)
+}
+
+# chmod over a directory of scripts, without a glob the caller has to expand.
+_lac_make_executable() {
+  # _lac_make_executable <dir> <extension>
+  [[ -d "$1" ]] || return 0
+  find "$1" -maxdepth 1 -type f -name "*.$2" -exec chmod +x {} +
+}
+
+_lac_register_mcp() {
+  command -v claude >/dev/null 2>&1 || return 0
+  command -v jq >/dev/null 2>&1 || return 0
+
+  local entry name transport url
+  for entry in "${LAC_MCP_SERVERS[@]}"; do
+    IFS='|' read -r name transport url <<<"$entry"
+
+    # Read ~/.claude.json rather than `claude mcp list`, which health-checks
+    # every server over the network and would stall an interactive shell.
+    # jq is already a hard dependency of claude/statusline.sh.
+    if jq -e --arg n "$name" '.mcpServers | has($n)' "$HOME/.claude.json" \
+      >/dev/null 2>&1; then
+      continue
+    fi
+
+    if claude mcp add --scope user --transport "$transport" "$name" "$url" >/dev/null 2>&1; then
+      echo "registered mcp server $name (claude, user scope)"
+      _lac_linked=$((_lac_linked + 1))
+    else
+      echo "link-agentic-configs: failed to register mcp server $name" >&2
+      _lac_warned=$((_lac_warned + 1))
+    fi
+  done
+}
+
+link-agentic-configs() {
+  _lac_linked=0
+  _lac_warned=0
+
+  # Shared, tool-agnostic instructions. Claude Code reads CLAUDE.md and never
+  # AGENTS.md, so the Claude side is a rename, not a copy.
+  _lac_link "$CONFIGS_ROOT/agents/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+  _lac_link "$CONFIGS_ROOT/agents/AGENTS.md" "$HOME/.codex/AGENTS.md"
+
+  _lac_prune "$HOME/.claude/rules"
+  _lac_link_files "$CONFIGS_ROOT/agents/rules" md "$HOME/.claude/rules"
+
+  _lac_link "$CONFIGS_ROOT/claude/settings.json" "$HOME/.claude/settings.json"
+
+  _lac_prune "$HOME/.claude/agents"
+  _lac_link_files "$CONFIGS_ROOT/claude/agents" md "$HOME/.claude/agents"
+
+  chmod +x "$CONFIGS_ROOT/claude/statusline.sh" 2>/dev/null
+  _lac_make_executable "$CONFIGS_ROOT/claude/hooks" sh
+
+  local target_root
+  for target_root in "${LAC_SKILL_TARGETS[@]}"; do
+    _lac_prune "$target_root"
+  done
+  _lac_link_skills
+
+  _lac_register_mcp
+
+  ((_lac_linked == 0)) && echo "link-agentic-configs: everything already linked"
+  ((_lac_warned > 0)) && echo "link-agentic-configs: finished with $_lac_warned warning(s)" >&2
+  return 0
+}
+
+# Previous names; some notes and muscle memory still use them.
+link-configs() { link-agentic-configs "$@"; }
+link-skills() { link-agentic-configs "$@"; }

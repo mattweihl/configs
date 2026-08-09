@@ -12,39 +12,32 @@ description: >
 An extremely strict code quality review focused on maintainability,
 abstraction quality, and codebase health.
 
-## Inputs
-
-This skill needs two things to operate:
-
-1. **Git diff output** — the diff of the changes under review.
-2. **Changed file contents** — full contents of each changed file (for cross-file reasoning).
-
-### If you are the orchestrating agent
-
-Collect inputs before applying the rubric:
-
-1. Run `git diff <base>...HEAD` (default base: `main`) to get the diff.
-2. Read the full contents of every file touched by the diff.
-3. Apply the rubric from [rubric.md](rubric.md) to the collected material.
-
-When delegating to subagents, collect diff and file contents in parallel,
-then pass both as labeled sections (`### Git / diff output` and
-`### Changed file contents`) to the reviewing agent.
-
-### If you are the reviewing agent (receiving pre-collected inputs)
-
-Your prompt already contains the diff and file contents. Proceed directly
-to applying the rubric.
-
 ## Rubric
 
 Read and apply [rubric.md](rubric.md) as the **complete** review rubric —
-tone, approval bar, output ordering, code-judo / 1k-line / spaghetti
-rules, and code style preferences.
+tone, approval bar, output ordering, verification bar, and the code-judo /
+1k-line / spaghetti rules. It points at
+`~/configs/agents/rules/code-style.md` for style preferences; read that too.
+
+## Inputs
+
+The review needs the diff (`git diff <base>...HEAD`, default base `main`) and
+the full contents of every file it touches. Read the files — a diff alone
+cannot show whether a change fits the module around it.
+
+If your prompt already contains both, use them and read nothing further.
 
 ## Constraints
 
 - Apply the rubric **only** to what the diff and file contents show.
 - Trace cross-file impact when the change touches module boundaries.
 - Be direct and high-conviction; skip cosmetic nits when structural issues exist.
+- Verify any claim about tool, API, or config behavior before asserting it. See
+  "Verify Before You Assert" in the rubric.
 - Do **not** spawn nested subagents unless explicitly asked.
+
+<!--
+The `code-reviewer` subagent (claude/agents/code-reviewer.md) owns the procedure
+for collecting inputs. This file owns the standard. Keep it that way: the two
+drifted once already, when both spelled out the collection steps.
+-->
