@@ -26,7 +26,6 @@ return {
         yaml = { "prettier" },
         python = { "ruff_format" },
         terraform = { "terraform_fmt" },
-        sql = { "sql_formatter" },
       },
       format_on_save = {
         timeout_ms = 500,

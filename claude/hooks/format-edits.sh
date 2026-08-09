@@ -105,13 +105,6 @@ case "$path" in
     command -v terraform >/dev/null 2>&1 || exit 0
     format_via_stdin "$path" terraform fmt -no-color -
     ;;
-  *.sql)
-    # Present because nvim formats sql on save (format.lua). sql_formatter is
-    # stdin-only. No config gate, for the same reason as terraform: the agent
-    # only reaches here for a .sql file it just wrote itself.
-    bin="$(resolve_formatter "$path" sql-formatter)" || exit 0
-    format_via_stdin "$path" "$bin"
-    ;;
 esac
 
 # Always succeed. A missing formatter, or one that chokes on a file the agent is

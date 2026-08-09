@@ -84,16 +84,17 @@ relinks, and prints where the backup went — diff it to recover the change.
   no `skills:` field: an agent that must read a skill needs an explicit
   instruction to `Read` the file by path. Verify a frontmatter key exists
   before relying on it, because nothing will tell you it did not.
-- `claude/hooks/format-edits.sh` runs prettier/ruff/terraform/sql-formatter on
-  files Claude writes, because agent edits never pass through nvim's
-  format-on-save. It reads the path from the hook's **stdin JSON**
-  (`.tool_response.filePath`, falling back to `.tool_input.file_path` /
-  `.tool_input.notebook_path`). There is no `CLAUDE_FILE_PATHS` environment
-  variable — a hook written against one silently formats nothing.
+- `claude/hooks/format-edits.sh` runs prettier/ruff/terraform on files Claude
+  writes, because agent edits never pass through nvim's format-on-save. It
+  reads the path from the hook's **stdin JSON** (`.tool_response.filePath`,
+  falling back to `.tool_input.file_path` / `.tool_input.notebook_path`). There
+  is no `CLAUDE_FILE_PATHS` environment variable — a hook written against one
+  silently formats nothing.
 - prettier and ruff only run when the project has a matching config file, so a
   repo that never opted into them does not get a whole-file reformat from one
-  agent edit. terraform and sql have no such gate: `terraform fmt` is the one
-  canonical HCL style, and both are stdin-only formatters.
+  agent edit. terraform has no such gate: `terraform fmt` is the one canonical
+  HCL style. It is also stdin-only — `terraform fmt <file>` is rejected,
+  because the positional argument is a directory.
 
 ## tmux + Claude Code
 
@@ -170,6 +171,7 @@ relinks, and prints where the backup went — diff it to recover the change.
 - Shell scripts in `lazygit/scripts/` use `~/configs/` as the base path
 - No completion/autocomplete plugin in nvim (intentional)
 - Format-on-save enabled in nvim (conform.nvim); `<leader>F` also available for manual formatting
-- Formatter lists in `nvim/lua/plugins/format.lua` and `claude/hooks/format-edits.sh` must stay in step, binary names included (`sql-formatter`, `terraform fmt -no-color -`)
+- Formatter lists in `nvim/lua/plugins/format.lua` and `claude/hooks/format-edits.sh` must stay in step, binary names and arguments included (`terraform fmt -no-color -`)
+- Before adding a formatter to either file, check the binary actually resolves. `sql_formatter` sat in `format.lua` doing nothing for as long as it was there: conform runs `sql-formatter`, which was installed nowhere
 - Run a script against a realistic input before documenting how it behaves. Every wrong claim in this file so far came from describing intent instead of observed output
 - Binary/generated files (`.icns`, `lazy-lock.json`, iTerm themes) are committed as-is
