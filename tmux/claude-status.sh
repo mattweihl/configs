@@ -41,9 +41,23 @@ case "$1" in
     ;;
 esac
 
-# Nudge the status bar so the new glyph is drawn promptly. Don't toggle
-# automatic-rename to force this -- that races with tmux's own rename pass and
-# can leave the window stuck on a stale name.
+# Setting @claude_state does not dirty the window, and tmux only recomputes an
+# automatic-rename name when the pane produces *output*. "wait" is precisely the
+# state where the agent has gone quiet, so without a nudge that glyph would
+# never appear -- the one state you most need to see would be the one that never
+# repaints. Re-asserting automatic-rename to the value it already holds dirties
+# the window and forces the recompute.
+#
+# This is not the off/on toggle that races with tmux's rename pass and can
+# strand a stale name: writing `on` over `on` is idempotent. Windows reading
+# "off" were renamed by hand (tmux clears the flag on rename-window) and are not
+# ours to relabel.
+if [ "$(tmux show-options -wqv -t "$TMUX_PANE" automatic-rename 2>/dev/null)" != "off" ]; then
+  tmux set-option -w -t "$TMUX_PANE" automatic-rename on 2>/dev/null
+fi
+
+# Belt and braces: the rename above should dirty the status line on its own, but
+# powerline owns the status format here, so force the redraw rather than assume.
 tmux refresh-client -S 2>/dev/null
 
 exit 0

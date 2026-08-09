@@ -21,12 +21,25 @@ zsh/              zsh config (config.zsh) + worktree helpers
   `2.1.226`. `automatic-rename-format` substitutes Claude's own OSC title.
 - `tmux/claude-status.sh` is driven by hooks in `~/.claude/settings.json`
   (not in this repo) and sets a per-pane `@claude_state` that renders as a
-  glyph in the window name: `●` working, `◍` needs input, `✦` idle.
+  glyph in the window name: `●` working, `◍` needs input, `✦` idle. It then
+  re-asserts `automatic-rename` on the window: tmux only recomputes an
+  auto-name when the pane emits output, and `◍` is by definition the moment the
+  agent has gone quiet, so the glyph would otherwise never repaint.
 - `<prefix> a` opens `tmux/claude-agents.sh`, an fzf picker over every Claude
   pane across all sessions.
 - The `@_claude_*` formats in `tmux.conf` (pane match, glyph, label, title) are
   the single source of truth; `claude-agents.sh` evaluates them via
   `list-panes -f` rather than reimplementing the matching.
+- Only agents launched inside a pane drive the glyph. `claude-status.sh` targets
+  `$TMUX_PANE`, and background / daemon-resumed sessions don't inherit it, so
+  their hooks exit as a no-op. Don't try to recover the pane by walking the
+  process tree: such a session's ancestry either reaches no pane at all, or
+  reaches the *parent* agent's pane and marks a window that isn't its own.
+- Diagnostic: a pane whose window *name* tracks Claude's title live but whose
+  glyph is stuck on `✦` is the case above, not a broken hook. The title arrives
+  as an OSC escape on the tty (no env needed); the state needs `$TMUX_PANE`.
+  Same pane, two channels — verify with `tmux list-panes -a -F
+  '#{pane_id} [#{@claude_state}] #{window_name}'`.
 
 ## How configs are deployed
 
