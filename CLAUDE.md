@@ -10,9 +10,23 @@ glow/             Glow markdown viewer config
 iterm2/           iTerm2 profile, keymaps, color themes (legacy/backup)
 lazygit/          Lazygit config + helper scripts
 nvim/             Neovim config (Lua, lazy.nvim)
-tmux/             tmux config
+tmux/             tmux config + Claude Code integration scripts
 zsh/              zsh config (config.zsh) + worktree helpers
 ```
+
+## tmux + Claude Code
+
+- Claude Code panes are detected in `tmux.conf` by their process name: the
+  launcher execs a version-named binary, so `pane_current_command` is e.g.
+  `2.1.226`. `automatic-rename-format` substitutes Claude's own OSC title.
+- `tmux/claude-status.sh` is driven by hooks in `~/.claude/settings.json`
+  (not in this repo) and sets a per-pane `@claude_state` that renders as a
+  glyph in the window name: `●` working, `◍` needs input, `✦` idle.
+- `<prefix> a` opens `tmux/claude-agents.sh`, an fzf picker over every Claude
+  pane across all sessions.
+- The `@_claude_*` formats in `tmux.conf` (pane match, glyph, label, title) are
+  the single source of truth; `claude-agents.sh` evaluates them via
+  `list-panes -f` rather than reimplementing the matching.
 
 ## How configs are deployed
 

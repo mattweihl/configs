@@ -40,8 +40,8 @@ alias l="ll"
 go_to_code()  { cd "${CODE_LOCATION:-$HOME/code}"; }
 go_to_desktop() { cd "${DESKTOP:-$HOME/Desktop}"; }
 
-alias ,c='go_to_code'
-alias ,dt='go_to_desktop'
+alias c='go_to_code'
+alias dt='go_to_desktop'
 
 
 if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
@@ -52,12 +52,16 @@ if [[ -r "$HOME/configs/zsh/link-skills.sh" ]]; then
   source "$HOME/configs/zsh/link-skills.sh"
 fi
 
-alias ,gs="git status"
-alias ,gb="git branch"
-alias ,ga="git add"
-alias ,gc="git commit"
-alias ,gp="git push"
-alias ,gd="git diff"
+# These shadow two rarely-typed Homebrew binaries pulled in as dependencies:
+# `gs` (ghostscript) and `gc` (graphviz). Aliases only apply to interactive
+# shells, so scripts and other tools still resolve the real binaries; use
+# `command gs` / `command gc` if you ever need them by hand.
+alias gs="git status"
+alias gb="git branch"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
+alias gd="git diff"
 alias history="history 1"
 
 if command -v fzf &> /dev/null; then
@@ -81,12 +85,12 @@ fi
 
 if command -v lazygit &> /dev/null
 then
-  alias ,lg='lazygit'
+  alias lg='lazygit'
 fi
 
-#alias ,clawd='claude --dangerously-skip-permissions'
-alias ,clawd='claude --enable-auto-mode'
-alias ,neovide='neovide --fork'
+#alias clawd='claude --dangerously-skip-permissions'
+alias clawd='claude --permission-mode auto'
+alias neovide='neovide --fork'
 
 bindkey -e
 # VS Code/Cursor send CSI modifier sequences for Option/Ctrl + Arrow.
