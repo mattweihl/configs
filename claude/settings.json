@@ -1,5 +1,4 @@
 {
-  "model": "opus[1m]",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -92,6 +91,7 @@
     "command": "~/configs/claude/statusline.sh",
     "padding": 0
   },
+  "effortLevel": "medium",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",

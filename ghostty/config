@@ -1,6 +1,6 @@
-font-family = Iosevka Nerd Font
+font-family = Maple Mono NF
 font-style = "Bold"
-font-size = 18
+font-size = 14
 macos-icon = custom
 macos-custom-icon = ~/configs/ghostty/icons/ghostty-black.icns
 
@@ -16,7 +16,7 @@ shell-integration-features = ssh-terminfo,ssh-env
 theme = Dracula+
 
 window-width = 98
-window-height = 25
+window-height = 30
 
 # ── Splits (Ctrl-A leader, tmux-style) ─────────────────────
 
