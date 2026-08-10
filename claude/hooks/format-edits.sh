@@ -1,7 +1,8 @@
 #!/bin/sh
-# Formats the file that Claude Code just wrote.
+# Formats the file that an agent just wrote.
 #
-# Wired to PostToolUse (Edit|Write|NotebookEdit) in claude/settings.json.
+# Wired to PostToolUse (Edit|Write|NotebookEdit) in claude/settings.json, and to
+# afterFileEdit in cursor/hooks.json.
 #
 # Why this exists: nvim formats on save through conform.nvim, but Claude edits
 # files directly and never goes through nvim. Without this hook, every file the
@@ -10,11 +11,12 @@
 #
 # The formatter list mirrors nvim/lua/plugins/format.lua. Keep the two in step.
 #
-# Claude Code passes the hook payload as JSON on stdin and sets no per-tool
-# environment variables. The path lives at .tool_response.filePath, with
-# .tool_input.file_path / .tool_input.notebook_path as fallbacks -- this is the
-# pattern Claude Code's own hook docs use. One tool call means one file, so
-# there is no list to split and paths containing spaces are safe.
+# Both agents pass the hook payload as JSON on stdin and set no per-tool
+# environment variables, but they spell the path differently. Claude Code puts
+# it at .tool_response.filePath, with .tool_input.file_path /
+# .tool_input.notebook_path as fallbacks -- the pattern its own hook docs use.
+# Cursor's afterFileEdit payload is flat: .file_path. One edit means one file,
+# so there is no list to split and paths containing spaces are safe.
 
 set -u
 
@@ -24,6 +26,7 @@ path="$(jq -r '
   .tool_response.filePath
   // .tool_input.file_path
   // .tool_input.notebook_path
+  // .file_path
   // empty
 ' 2>/dev/null)"
 

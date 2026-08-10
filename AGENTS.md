@@ -13,6 +13,7 @@ agents/           Cross-tool agent instructions (user-level)
                     rules/      path-scoped, loaded when a matching file is read
                     reference/  never loaded; read on demand by absolute path
 claude/           Claude Code config: settings.json, subagents, hooks, statusline
+cursor/           Cursor config: hooks.json (skills and MCP are not files here)
 ghostty/          Ghostty terminal config + custom icons
 glow/             Glow markdown viewer config
 iterm2/           iTerm2 profile, keymaps, color themes (legacy/backup)
@@ -31,14 +32,26 @@ Note the two `AGENTS.md` files, which are not the same thing:
 
 ## How configs are deployed
 
-- `link-agentic-configs` (from `zsh/link-agentic-configs.sh`) links everything
-  agent-related — `agents/AGENTS.md`, `agents/rules/`, `claude/settings.json`,
-  `claude/agents/`, and `skills/` — into `~/.claude/`, `~/.codex/`, and
-  `~/.cursor/`, and registers the MCP servers **for Claude Code only**. Codex
-  MCP servers live in a `[mcp_servers.*]` table in `~/.codex/config.toml`,
-  which is hand-maintained and not in this repo. The script covers agentic
-  tooling only; the entries below are deployed by hand. `link-configs` and
-  `link-skills` are aliases for it.
+- `link-agentic-configs` (from `zsh/link-agentic-configs.sh`) deploys everything
+  agent-related. Each tool gets only what it can read, which is not the same set:
+
+  | Repo | Claude Code | Codex | Cursor |
+  | --- | --- | --- | --- |
+  | `agents/AGENTS.md` | `~/.claude/CLAUDE.md` | `~/.codex/AGENTS.md` | — |
+  | `agents/rules/*.md` | `~/.claude/rules/` | — | — |
+  | `claude/settings.json` | `~/.claude/settings.json` | — | — |
+  | `claude/agents/*.md` | `~/.claude/agents/` | — | — |
+  | `claude/hooks/format-edits.sh` | named by `settings.json` | — | `~/.cursor/hooks/` |
+  | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` |
+  | `skills/*/` | `~/.claude/skills/` | — | `~/.cursor/skills/` |
+  | MCP servers | `~/.claude.json` | — | `~/.cursor/mcp.json` |
+
+  MCP servers are registered, not linked, from the single `LAC_MCP_SERVERS`
+  table in the script. Codex is left out of that: its servers live in a
+  `[mcp_servers.*]` table in `~/.codex/config.toml`, which is hand-maintained
+  and not in this repo. The script covers agentic tooling only; the entries
+  below are deployed by hand. `link-configs` and `link-skills` are aliases
+  for it.
 - The script is bash but zsh sources it, so it enumerates directories with
   `find`, never a glob. zsh has `nomatch` on by default: a glob matching
   nothing aborts the command instead of expanding to nothing.
@@ -86,17 +99,50 @@ relinks, and prints where the backup went — diff it to recover the change.
   no `skills:` field: an agent that must read a skill needs an explicit
   instruction to `Read` the file by path. Verify a frontmatter key exists
   before relying on it, because nothing will tell you it did not.
-- `claude/hooks/format-edits.sh` runs prettier/ruff/terraform on files Claude
-  writes, because agent edits never pass through nvim's format-on-save. It
-  reads the path from the hook's **stdin JSON** (`.tool_response.filePath`,
-  falling back to `.tool_input.file_path` / `.tool_input.notebook_path`). There
-  is no `CLAUDE_FILE_PATHS` environment variable — a hook written against one
-  silently formats nothing.
+- `claude/hooks/format-edits.sh` runs prettier/ruff/terraform on files an agent
+  writes, because agent edits never pass through nvim's format-on-save. One
+  script serves both agents. It stays under `claude/` despite that: the path is
+  named by `claude/settings.json` and by the link script, so the directory is a
+  historical name, not a scope. It reads the path from the
+  hook's **stdin JSON**, and the two agents spell it differently: Claude
+  uses `.tool_response.filePath` (falling back to `.tool_input.file_path` /
+  `.tool_input.notebook_path`), Cursor's `afterFileEdit` payload is a flat
+  `.file_path`. There is no `CLAUDE_FILE_PATHS` environment variable — a hook
+  written against one silently formats nothing.
 - prettier and ruff only run when the project has a matching config file, so a
   repo that never opted into them does not get a whole-file reformat from one
   agent edit. terraform has no such gate: `terraform fmt` is the one canonical
   HCL style. It is also stdin-only — `terraform fmt <file>` is rejected,
   because the positional argument is a directory.
+
+## Cursor coverage
+
+Cursor reads skills, hooks, and MCP servers from the home directory. It reads
+instructions from a project only. That split is the whole story:
+
+- `~/.cursor/skills/` is a documented global skill root, alongside
+  `~/.agents/skills/`. A `SKILL.md` needs `name` (matching the folder) and
+  `description`; the optional `paths:` field scopes a skill to matching files,
+  which is the closest thing Cursor has to a path-scoped rule.
+- `~/.cursor/hooks.json` holds user hooks. A user hook runs with `~/.cursor/` as
+  its working directory, so `cursor/hooks.json` names the script as
+  `./hooks/format-edits.sh` and the link script puts a symlink there. Do not
+  switch it to an absolute path to match `claude/settings.json` — the two are
+  resolved differently.
+- `~/.cursor/mcp.json` takes a remote server as `{"url": ...}`. It is merged,
+  never linked or overwritten: Cursor writes to that file when you add a server
+  through the UI.
+- **Instructions do not reach Cursor at all.** There is no user-level rules
+  directory, `AGENTS.md` is read from a project root and its subdirectories,
+  and User Rules live in Cursor's settings UI rather than on disk — the docs
+  say to re-enter them by hand on a new machine. So `agents/AGENTS.md` and
+  `agents/rules/` are Claude/Codex-only, and the Cursor equivalent is a manual
+  paste into Customize → Rules, once per machine.
+- `~/.cursor/cli-config.json` is `cursor-agent`'s own state (model, permissions,
+  sandbox). It is not linked; treat it as machine state.
+- Cursor is migrating slash commands to skills — it ships a `/migrate-to-skills`
+  command. Do not add a `~/.cursor/commands/` link; put shared behaviour in
+  `skills/`, which both agents already load.
 
 ## tmux + Claude Code
 

@@ -25,9 +25,18 @@
 #   claude/statusline.sh  } referenced by absolute path from settings.json,
 #   claude/hooks/*.sh     } so they only need the executable bit
 #   skills/*/             -> ~/.claude/skills/ and ~/.cursor/skills/
+#   cursor/hooks.json     -> ~/.cursor/hooks.json
+#   claude/hooks/         -> ~/.cursor/hooks/format-edits.sh (see below)
+#     format-edits.sh
 #
 # Skill source roots are ~/configs/skills (personal) and
 # ~/code/work-configs/skills (work-specific, absent on some machines).
+#
+# Cursor gets skills, hooks, and MCP servers, and cannot get the rest. It has no
+# user-level rules directory and reads AGENTS.md from a project root only, so
+# agents/AGENTS.md and agents/rules/ have no home to be linked to. Cursor's User
+# Rules live in its settings UI, not on disk -- paste them in by hand, once per
+# machine. See AGENTS.md, "Cursor coverage".
 #
 # Bash shebang, but config.zsh sources this into zsh. Directory contents are
 # therefore enumerated with `find`, never a glob: zsh has `nomatch` on by
@@ -46,9 +55,11 @@ LAC_SKILL_TARGETS=(
   "$HOME/.claude/skills"
 )
 
-# MCP servers registered for Claude Code only. Claude keeps user-scope servers
-# in ~/.claude.json, which is machine state mixed with UI counters and is not
-# worth versioning -- so register them idempotently instead of linking a file.
+# MCP servers, registered rather than linked for both Claude Code and Cursor.
+# Claude keeps user-scope servers in ~/.claude.json, which is machine state mixed
+# with UI counters and is not worth versioning. Cursor's ~/.cursor/mcp.json is a
+# plain config file, but Cursor writes to it whenever you add a server from the
+# UI, so it is merged into rather than replaced.
 #
 # Codex is deliberately not covered. It reads MCP servers from a [mcp_servers.*]
 # table in ~/.codex/config.toml, which also holds hand-maintained stdio servers
@@ -135,7 +146,7 @@ _lac_make_executable() {
   find "$1" -maxdepth 1 -type f -name "*.$2" -exec chmod +x {} +
 }
 
-_lac_register_mcp() {
+_lac_register_claude_mcp() {
   command -v claude >/dev/null 2>&1 || return 0
   command -v jq >/dev/null 2>&1 || return 0
 
@@ -161,6 +172,48 @@ _lac_register_mcp() {
   done
 }
 
+# Adds each server to ~/.cursor/mcp.json, leaving every other key alone. There is
+# no `cursor mcp add`, so this edits the file -- which means never overwriting
+# an entry that is already there, and never touching the file when nothing is
+# missing. A malformed file is left for the user to fix, not replaced.
+_lac_register_cursor_mcp() {
+  command -v jq >/dev/null 2>&1 || return 0
+
+  local config="$HOME/.cursor/mcp.json"
+  local entry name transport url tmp
+
+  mkdir -p "$HOME/.cursor"
+  [[ -e "$config" ]] || echo '{"mcpServers":{}}' >"$config"
+
+  for entry in "${LAC_MCP_SERVERS[@]}"; do
+    IFS='|' read -r name transport url <<<"$entry"
+
+    # Cursor addresses a remote server by url alone. A stdio server needs a
+    # command and args instead, which this table has no column for.
+    if [[ "$transport" != "http" && "$transport" != "sse" ]]; then
+      echo "link-agentic-configs: mcp server $name is $transport; add it to ~/.cursor/mcp.json by hand" >&2
+      _lac_warned=$((_lac_warned + 1))
+      continue
+    fi
+
+    if jq -e --arg n "$name" '.mcpServers | has($n)' "$config" >/dev/null 2>&1; then
+      continue
+    fi
+
+    tmp="$(mktemp)" || continue
+    if jq --arg n "$name" --arg u "$url" '.mcpServers[$n] = {url: $u}' \
+      "$config" >"$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
+      mv "$tmp" "$config"
+      echo "registered mcp server $name (cursor, user scope)"
+      _lac_linked=$((_lac_linked + 1))
+    else
+      rm -f "$tmp"
+      echo "link-agentic-configs: failed to register mcp server $name for cursor" >&2
+      _lac_warned=$((_lac_warned + 1))
+    fi
+  done
+}
+
 link-agentic-configs() {
   _lac_linked=0
   _lac_warned=0
@@ -181,13 +234,21 @@ link-agentic-configs() {
   chmod +x "$CONFIGS_ROOT/claude/statusline.sh" 2>/dev/null
   _lac_make_executable "$CONFIGS_ROOT/claude/hooks" sh
 
+  # Cursor runs a user hook from ~/.cursor/, and its docs spell the path
+  # relative to that directory. So the script is linked next to hooks.json
+  # rather than named by an absolute path the way settings.json names it.
+  _lac_link "$CONFIGS_ROOT/cursor/hooks.json" "$HOME/.cursor/hooks.json"
+  _lac_link "$CONFIGS_ROOT/claude/hooks/format-edits.sh" \
+    "$HOME/.cursor/hooks/format-edits.sh"
+
   local target_root
   for target_root in "${LAC_SKILL_TARGETS[@]}"; do
     _lac_prune "$target_root"
   done
   _lac_link_skills
 
-  _lac_register_mcp
+  _lac_register_claude_mcp
+  _lac_register_cursor_mcp
 
   ((_lac_linked == 0)) && echo "link-agentic-configs: everything already linked"
   ((_lac_warned > 0)) && echo "link-agentic-configs: finished with $_lac_warned warning(s)" >&2
