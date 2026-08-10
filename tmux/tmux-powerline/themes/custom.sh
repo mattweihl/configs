@@ -23,16 +23,21 @@ TMUX_POWERLINE_DEFAULT_LEFTSIDE_SEPARATOR="$TMUX_POWERLINE_SEPARATOR_RIGHT_BOLD"
 TMUX_POWERLINE_DEFAULT_RIGHTSIDE_SEPARATOR="$TMUX_POWERLINE_SEPARATOR_LEFT_BOLD"
 
 # Window list — preserves your λ (nvim) / ✦ (claude) / $ (shell) indicators
-# from the original tmux.conf. The #{?#{m:...}} matcher inspects pane_current_command.
+# from the original tmux.conf.
+#
+# The claude test goes through @_claude_pane, not `#{m:claude,...}`: the
+# launcher execs a version-named binary, so pane_current_command is e.g.
+# "2.1.226" and a literal match on "claude" never fires. tmux.conf owns that
+# format; matching it a second time here is what let the bug sit unnoticed.
 TMUX_POWERLINE_WINDOW_STATUS_FORMAT=(
 	"#[$(tp_format regular)]"
-	"  #{?#{m:nvim,#{pane_current_command}},λ,#{?#{m:claude,#{pane_current_command}},✦,$}} #I: #W "
+	"  #{?#{m:nvim,#{pane_current_command}},λ,#{?#{E:@_claude_pane},✦,$}} #I: #W "
 )
 
 TMUX_POWERLINE_WINDOW_STATUS_CURRENT=(
 	"#[$(tp_format inverse)]"
 	"$TMUX_POWERLINE_DEFAULT_LEFTSIDE_SEPARATOR"
-	" #{?#{m:nvim,#{pane_current_command}},λ,#{?#{m:claude,#{pane_current_command}},✦,$}} #I: #W "
+	" #{?#{m:nvim,#{pane_current_command}},λ,#{?#{E:@_claude_pane},✦,$}} #I: #W "
 	"#[$(tp_format regular)]"
 	"$TMUX_POWERLINE_DEFAULT_LEFTSIDE_SEPARATOR"
 )
@@ -46,8 +51,11 @@ export TMUX_POWERLINE_SEG_TMUX_SESSION_INFO_FORMAT="#{=/20/…:session_name}"
 export TMUX_POWERLINE_SEG_TIME_FORMAT="%l:%M %p"
 
 # Left: green session badge transitioning into the window list.
+# claude_waiting sits after it and renders only when an agent in *another*
+# session is blocked on you; with no output tmux-powerline drops the segment.
 TMUX_POWERLINE_LEFT_STATUS_SEGMENTS=(
 	"tmux_session_info 148 234"
+	"claude_waiting 166 234"
 )
 
 TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS=(

@@ -30,6 +30,20 @@ path="$(jq -r '
 [ -n "$path" ] || exit 0
 [ -f "$path" ] || exit 0
 
+# Record what the agent touched, for `<prefix> e` (tmux/claude-edits.sh).
+#
+# Keyed by pane, not by session: two agents can share a window, and `git
+# status` cannot tell their edits apart. No pane means no reader, so skip it.
+#
+# This runs before the formatter gates below, which exit early for file types
+# no formatter claims -- the list is of every edit, not of every reformat.
+# $TMPDIR is deliberately not used: on macOS it is per-process-context, so the
+# tmux server that reads this list can resolve it to a different directory.
+if [ -n "${TMUX_PANE:-}" ]; then
+  edits_dir="$HOME/.cache/claude-edits"
+  mkdir -p "$edits_dir" 2>/dev/null && printf '%s\n' "$path" >>"$edits_dir/$TMUX_PANE"
+fi
+
 # Neither prettier nor ruff is installed globally on this machine: conform.nvim
 # finds them because Mason prepends its bin/ to nvim's PATH. A hook gets no such
 # help, so resolve the same binaries by hand -- project-local first, so a repo

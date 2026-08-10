@@ -45,6 +45,8 @@ Note the two `AGENTS.md` files, which are not the same thing:
 - `nvim/` → symlinked to `~/.config/nvim/`
 - `lazygit/` → symlinked to platform-specific lazygit config path
 - `tmux/tmux.conf` → sourced from `~/.tmux.conf` wrapper file (not symlinked)
+- `tmux/tmux-powerline/` → symlinked to `~/.config/tmux-powerline/`, so
+  `config.sh`, `themes/`, and `segments/` are all live from the repo
 - `zsh/config.zsh` → sourced from `~/.zshrc` wrapper file (not symlinked)
 - `glow/` → symlinked to `~/Library/Preferences/glow/` (macOS) or `~/.config/glow/` (Linux)
 
@@ -134,6 +136,33 @@ relinks, and prints where the backup went — diff it to recover the change.
 - The glyph in the window name and `claude/statusline.sh` inside the pane answer
   different questions: the glyph says *which* pane wants you, the status line
   says what the agent in front of you is running on.
+- The glyph is scoped to the session you are attached to, because it renders in
+  a window *name*. The `claude_waiting` powerline segment
+  (`tmux/tmux-powerline/segments/`) closes that gap: it lists every *other*
+  session holding a `wait` pane, and prints nothing — which makes powerline drop
+  the segment entirely — when there are none. It filters with `list-panes -f`
+  against `@claude_state` rather than restating the state vocabulary.
+- The theme's per-window `λ`/`✦`/`$` prefix tests `@_claude_pane`, not
+  `#{m:claude,#{pane_current_command}}`. The literal match silently never fired:
+  `pane_current_command` is the version string. Anything that needs to know "is
+  this a Claude pane" goes through that format.
+- `<prefix> e` opens `tmux/claude-edits.sh`, an fzf picker over the files the
+  agent in *that pane* has edited, newest first. `claude/hooks/format-edits.sh`
+  appends each path to `~/.cache/claude-edits/<pane-id>` before its formatter
+  gates, so the list covers every edit and not just the reformatted ones. The
+  `SessionStart` hook clears it, matched to `startup` only — a resume or a
+  compact keeps the history it had.
+- Do not build that path with `#{s/%//:pane_id}`. tmux substitution works on
+  other characters but leaves the leading `%` of a pane id in place, so the
+  binding passes `#{pane_id}` verbatim as an argument and the file is named
+  `%3`, not `3`.
+- `$TMPDIR` is not usable as a handoff point between a hook and the tmux server:
+  on macOS it is per-process-context, and the two can resolve it differently.
+  `~/.cache` is shared by definition.
+- Popups sit over the agent pane instead of splitting it: `<prefix> g` for
+  lazygit, `M-t` for a shell, both starting in `#{pane_current_path}`. A Claude
+  pane reflows badly when it loses columns, so nothing that is transient should
+  cost it width. `<prefix> t` is the clock, which is why lazygit is on `g`.
 - Only agents launched inside a pane drive the glyph. `claude-status.sh` targets
   `$TMUX_PANE`, and background / daemon-resumed sessions don't inherit it, so
   their hooks exit as a no-op. Don't try to recover the pane by walking the

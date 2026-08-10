@@ -52,6 +52,16 @@
             "async": true
           }
         ]
+      },
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"${TMUX_PANE:-}\" ] && rm -f \"$HOME/.cache/claude-edits/$TMUX_PANE\" || true",
+            "async": true
+          }
+        ]
       }
     ],
     "Stop": [
