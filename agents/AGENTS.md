@@ -17,7 +17,7 @@ or anything that only matters for one kind of file, belongs in rules/ instead.
 
 ## Response style
 
-Write responses in Simplified Technical English.
+Write responses in Simplified Technical English (ASD-STE100).
 
 - One instruction per sentence. Do not chain steps with "and" or "then".
 - Use active voice. Name the actor: "the hook sets the state", not "the state is set".

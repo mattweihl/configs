@@ -9,6 +9,17 @@
 WT_DEFAULT_ROOT="${WT_DEFAULT_ROOT:-$HOME/code/worktrees}"
 WT_ROOT="${WT_ROOT:-$WT_DEFAULT_ROOT}"
 
+# Per-stage timing logs for cwt/rwt, useful for diagnosing slow git/yarn
+# stages. Enabled by default; disable with WT_TIMING=0.
+WT_TIMING="${WT_TIMING:-1}"
+
+_wt_log_stage() {
+  local label="$1"
+  local start="$2"
+  [[ "$WT_TIMING" == 0 ]] && return 0
+  echo "wt: $label took $(( $(date +%s) - start ))s" >&2
+}
+
 # Resolve the worktrees root, precedence: explicit arg > $WT_ROOT > $WT_DEFAULT_ROOT.
 wt_resolve_root() {
   local explicit="${1:-}"
@@ -163,11 +174,16 @@ wt_ensure_worktree() {
     return 1
   fi
 
+  local stage_start
+  stage_start=$(date +%s)
   if git -C "$repo_root" remote get-url origin >/dev/null 2>&1; then
     git -C "$repo_root" fetch origin --prune
   fi
+  _wt_log_stage "fetch" "$stage_start"
 
+  stage_start=$(date +%s)
   git -C "$repo_root" worktree prune
+  _wt_log_stage "worktree prune" "$stage_start"
 
   local existing_worktree
   existing_worktree="$(_wt_find_worktree_for_branch "$repo_root" "$branch")"
@@ -204,6 +220,7 @@ wt_ensure_worktree() {
     fi
   fi
 
+  stage_start=$(date +%s)
   if git -C "$repo_root" show-ref --verify --quiet "$local_branch_ref"; then
     git -C "$repo_root" worktree add "$target_path" "$branch"
     _wt_ensure_branch_tracks_origin "$target_path" "$branch"
@@ -223,12 +240,15 @@ wt_ensure_worktree() {
     # Clear it so first push sets upstream to origin/<new-branch> instead.
     git -C "$target_path" branch --unset-upstream >/dev/null 2>&1 || true
   fi
+  _wt_log_stage "worktree add" "$stage_start"
 
   WT_LAST_WORKTREE_PATH="$target_path"
   WT_LAST_WORKTREE_CREATED=1
 
   if typeset -f wt_post_create_hook >/dev/null 2>&1; then
+    stage_start=$(date +%s)
     wt_post_create_hook "$target_path" "$branch" "$base_branch"
+    _wt_log_stage "post-create hook" "$stage_start"
   fi
 
   printf '%s\n' "$target_path"
@@ -295,13 +315,18 @@ wt_remove_worktree() {
         /^branch /   { if (path == wt) { sub("refs/heads/", "", $2); print $2; exit } }
       ')"
 
+  local stage_start
+  stage_start=$(date +%s)
   git -C "$repo_root" worktree remove --force "$worktree_path"
+  _wt_log_stage "worktree remove" "$stage_start"
 
   if [[ -n "$wt_branch" ]]; then
+    stage_start=$(date +%s)
     if ! git -C "$repo_root" branch -d "$wt_branch" 2>/dev/null; then
       echo "warning: force deleting branch '$wt_branch' (unmerged)." >&2
       git -C "$repo_root" branch -D "$wt_branch"
     fi
+    _wt_log_stage "branch delete" "$stage_start"
   fi
 
   if [[ "$keep_session" -eq 0 && -n "$session_name" ]] && command -v tmux >/dev/null 2>&1; then
