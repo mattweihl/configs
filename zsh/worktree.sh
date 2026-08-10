@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Shared worktree helpers used by both shell commands and tmux scripts.
-# Keep this file shell-compatible (bash + zsh).
+# Shared worktree helpers and the cwt/rwt commands, used by both interactive
+# shells and tmux scripts. Keep this file shell-compatible (bash + zsh).
 
 # Default root for newly-created worktrees. Generic/personal usage lands here.
 # Machine- or repo-specific configs (e.g. work config) can override WT_ROOT to
@@ -18,6 +18,18 @@ wt_resolve_root() {
     printf '%s\n' "$WT_ROOT"
   else
     printf '%s\n' "$WT_DEFAULT_ROOT"
+  fi
+}
+
+# Resolve the target repo, precedence: explicit arg > $WT_REPO > current git toplevel.
+wt_resolve_repo() {
+  local explicit="${1:-}"
+  if [[ -n "$explicit" ]]; then
+    printf '%s\n' "$explicit"
+  elif [[ -n "${WT_REPO:-}" ]]; then
+    printf '%s\n' "$WT_REPO"
+  else
+    git rev-parse --show-toplevel 2>/dev/null
   fi
 }
 
@@ -130,7 +142,7 @@ _wt_ensure_branch_tracks_origin() {
 wt_ensure_worktree() {
   local repo_root="$1"
   local branch="$2"
-  local base_branch="${3:-main}"
+  local base_branch="${3:-${WT_BASE_BRANCH:-main}}"
   local worktrees_dir="${4:-}"
 
   WT_LAST_WORKTREE_CREATED=0
@@ -225,9 +237,13 @@ wt_ensure_worktree() {
 wt_remove_worktree() {
   local repo_root="$1"
   local worktree_name="$2"
-  local worktrees_dir="${3:-}"
   shift 2 || true
-  [[ -n "${1:-}" && "$1" != --* ]] && shift
+
+  local worktrees_dir=""
+  if [[ $# -gt 0 && "$1" != --* ]]; then
+    worktrees_dir="$1"
+    shift
+  fi
 
   local keep_session=0
   while [[ $# -gt 0 ]]; do
@@ -295,3 +311,215 @@ wt_remove_worktree() {
     fi
   fi
 }
+
+create-worktree() {
+  local branch="" base_branch="" repo="" root=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --repo)
+        shift
+        [[ -z "${1:-}" ]] && { echo "error: --repo requires a path" >&2; return 1; }
+        repo="$1"
+        ;;
+      --repo=*)
+        repo="${1#--repo=}"
+        ;;
+      --root)
+        shift
+        [[ -z "${1:-}" ]] && { echo "error: --root requires a path" >&2; return 1; }
+        root="$1"
+        ;;
+      --root=*)
+        root="${1#--root=}"
+        ;;
+      --base)
+        shift
+        [[ -z "${1:-}" ]] && { echo "error: --base requires a branch name" >&2; return 1; }
+        base_branch="$1"
+        ;;
+      --base=*)
+        base_branch="${1#--base=}"
+        ;;
+      -h|--help)
+        echo "usage: create-worktree <branch> [base-branch] [--repo <path>] [--root <dir>] [--base <base-branch>]"
+        return 0
+        ;;
+      *)
+        if [[ -z "$branch" ]]; then
+          branch="$1"
+        elif [[ -z "$base_branch" ]]; then
+          base_branch="$1"
+        else
+          echo "error: unexpected argument '$1'" >&2
+          return 1
+        fi
+        ;;
+    esac
+    shift
+  done
+
+  if [[ -z "$branch" ]]; then
+    echo "usage: create-worktree <branch> [base-branch] [--repo <path>] [--root <dir>] [--base <base-branch>]" >&2
+    return 1
+  fi
+
+  local repo_root
+  repo_root="$(wt_resolve_repo "$repo")"
+  if [[ -z "$repo_root" ]]; then
+    echo "error: could not resolve repo; pass --repo or run from inside a git repo" >&2
+    return 1
+  fi
+
+  wt_ensure_worktree "$repo_root" "$branch" "$base_branch" "$root" >/dev/null || return 1
+
+  if [[ -z "$WT_LAST_WORKTREE_PATH" ]]; then
+    echo "error: failed to resolve worktree path" >&2
+    return 1
+  fi
+
+  printf '%s\n' "$WT_LAST_WORKTREE_PATH"
+}
+alias cwt='create-worktree'
+
+remove-worktree() {
+  local -a names=()
+  local repo="" root="" keep_session_flag=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --repo)
+        shift
+        [[ -z "${1:-}" ]] && { echo "error: --repo requires a path" >&2; return 1; }
+        repo="$1"
+        ;;
+      --repo=*)
+        repo="${1#--repo=}"
+        ;;
+      --root)
+        shift
+        [[ -z "${1:-}" ]] && { echo "error: --root requires a path" >&2; return 1; }
+        root="$1"
+        ;;
+      --root=*)
+        root="${1#--root=}"
+        ;;
+      --keep-session|--no-kill-session)
+        keep_session_flag="--keep-session"
+        ;;
+      -h|--help)
+        echo "usage: remove-worktree <work-tree-dir> [<work-tree-dir>...] [--repo <path>] [--root <dir>] [--keep-session]"
+        return 0
+        ;;
+      *)
+        names+=("$1")
+        ;;
+    esac
+    shift
+  done
+
+  if (( ${#names[@]} == 0 )); then
+    echo "usage: remove-worktree <work-tree-dir> [<work-tree-dir>...] [--repo <path>] [--root <dir>] [--keep-session]" >&2
+    return 1
+  fi
+
+  if (( ${#names[@]} == 1 )); then
+    printf "Remove worktree '%s'? [y/N] " "${names[1]}"
+  else
+    printf "Remove %d worktrees (%s)? [y/N] " "${#names[@]}" "${(j:, :)names}"
+  fi
+  read -r confirm
+  [[ "$confirm" != [yY] ]] && { echo "Aborted."; return 0; }
+
+  local repo_root
+  repo_root="$(wt_resolve_repo "$repo")"
+  if [[ -z "$repo_root" ]]; then
+    echo "error: could not resolve repo; pass --repo or run from inside a git repo" >&2
+    return 1
+  fi
+
+  local name rc=0
+  for name in "${names[@]}"; do
+    wt_remove_worktree "$repo_root" "$name" "$root" $keep_session_flag || rc=$?
+  done
+  return $rc
+}
+alias rwt='remove-worktree'
+
+_rwt_worktree_completion() {
+  local -a candidates
+  local current_path
+  local common_dir
+
+  current_path="$(git rev-parse --show-toplevel 2>/dev/null || pwd -P)"
+  current_path="$(cd "$current_path" 2>/dev/null && pwd -P)" || return 1
+  common_dir="$(git rev-parse --git-common-dir 2>/dev/null)" || return 1
+  common_dir="$(cd "$common_dir" 2>/dev/null && pwd -P)" || return 1
+
+  candidates=(
+    $(
+      git --git-dir "$common_dir" worktree list --porcelain 2>/dev/null \
+        | awk -v current="$current_path" '
+            /^worktree / {
+              path=$2
+              gsub(/^[ \t]+|[ \t]+$/, "", path)
+              if (path != current) {
+                n=split(path, parts, "/")
+                print parts[n]
+              }
+            }
+          ' \
+        | sort -u
+    )
+  )
+
+  (( ${#candidates[@]} == 0 )) && return 1
+
+  local -a selected remaining
+  selected=(${words[2,-1]})
+  remaining=(${candidates:|selected})
+
+  (( ${#remaining[@]} == 0 )) && return 1
+  _describe 'worktree' remaining
+}
+
+_cwt_branch_completion() {
+  local -a candidates
+  local -a existing_branches
+  local repo_root
+  repo_root="$(wt_resolve_repo)" || return 1
+  [[ -z "$repo_root" ]] && return 1
+
+  existing_branches=(
+    $(
+      git -C "$repo_root" worktree list --porcelain 2>/dev/null \
+        | awk '/^branch / { sub("refs/heads/", "", $2); print $2 }'
+    )
+  )
+
+  candidates=(
+    $(
+      git -C "$repo_root" branch -r --format='%(refname:short)' 2>/dev/null \
+        | sed 's|^origin/||' \
+        | grep -v '^HEAD$' \
+        | while read -r branch; do
+            local skip=0
+            for existing in "${existing_branches[@]}"; do
+              [[ "$branch" == "$existing" ]] && skip=1 && break
+            done
+            (( skip == 0 )) && echo "$branch"
+          done \
+        | sort -u
+    )
+  )
+
+  (( ${#candidates[@]} == 0 )) && return 1
+  _describe 'branch' candidates
+}
+
+if typeset -f compdef >/dev/null 2>&1; then
+  compdef _rwt_worktree_completion remove-worktree
+  compdef _rwt_worktree_completion rwt
+  compdef _cwt_branch_completion create-worktree
+  compdef _cwt_branch_completion cwt
+fi

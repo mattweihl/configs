@@ -231,14 +231,23 @@ instructions from a project only. That split is the whole story:
 - `init.lua` loads `core/` (options, keymaps, autocmds), then `lazy.setup("plugins")` auto-discovers `lua/plugins/*.lua`
 - 2 spaces default indent, 4 for Python (autocmd)
 
-## Worktree + tmux workflow
+## Worktree workflow
 
-- Shared helpers live in `~/configs/zsh/worktree.sh` and are sourced from `~/configs/zsh/config.zsh`.
-- Work-repo wrappers stay in `~/code/configs/config.zsh` so repo-specific paths are not baked into shared dotfiles.
-- `,cwt <branch> [base-branch]` creates/reuses the worktree, runs bootstrap steps, and enters tmux by default.
-- `,cwt --no-tmux <branch> [base-branch]` creates/reuses without attaching/switching tmux.
-- `,rwt <worktree>` removes the worktree and kills its matching tmux session when present.
-- `,rwt --keep-session <worktree>` (or `--no-kill-session`) removes without killing tmux.
+- `cwt`/`rwt` and their shared helpers (`wt_ensure_worktree`, `wt_remove_worktree`,
+  `wt_resolve_repo`, `wt_resolve_root`) live in `~/configs/zsh/worktree.sh`, sourced
+  from `~/configs/zsh/config.zsh`. Both commands work standalone, with no
+  work-repo config loaded: they default to the current git checkout as the repo
+  and `~/code/worktrees` as the worktrees directory.
+- `cwt <branch> [base-branch]` (or `--base <base-branch>`) creates/reuses the
+  worktree and runs `wt_post_create_hook` if one is defined.
+- `rwt <worktree> [<worktree>...]` removes the worktree(s) and kills each
+  matching tmux session, unless `--keep-session`/`--no-kill-session` is passed.
+- Both accept `--repo <path>` and `--root <dir>` to target a repo/worktrees-dir
+  other than the defaults, and read `$WT_REPO`/`$WT_ROOT`/`$WT_BASE_BRANCH` as
+  per-shell overrides (explicit flag wins over env var wins over default).
+- `~/code/work-configs/config.zsh` sets those three env vars for the dashboards
+  repo, plus a `wt_post_create_hook` that copies `.env` files and installs
+  dependencies, so repo-specific paths stay out of this public repo.
 
 ## Conventions
 
