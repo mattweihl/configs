@@ -1,6 +1,6 @@
 font-family = Maple Mono NF
-font-style = "Bold"
-font-size = 14
+#font-style = "Bold"
+font-size = 16
 macos-icon = custom
 macos-custom-icon = ~/configs/ghostty/icons/ghostty-black.icns
 
