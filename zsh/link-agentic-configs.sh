@@ -4,8 +4,8 @@
 # actually read it from, so a new machine needs one command and a new skill,
 # rule, or subagent needs none.
 #
-# Scope is agentic tooling only -- Claude Code, Codex, Cursor. nvim, tmux, zsh,
-# ghostty, lazygit, and glow are deployed the way they always were (see
+# Scope is agentic tooling only -- Claude Code, Codex, Cursor, OpenCode. nvim,
+# tmux, zsh, ghostty, lazygit, and glow are deployed the way they always were (see
 # AGENTS.md, "How configs are deployed"); this script does not touch them.
 #
 # Run `link-agentic-configs`. It is idempotent: it re-links only what is wrong
@@ -24,7 +24,8 @@
 #   claude/agents/*.md    -> ~/.claude/agents/
 #   claude/statusline.sh  } referenced by absolute path from settings.json,
 #   claude/hooks/*.sh     } so they only need the executable bit
-#   skills/*/             -> ~/.claude/skills/ and ~/.cursor/skills/
+#   skills/*/             -> ~/.claude/skills/, ~/.cursor/skills/, and
+#                            ~/.config/opencode/skills/
 #   cursor/hooks.json     -> ~/.cursor/hooks.json
 #   claude/hooks/         -> ~/.cursor/hooks/format-edits.sh (see below)
 #     format-edits.sh
@@ -53,6 +54,7 @@ LAC_SKILL_SOURCES=(
 LAC_SKILL_TARGETS=(
   "$HOME/.cursor/skills"
   "$HOME/.claude/skills"
+  "$HOME/.config/opencode/skills"
 )
 
 # MCP servers, registered rather than linked for both Claude Code and Cursor.

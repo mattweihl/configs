@@ -35,16 +35,16 @@ Note the two `AGENTS.md` files, which are not the same thing:
 - `link-agentic-configs` (from `zsh/link-agentic-configs.sh`) deploys everything
   agent-related. Each tool gets only what it can read, which is not the same set:
 
-  | Repo | Claude Code | Codex | Cursor |
-  | --- | --- | --- | --- |
-  | `agents/AGENTS.md` | `~/.claude/CLAUDE.md` | `~/.codex/AGENTS.md` | — |
-  | `agents/rules/*.md` | `~/.claude/rules/` | — | — |
-  | `claude/settings.json` | `~/.claude/settings.json` | — | — |
-  | `claude/agents/*.md` | `~/.claude/agents/` | — | — |
-  | `claude/hooks/format-edits.sh` | named by `settings.json` | — | `~/.cursor/hooks/` |
-  | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` |
-  | `skills/*/` | `~/.claude/skills/` | — | `~/.cursor/skills/` |
-  | MCP servers | `~/.claude.json` | — | `~/.cursor/mcp.json` |
+  | Repo | Claude Code | Codex | Cursor | OpenCode |
+  | --- | --- | --- | --- | --- |
+  | `agents/AGENTS.md` | `~/.claude/CLAUDE.md` | `~/.codex/AGENTS.md` | — | — |
+  | `agents/rules/*.md` | `~/.claude/rules/` | — | — | — |
+  | `claude/settings.json` | `~/.claude/settings.json` | — | — | — |
+  | `claude/agents/*.md` | `~/.claude/agents/` | — | — | — |
+  | `claude/hooks/format-edits.sh` | named by `settings.json` | — | `~/.cursor/hooks/` | — |
+  | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` | — |
+  | `skills/*/` | `~/.claude/skills/` | — | `~/.cursor/skills/` | `~/.config/opencode/skills/` |
+  | MCP servers | `~/.claude.json` | — | `~/.cursor/mcp.json` | — |
 
   MCP servers are registered, not linked, from the single `LAC_MCP_SERVERS`
   table in the script. Codex is left out of that: its servers live in a
