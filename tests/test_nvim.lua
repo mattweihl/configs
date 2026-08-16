@@ -138,6 +138,12 @@ local function test_fswatch_lifecycle()
 end
 
 local function test_plugin_configuration()
+  local claudecode = dofile("nvim/lua/plugins/claudecode.lua")
+  expect(
+    not vim.iter(claudecode.keys):any(function(key) return key[2]:find("dangerously%-skip%-permissions") end),
+    "ClaudeCode mappings must not bypass permission checks"
+  )
+
   local completion = dofile("nvim/lua/plugins/completion.lua")[1]
   expect(not vim.list_contains(completion.opts.sources.default, "lazydev"), "Blink must not enable LazyDev globally")
   expect(vim.list_contains(completion.opts.sources.per_filetype.lua, "lazydev"), "Blink Lua sources must include LazyDev")

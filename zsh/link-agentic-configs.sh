@@ -24,8 +24,11 @@
 #   claude/agents/*.md    -> ~/.claude/agents/
 #   claude/statusline.sh  } referenced by absolute path from settings.json,
 #   claude/hooks/*.sh     } so they only need the executable bit
-#   skills/*/             -> ~/.claude/skills/, ~/.cursor/skills/, and
-#                            ~/.config/opencode/skills/
+#   skills/*/             -> ~/.claude/skills/, ~/.cursor/skills/,
+#                            ~/.codex/skills/, and ~/.config/opencode/skills/
+#                         Codex ships its own bundled skills in
+#                         ~/.codex/skills/.system/. That is a real directory,
+#                         not a link, so pruning never touches it.
 #   cursor/hooks.json     -> ~/.cursor/hooks.json
 #   claude/hooks/         -> ~/.cursor/hooks/format-edits.sh (see below)
 #     format-edits.sh
@@ -54,6 +57,7 @@ LAC_SKILL_SOURCES=(
 LAC_SKILL_TARGETS=(
   "$HOME/.cursor/skills"
   "$HOME/.claude/skills"
+  "$HOME/.codex/skills"
   "$HOME/.config/opencode/skills"
 )
 

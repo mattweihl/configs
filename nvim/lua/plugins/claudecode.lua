@@ -11,7 +11,6 @@ return {
   },
   keys = {
     { "<leader>ac", "<cmd>ClaudeCodeFocus<cr>", desc = "Toggle Claude" },
-    { "<leader>ad", "<cmd>ClaudeCodeFocus --dangerously-skip-permissions<cr>", desc = "Toggle Claude (no perms)" },
     { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
     { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
     { "<leader>am", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Claude model" },

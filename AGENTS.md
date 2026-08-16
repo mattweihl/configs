@@ -43,7 +43,7 @@ Note the two `AGENTS.md` files, which are not the same thing:
   | `claude/agents/*.md` | `~/.claude/agents/` | — | — | — |
   | `claude/hooks/format-edits.sh` | named by `settings.json` | — | `~/.cursor/hooks/` | — |
   | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` | — |
-  | `skills/*/` | `~/.claude/skills/` | — | `~/.cursor/skills/` | `~/.config/opencode/skills/` |
+  | `skills/*/` | `~/.claude/skills/` | `~/.codex/skills/` | `~/.cursor/skills/` | `~/.config/opencode/skills/` |
   | MCP servers | `~/.claude.json` | — | `~/.cursor/mcp.json` | — |
 
   MCP servers are registered, not linked, from the single `LAC_MCP_SERVERS`

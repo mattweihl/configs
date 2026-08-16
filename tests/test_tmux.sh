@@ -44,6 +44,7 @@ wait_for_command() {
 
 jq -e '
   .model == "opus"
+  and (.skipDangerousModePermissionPrompt == null)
   and (.hooks.Notification[0].matcher == "permission_prompt|idle_prompt|elicitation_dialog|elicitation_url_dialog|agent_needs_input")
   and (.hooks.PermissionRequest[0].hooks[0].command | endswith("claude-status.sh wait"))
   and (.hooks.Elicitation[0].hooks[0].command | endswith("claude-status.sh wait"))
