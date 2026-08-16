@@ -32,10 +32,8 @@
 # telling the same lie -- becomes correct too. The state is only as fresh as the
 # last time you opened this picker, which is still better than never.
 #
-# Rows that survive with no pane are detached. Those print the daemon's own
-# state verbatim (`working`, `done`, `failed`, ...) rather than being squeezed
-# into the pane vocabulary. A daemon agent really can be `failed`, and there is
-# no glyph for that; collapsing it to `idle` would hide the one row you need.
+# Rows that survive with no pane are detached. Those print the daemon state
+# verbatim because detached agents are not limited to the pane vocabulary.
 #
 # Picking a pane switches to it. Picking a detached background agent opens the
 # agent view in a new window, filtered to that agent's directory, because no CLI
@@ -57,9 +55,7 @@ tmux_literal() {
 # to panes only rather than failing outright.
 #
 # Prefer .state (the daemon's job lifecycle: working / done / failed) over
-# .status (idle / busy), and pass whatever comes back through untouched. A
-# state this script has not seen before should read as itself; mapping the
-# unknown onto a default is how `failed` ends up looking like `idle`.
+# .status (idle / busy).
 background=''
 if command -v claude >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
   background="$(claude agents --json 2>/dev/null | jq -r --arg tab "$tab" '
@@ -90,12 +86,15 @@ detached_row() {
   tmux display-message -p "#{p10:#{l:$(tmux_literal "$3")}} #{p20:#{=/19/…:#{l:$(tmux_literal "$1")}}} [bg] $(tmux_literal "$(basename "${2:-?}")")"
 }
 
-# Squeezes a daemon state into the three values @claude_state can hold.
+# Maps daemon states onto the pane state vocabulary. Unknown values stay
+# visible instead of looking idle.
 pane_state_for() {
   case "$1" in
-    working|running|busy)                        printf 'busy\n' ;;
-    waiting|blocked|requires_action|needs_input) printf 'wait\n' ;;
-    *)                                           printf 'idle\n' ;;
+    working|running|busy)                         printf 'busy\n' ;;
+    waiting|blocked|requires_action|needs_input)  printf 'wait\n' ;;
+    done|completed|complete|idle|stopped|finished) printf 'idle\n' ;;
+    failed|error|errored)                         printf 'failed\n' ;;
+    *)                                            printf 'unknown\n' ;;
   esac
 }
 

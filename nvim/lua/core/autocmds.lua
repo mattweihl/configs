@@ -43,10 +43,13 @@ autocmd("BufWritePre", {
   group = "TrimWhitespace",
   pattern = "*",
   callback = function(args)
-    if vim.b[args.buf].large_file then return end
-    local pos = vim.api.nvim_win_get_cursor(0)
-    vim.cmd([[%s/\s\+$//e]])
-    pcall(vim.api.nvim_win_set_cursor, 0, pos)
+    if not vim.api.nvim_buf_is_loaded(args.buf) then return end
+    if vim.b[args.buf].large_file or vim.bo[args.buf].filetype == "markdown" then return end
+    vim.api.nvim_buf_call(args.buf, function()
+      local view = vim.fn.winsaveview()
+      vim.cmd([[silent keepjumps keeppatterns %s/\s\+$//e]])
+      vim.fn.winrestview(view)
+    end)
   end,
 })
 
@@ -88,11 +91,13 @@ autocmd("BufReadPre", {
     local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(args.buf))
     if ok and stats and stats.size > 1024 * 1024 then
       vim.b[args.buf].large_file = true
-      vim.opt_local.syntax = ""
-      vim.opt_local.foldmethod = "manual"
-      vim.opt_local.cursorline = false
-      vim.opt_local.swapfile = false
-      vim.opt_local.undofile = false
+      vim.api.nvim_buf_call(args.buf, function()
+        vim.opt_local.syntax = ""
+        vim.opt_local.foldmethod = "manual"
+        vim.opt_local.cursorline = false
+        vim.opt_local.swapfile = false
+        vim.opt_local.undofile = false
+      end)
       -- Disable treesitter highlighting for this buffer
       vim.schedule(function()
         pcall(vim.treesitter.stop, args.buf)
@@ -100,7 +105,7 @@ autocmd("BufReadPre", {
       -- Detach LSP clients (they choke on huge files)
       vim.schedule(function()
         for _, client in pairs(vim.lsp.get_clients({ bufnr = args.buf })) do
-          client:detach(args.buf)
+          vim.lsp.buf_detach_client(args.buf, client.id)
         end
       end)
     end
@@ -218,85 +223,3 @@ vim.keymap.set("n", "<RightMouse>", function()
     vim.cmd("popup! PopUp")
   end)
 end, { desc = "Context menu" })
-
--- Detect external file changes (e.g. Cursor Agent, Claude, or another process).
--- Two layers: (1) checktime on focus/enter/cursor-hold events, (2) native fs_event watchers
--- for real-time reload without user interaction.
-augroup("AutoReload", { clear = true })
-autocmd({ "FocusGained", "TermLeave", "WinEnter", "BufEnter" }, {
-  group = "AutoReload",
-  command = "checktime",
-})
-autocmd("FileChangedShellPost", {
-  group = "AutoReload",
-  callback = function()
-    vim.notify("File changed on disk (e.g. by agent). Buffer reloaded.", vim.log.levels.INFO)
-  end,
-})
-
--- Native filesystem watcher: reload visible buffers when files change on disk.
--- Uses libuv fs_event for near-instant detection, independent of cursor/focus events.
-local fs_watchers = {}
-
-local function stop_watcher(bufnr)
-  if fs_watchers[bufnr] then
-    fs_watchers[bufnr]:stop()
-    fs_watchers[bufnr] = nil
-  end
-end
-
-local function start_watcher(bufnr)
-  local path = vim.api.nvim_buf_get_name(bufnr)
-  if path == "" or not vim.uv.fs_stat(path) then return end
-  -- Skip special buffer types (diffview, neo-tree, help, etc.)
-  local bt = vim.bo[bufnr].buftype
-  if bt ~= "" then return end
-
-  stop_watcher(bufnr)
-  local handle = vim.uv.new_fs_event()
-  if not handle then return end
-  fs_watchers[bufnr] = handle
-
-  handle:start(path, {}, function(err)
-    if err then return end
-    vim.schedule(function()
-      if not vim.api.nvim_buf_is_valid(bufnr) then
-        stop_watcher(bufnr)
-        return
-      end
-      -- Skip if buffer has unsaved local changes
-      if vim.bo[bufnr].modified then return end
-      vim.api.nvim_buf_call(bufnr, function()
-        vim.cmd("silent! checktime")
-      end)
-    end)
-  end)
-end
-
-augroup("FsWatch", { clear = true })
-autocmd("BufReadPost", {
-  group = "FsWatch",
-  callback = function(args) start_watcher(args.buf) end,
-})
--- Re-arm after every save. Atomic-save tools (Cursor Agent, Claude) — and our own
--- write — replace the file via temp + rename, which swaps the inode out from under
--- the fs_event handle, leaving it watching a stale inode that never fires again.
--- Re-pointing the watch at the current inode keeps real-time reload working past
--- the first external edit.
-autocmd("BufWritePost", {
-  group = "FsWatch",
-  callback = function(args) start_watcher(args.buf) end,
-})
-autocmd("BufDelete", {
-  group = "FsWatch",
-  callback = function(args) stop_watcher(args.buf) end,
-})
-autocmd("VimLeavePre", {
-  group = "FsWatch",
-  callback = function()
-    for bufnr, _ in pairs(fs_watchers) do
-      stop_watcher(bufnr)
-    end
-  end,
-})
-

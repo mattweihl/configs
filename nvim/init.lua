@@ -11,6 +11,7 @@ vim.opt.rtp:prepend(lazypath)
 require("core.options")
 require("core.keymaps")
 require("core.autocmds")
+require("core.fswatch").setup()
 
 require("lazy").setup("plugins", {
   defaults = { lazy = true },
@@ -32,4 +33,3 @@ require("lazy").setup("plugins", {
     },
   },
 })
-

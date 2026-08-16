@@ -16,6 +16,16 @@ return {
   },
 
   {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
+
+  {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     event = "VeryLazy",
     dependencies = { "williamboman/mason.nvim" },
@@ -115,6 +125,11 @@ return {
             return
           end
 
+          if vim.b[bufnr].large_file then
+            vim.lsp.buf_detach_client(bufnr, client.id)
+            return
+          end
+
           local map = function(mode, lhs, rhs, desc)
             vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
           end
@@ -153,7 +168,7 @@ return {
           end, "Toggle inlay hints")
 
           map("n", "<leader>e", vim.diagnostic.open_float, "Line diagnostics")
-          map("n", "<leader>dl", vim.diagnostic.setloclist, "Diagnostics to loclist")
+          map("n", "<leader>dq", vim.diagnostic.setloclist, "Diagnostics to loclist")
         end,
       })
 

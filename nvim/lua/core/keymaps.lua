@@ -11,26 +11,27 @@ end, { desc = "Clear search highlight", silent = true })
 
 map("n", "<leader>q", function()
   if #vim.api.nvim_list_wins() > 1 then
-    vim.cmd("close!")
-  else
-    -- Last window: switch to alternate buffer or create empty
-    local bufs = vim.fn.getbufinfo({ buflisted = 1 })
-    if #bufs > 1 then
-      vim.cmd("bnext | bdelete! #")
-    else
-      vim.cmd("q!")
-    end
+    vim.cmd("close")
+    return
   end
+
+  if #vim.fn.getbufinfo({ buflisted = 1 }) > 1 then
+    vim.cmd("confirm bdelete")
+    return
+  end
+
+  vim.cmd("confirm quit")
 end, { desc = "Close split/buffer", silent = true })
-map("n", "<leader>qq", ":qa!<CR>", { desc = "Quit all", silent = true })
-map("n", "<leader>wq", ":wqa!<CR>", { desc = "Save and quit all", silent = true })
-map("n", "<leader>ww", ":w!<CR>", { desc = "Save", silent = true })
+map("n", "<leader>qq", "<cmd>confirm qall<CR>", { desc = "Quit all", silent = true })
+map("n", "<leader>wq", "<cmd>wqall<CR>", { desc = "Save and quit all", silent = true })
+map("n", "<leader>ww", "<cmd>write<CR>", { desc = "Save", silent = true })
 map("n", "<leader>R", function()
   -- Re-source core config modules
   for _, mod in ipairs({ "core.options", "core.keymaps", "core.autocmds" }) do
     package.loaded[mod] = nil
     require(mod)
   end
+  require("core.fswatch").setup()
   vim.notify("Config reloaded")
 end, { desc = "Reload config" })
 
@@ -178,4 +179,3 @@ end
 map("n", "<C-_>", "gcc", { remap = true, desc = "Toggle comment (Cmd+/)" })
 map("x", "<C-_>", "gc", { remap = true, desc = "Toggle comment (Cmd+/)" })
 map("i", "<C-_>", "<C-o>gcc", { remap = true, desc = "Toggle comment (Cmd+/)" })
-

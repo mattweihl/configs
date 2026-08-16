@@ -107,10 +107,11 @@ wt_enter_tmux_session_for_path() {
 _wt_find_worktree_for_branch() {
   local repo_root="$1"
   local branch="$2"
+  local worktrees
 
-  git -C "$repo_root" worktree list --porcelain \
-    | awk -v wanted_branch="refs/heads/$branch" '
-        /^worktree / { path=$2 }
+  worktrees="$(git -C "$repo_root" worktree list --porcelain)" || return 1
+  printf '%s\n' "$worktrees" | awk -v wanted_branch="refs/heads/$branch" '
+        /^worktree / { path=substr($0, 10) }
         /^branch /   { if ($2 == wanted_branch) { print path; exit } }
       '
 }
@@ -147,7 +148,7 @@ _wt_ensure_branch_tracks_origin() {
     return 0
   fi
 
-  git -C "$repo_path" branch --set-upstream-to "$remote_ref" "$branch" >/dev/null 2>&1 || true
+  git -C "$repo_path" branch --set-upstream-to "$remote_ref" "$branch" >/dev/null 2>&1
 }
 
 wt_ensure_worktree() {
@@ -174,31 +175,31 @@ wt_ensure_worktree() {
     return 1
   fi
 
-  local stage_start
-  stage_start=$(date +%s)
-  if git -C "$repo_root" remote get-url origin >/dev/null 2>&1; then
-    git -C "$repo_root" fetch origin --prune
-  fi
-  _wt_log_stage "fetch" "$stage_start"
-
-  stage_start=$(date +%s)
-  git -C "$repo_root" worktree prune
-  _wt_log_stage "worktree prune" "$stage_start"
-
   local existing_worktree
-  existing_worktree="$(_wt_find_worktree_for_branch "$repo_root" "$branch")"
-  if [[ -n "$existing_worktree" ]]; then
-    _wt_ensure_branch_tracks_origin "$existing_worktree" "$branch"
+  existing_worktree="$(_wt_find_worktree_for_branch "$repo_root" "$branch")" || return 1
+  if [[ -n "$existing_worktree" && -d "$existing_worktree" ]]; then
+    _wt_ensure_branch_tracks_origin "$existing_worktree" "$branch" || return 1
     WT_LAST_WORKTREE_PATH="$existing_worktree"
     WT_LAST_WORKTREE_CREATED=0
     printf '%s\n' "$existing_worktree"
     return 0
   fi
 
+  local stage_start
+  stage_start=$(date +%s)
+  if git -C "$repo_root" remote get-url origin >/dev/null 2>&1; then
+    git -C "$repo_root" fetch origin --prune || return 1
+  fi
+  _wt_log_stage "fetch" "$stage_start"
+
+  stage_start=$(date +%s)
+  git -C "$repo_root" worktree prune || return 1
+  _wt_log_stage "worktree prune" "$stage_start"
+
   local target_dir target_path resolved_root
   target_dir="$(wt_branch_to_dir "$branch")"
   resolved_root="$(wt_resolve_root "$worktrees_dir")"
-  mkdir -p "$resolved_root"
+  mkdir -p "$resolved_root" || return 1
   target_path="$resolved_root/$target_dir"
 
   if [[ -e "$target_path" ]]; then
@@ -211,9 +212,10 @@ wt_ensure_worktree() {
 
   if git -C "$repo_root" show-ref --verify --quiet "$local_branch_ref" \
      && git -C "$repo_root" show-ref --verify --quiet "$remote_branch_ref"; then
-    if [[ -z "$(_wt_find_worktree_for_branch "$repo_root" "$branch")" ]]; then
+    existing_worktree="$(_wt_find_worktree_for_branch "$repo_root" "$branch")" || return 1
+    if [[ -z "$existing_worktree" ]]; then
       if git -C "$repo_root" merge-base --is-ancestor "$local_branch_ref" "origin/$branch" 2>/dev/null; then
-        git -C "$repo_root" branch -f "$branch" "origin/$branch"
+        git -C "$repo_root" branch -f "$branch" "origin/$branch" || return 1
       else
         echo "warning: local '$branch' has diverged from origin, using local as-is" >&2
       fi
@@ -222,11 +224,11 @@ wt_ensure_worktree() {
 
   stage_start=$(date +%s)
   if git -C "$repo_root" show-ref --verify --quiet "$local_branch_ref"; then
-    git -C "$repo_root" worktree add "$target_path" "$branch"
-    _wt_ensure_branch_tracks_origin "$target_path" "$branch"
+    git -C "$repo_root" worktree add "$target_path" "$branch" || return 1
+    _wt_ensure_branch_tracks_origin "$target_path" "$branch" || return 1
   elif git -C "$repo_root" show-ref --verify --quiet "$remote_branch_ref"; then
-    git -C "$repo_root" worktree add --track -b "$branch" "$target_path" "origin/$branch"
-    _wt_ensure_branch_tracks_origin "$target_path" "$branch"
+    git -C "$repo_root" worktree add --track -b "$branch" "$target_path" "origin/$branch" || return 1
+    _wt_ensure_branch_tracks_origin "$target_path" "$branch" || return 1
   else
     local base_ref
     base_ref="$(_wt_resolve_base_ref "$repo_root" "$base_branch")" || {
@@ -234,7 +236,7 @@ wt_ensure_worktree() {
       return 1
     }
 
-    git -C "$repo_root" worktree add -b "$branch" "$target_path" "$base_ref"
+    git -C "$repo_root" worktree add -b "$branch" "$target_path" "$base_ref" || return 1
     # When base_ref is a remote-tracking branch (for example origin/develop),
     # Git can auto-configure the new branch's upstream to that base branch.
     # Clear it so first push sets upstream to origin/<new-branch> instead.
@@ -248,6 +250,12 @@ wt_ensure_worktree() {
   if typeset -f wt_post_create_hook >/dev/null 2>&1; then
     stage_start=$(date +%s)
     wt_post_create_hook "$target_path" "$branch" "$base_branch"
+    local hook_rc=$?
+    if [[ "$hook_rc" -ne 0 ]]; then
+      _wt_log_stage "post-create hook" "$stage_start"
+      echo "error: post-create hook failed for '$target_path'" >&2
+      return "$hook_rc"
+    fi
     _wt_log_stage "post-create hook" "$stage_start"
   fi
 
@@ -309,29 +317,30 @@ wt_remove_worktree() {
   fi
 
   local wt_branch
-  wt_branch="$(git -C "$repo_root" worktree list --porcelain \
-    | awk -v wt="$worktree_path" '
-        /^worktree / { path=$2 }
+  local worktrees
+  worktrees="$(git -C "$repo_root" worktree list --porcelain)" || return 1
+  wt_branch="$(printf '%s\n' "$worktrees" | awk -v wt="$worktree_path" '
+        /^worktree / { path=substr($0, 10) }
         /^branch /   { if (path == wt) { sub("refs/heads/", "", $2); print $2; exit } }
       ')"
 
   local stage_start
   stage_start=$(date +%s)
-  git -C "$repo_root" worktree remove --force "$worktree_path"
+  git -C "$repo_root" worktree remove --force "$worktree_path" || return 1
   _wt_log_stage "worktree remove" "$stage_start"
 
   if [[ -n "$wt_branch" ]]; then
     stage_start=$(date +%s)
     if ! git -C "$repo_root" branch -d "$wt_branch" 2>/dev/null; then
       echo "warning: force deleting branch '$wt_branch' (unmerged)." >&2
-      git -C "$repo_root" branch -D "$wt_branch"
+      git -C "$repo_root" branch -D "$wt_branch" || return 1
     fi
     _wt_log_stage "branch delete" "$stage_start"
   fi
 
   if [[ "$keep_session" -eq 0 && -n "$session_name" ]] && command -v tmux >/dev/null 2>&1; then
     if tmux has-session -t "=$session_name" 2>/dev/null; then
-      tmux kill-session -t "=$session_name"
+      tmux kill-session -t "=$session_name" || return 1
       echo "Killed tmux session '$session_name'."
     fi
   fi
@@ -448,10 +457,22 @@ remove-worktree() {
     return 1
   fi
 
+  local first_name=""
+  local names_label=""
+  local candidate
+  for candidate in "${names[@]}"; do
+    [[ -z "$first_name" ]] && first_name="$candidate"
+    if [[ -z "$names_label" ]]; then
+      names_label="$candidate"
+    else
+      names_label="$names_label, $candidate"
+    fi
+  done
+
   if (( ${#names[@]} == 1 )); then
-    printf "Remove worktree '%s'? [y/N] " "${names[1]}"
+    printf "Remove worktree '%s'? [y/N] " "$first_name"
   else
-    printf "Remove %d worktrees (%s)? [y/N] " "${#names[@]}" "${(j:, :)names}"
+    printf "Remove %d worktrees (%s)? [y/N] " "${#names[@]}" "$names_label"
   fi
   read -r confirm
   [[ "$confirm" != [yY] ]] && { echo "Aborted."; return 0; }
@@ -465,7 +486,11 @@ remove-worktree() {
 
   local name rc=0
   for name in "${names[@]}"; do
-    wt_remove_worktree "$repo_root" "$name" "$root" $keep_session_flag || rc=$?
+    if [[ -n "$keep_session_flag" ]]; then
+      wt_remove_worktree "$repo_root" "$name" "$root" "$keep_session_flag" || rc=$?
+    else
+      wt_remove_worktree "$repo_root" "$name" "$root" || rc=$?
+    fi
   done
   return $rc
 }

@@ -21,6 +21,7 @@ payload="$(cat)"
 eval "$(printf '%s' "$payload" | jq -r '
   @sh "model=\(.model.display_name // "?")
        effort=\(.effort.level // "")
+       session_id=\(.session_id // "")
        dir=\(.workspace.current_dir // .cwd // "")
        worktree=\(.workspace.git_worktree // "")
        pct=\(.context_window.used_percentage // 0 | floor)
@@ -55,9 +56,50 @@ fi
 # `git status` takes the index lock and races the editor you are typing in.
 branch=''
 if [ -n "$dir" ] && [ -d "$dir" ]; then
-  branch="$(git --no-optional-locks -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-  if [ -n "$branch" ] && [ -n "$(git --no-optional-locks -C "$dir" status --porcelain 2>/dev/null | head -1)" ]; then
-    branch="${branch}*"
+  cache_hit=0
+  cache_enabled=0
+  case "$session_id" in
+    ''|*[!A-Za-z0-9._-]*) ;;
+    *) cache_enabled=1 ;;
+  esac
+
+  if [ "$cache_enabled" -eq 1 ]; then
+    umask 077
+    git_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/claude-statusline"
+    git_cache_file="$git_cache_dir/$session_id.json"
+    git_cache_tmp=""
+    trap 'rm -f "${git_cache_tmp:-}"' EXIT
+    trap 'exit 1' HUP INT TERM
+    now="$(date +%s)"
+  fi
+
+  if [ "$cache_enabled" -eq 1 ] && [ -f "$git_cache_file" ]; then
+    eval "$(jq -r --arg dir "$dir" --argjson now "$now" '
+      select(
+        .directory == $dir
+        and (.timestamp | type) == "number"
+        and ($now - .timestamp) >= 0
+        and ($now - .timestamp) < 2
+      )
+      | @sh "cache_hit=1 branch=\(.branch)"
+    ' "$git_cache_file" 2>/dev/null)"
+  fi
+
+  if [ "$cache_hit" -eq 0 ]; then
+    branch="$(git --no-optional-locks -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+    if [ -n "$branch" ] && [ -n "$(git --no-optional-locks -C "$dir" status --porcelain 2>/dev/null | head -1)" ]; then
+      branch="${branch}*"
+    fi
+
+    if [ "$cache_enabled" -eq 1 ] && mkdir -p "$git_cache_dir" 2>/dev/null; then
+      git_cache_tmp="$git_cache_file.$$"
+      if jq -n --arg directory "$dir" --arg branch "$branch" --argjson timestamp "$now" \
+        '{directory: $directory, timestamp: $timestamp, branch: $branch}' >"$git_cache_tmp" 2>/dev/null; then
+        mv "$git_cache_tmp" "$git_cache_file" 2>/dev/null || rm -f "$git_cache_tmp"
+      else
+        rm -f "$git_cache_tmp"
+      fi
+    fi
   fi
 fi
 

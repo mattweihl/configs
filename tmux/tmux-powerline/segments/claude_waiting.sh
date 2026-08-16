@@ -18,8 +18,8 @@ run_segment() {
 	# -f reuses tmux's own comparison against the per-pane @claude_state that
 	# tmux/claude-status.sh writes. Do not re-implement the state vocabulary
 	# here; tmux.conf owns it.
-	waiting="$(tmux list-panes -a -f '#{==:#{@claude_state},wait}' -F '#{session_name}' |
-		grep -vxF "$here" | sort -u | paste -sd, -)"
+	waiting="$(tmux list-panes -a -f '#{&&:#{E:@_claude_pane},#{==:#{@claude_state},wait}}' -F '#{session_name}' |
+		grep -vxF -e "$here" | sort -u | paste -sd, -)"
 
 	[ -n "$waiting" ] || return 0
 

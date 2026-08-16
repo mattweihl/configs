@@ -2,11 +2,12 @@
 # Reflects Claude Code's state onto the tmux pane that is running it.
 # Called by Claude Code hooks in ~/.claude/settings.json.
 #
-# Usage: claude-status.sh busy|wait|idle
+# Usage: claude-status.sh busy|wait|idle|failed
 #
 #   busy  agent is working            -> window name shows ●
 #   wait  agent needs your input      -> window name shows ◍
 #   idle  agent is done / at rest     -> window name shows ✦
+#   failed turn ended with an error   -> window name shows ✕
 #
 # The glyph is rendered by @_claude_glyph in tmux.conf, so it lands in the
 # window *name* and is therefore readable from any session's status bar.
@@ -32,11 +33,11 @@ tmux has-session 2>/dev/null || exit 0
 # to whatever an outer scope happens to hold and could pin the glyph on a stale
 # value. Writing every state keeps the pane authoritative about itself.
 case "$1" in
-  busy|wait|idle)
+  busy|wait|idle|failed)
     tmux set-option -p -t "$TMUX_PANE" @claude_state "$1" 2>/dev/null
     ;;
   *)
-    printf 'claude-status: unknown state "%s" (want busy|wait|idle)\n' "$1" >&2
+    printf 'claude-status: unknown state "%s" (want busy|wait|idle|failed)\n' "$1" >&2
     exit 2
     ;;
 esac

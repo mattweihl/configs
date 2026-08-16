@@ -16,6 +16,12 @@ return {
     opts = {
       options = {
         close_command = function(bufnr)
+          if not vim.api.nvim_buf_is_valid(bufnr) then return end
+          if vim.bo[bufnr].modified then
+            vim.notify("Buffer has unsaved changes", vim.log.levels.WARN)
+            return
+          end
+
           -- Find an alternate buffer to show
           local alt_buf = nil
           for _, b in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
@@ -34,7 +40,7 @@ return {
               end
             end
           end
-          vim.api.nvim_buf_delete(bufnr, { force = true })
+          vim.api.nvim_buf_delete(bufnr, { force = false })
         end,
         diagnostics = "nvim_lsp",
         always_show_bufferline = true,

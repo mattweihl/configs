@@ -87,4 +87,3 @@ opt.history = 1000
 -- attack surface when opening repos you don't fully control. Re-enable if a
 -- project ever genuinely needs local config (nvim 0.9+ gates it behind a trust prompt).
 opt.exrc = false
-

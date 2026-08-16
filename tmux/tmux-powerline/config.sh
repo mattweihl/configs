@@ -14,9 +14,8 @@ export TMUX_POWERLINE_DIR_USER_SEGMENTS="${XDG_CONFIG_HOME:-$HOME/.config}/tmux-
 # Iosevka Nerd Font Mono in Ghostty — patched separators render correctly.
 export TMUX_POWERLINE_PATCHED_FONT_IN_USE="true"
 
-# Status bar refresh interval (seconds). 1 keeps the clock smooth; bump higher
-# if any segments turn out to be expensive on your machine.
-export TMUX_POWERLINE_STATUS_INTERVAL=1
+# Status bar refresh interval (seconds).
+export TMUX_POWERLINE_STATUS_INTERVAL=10
 
 # Window list left-aligned (after the left status segments).
 export TMUX_POWERLINE_STATUS_JUSTIFICATION="left"

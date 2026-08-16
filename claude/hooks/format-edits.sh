@@ -47,6 +47,14 @@ if [ -n "${TMUX_PANE:-}" ]; then
   mkdir -p "$edits_dir" 2>/dev/null && printf '%s\n' "$path" >>"$edits_dir/$TMUX_PANE"
 fi
 
+# Formatting executes project-owned binaries and reads project-owned configs.
+# Require an explicit local opt-in before running either one. History stays
+# above this gate because untrusted edits must still appear in the pane list.
+path_dir="$(CDPATH= cd -- "$(dirname -- "$path")" && pwd -P)" || exit 0
+repo_root="$(git -C "$path_dir" rev-parse --show-toplevel 2>/dev/null)" || exit 0
+is_trusted="$(git -C "$repo_root" config --local --bool --get agent.formatEditsTrusted 2>/dev/null)" || exit 0
+[ "$is_trusted" = "true" ] || exit 0
+
 # Neither prettier nor ruff is installed globally on this machine: conform.nvim
 # finds them because Mason prepends its bin/ to nvim's PATH. A hook gets no such
 # help, so resolve the same binaries by hand -- project-local first, so a repo

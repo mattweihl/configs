@@ -136,26 +136,71 @@ if [ -d "$HOME/.pyenv" ]; then
   }
 fi
 
-# nvm: install via Homebrew (`brew install nvm`). Node versions still live in
-# $NVM_DIR=~/.nvm; Homebrew only owns the nvm.sh script.
-# Inject default node into PATH directly; defer `nvm.sh` source until use.
+# nvm: inject the default Node version into PATH, but defer nvm.sh until use.
 export NVM_DIR="$HOME/.nvm"
+
+_nvm_latest_installed_version() {
+  local version_dir
+  for version_dir in "$NVM_DIR"/versions/node/v<->.<->.<->(N/); do
+    basename "$version_dir"
+  done | sort -t. -k1.2,1n -k2,2n -k3,3n | tail -1
+}
+
+_nvm_resolve_installed_version() {
+  local alias_name="$1"
+  local alias_file alias_value seen=" "
+  local attempts=0
+
+  while [ -n "$alias_name" ] && [ "$attempts" -lt 20 ]; do
+    case "$seen" in
+      *" $alias_name "*) return 1 ;;
+    esac
+    seen="$seen$alias_name "
+
+    if [ -d "$NVM_DIR/versions/node/$alias_name" ]; then
+      printf '%s\n' "$alias_name"
+      return 0
+    fi
+
+    if [ "$alias_name" = "lts/*" ]; then
+      for alias_file in "$NVM_DIR"/alias/lts/*; do
+        [ -f "$alias_file" ] || continue
+        IFS= read -r alias_value < "$alias_file"
+        [ -d "$NVM_DIR/versions/node/$alias_value" ] && printf '%s\n' "$alias_value"
+      done | sort -t. -k1.2,1n -k2,2n -k3,3n | tail -1
+      return
+    fi
+
+    alias_file="$NVM_DIR/alias/$alias_name"
+    [ -f "$alias_file" ] || return 1
+    IFS= read -r alias_name < "$alias_file"
+    attempts=$((attempts + 1))
+  done
+  return 1
+}
+
 if [ -d "$NVM_DIR/versions/node" ]; then
-  DEFAULT_ALIAS=$(cat "$NVM_DIR/alias/default" 2>/dev/null)
-  if [ -d "$NVM_DIR/versions/node/$DEFAULT_ALIAS" ]; then
-    NODE_VERSION="$DEFAULT_ALIAS"
-  else
-    NODE_VERSION=$(command ls -1 "$NVM_DIR/versions/node" | tail -1)
+  nvm_default_alias=""
+  [ -f "$NVM_DIR/alias/default" ] && IFS= read -r nvm_default_alias < "$NVM_DIR/alias/default"
+  nvm_node_version="$(_nvm_resolve_installed_version "$nvm_default_alias" 2>/dev/null)"
+  [ -n "$nvm_node_version" ] || nvm_node_version="$(_nvm_latest_installed_version)"
+  if [ -n "$nvm_node_version" ]; then
+    nvm_node_bin="$NVM_DIR/versions/node/$nvm_node_version/bin"
+    path=("${(@)path:#${NVM_DIR}/versions/node/*/bin}")
+    path=("$nvm_node_bin" "$path[@]")
+    export PATH
   fi
-  if [ -n "$NODE_VERSION" ]; then
-    export PATH="$NVM_DIR/versions/node/$NODE_VERSION/bin:$PATH"
-  fi
+  unset nvm_default_alias nvm_node_version nvm_node_bin
 fi
 
-if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  NVM_SH="$NVM_DIR/nvm.sh"
+elif [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
   NVM_SH="/opt/homebrew/opt/nvm/nvm.sh"
 elif [ -s "/usr/local/opt/nvm/nvm.sh" ]; then
   NVM_SH="/usr/local/opt/nvm/nvm.sh"
+elif [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]; then
+  NVM_SH="/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
 fi
 
 if [ -n "${NVM_SH:-}" ]; then
@@ -168,16 +213,28 @@ if [ -n "${NVM_SH:-}" ]; then
     nvm() {
       _nvm_orig "$@"
       local rc=$?
-      [[ "$1" == "install" && $rc -eq 0 ]] && corepack enable >/dev/null 2>&1
+      if [[ "$1" == "install" && $rc -eq 0 ]] && command -v corepack >/dev/null 2>&1; then
+        corepack enable >/dev/null 2>&1
+      fi
       return $rc
     }
     nvm "$@"
   }
 
-  NVM_COMPLETION="${NVM_SH%/*}/etc/bash_completion.d/nvm"
+  NVM_COMPLETION=""
+  if [ -s "$NVM_DIR/bash_completion" ]; then
+    NVM_COMPLETION="$NVM_DIR/bash_completion"
+  elif [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]; then
+    NVM_COMPLETION="/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+  elif [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ]; then
+    NVM_COMPLETION="/usr/local/opt/nvm/etc/bash_completion.d/nvm"
+  elif [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm" ]; then
+    NVM_COMPLETION="/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm"
+  fi
   if [ -s "$NVM_COMPLETION" ]; then
     _nvm_lazy_completion() {
       compdef -d nvm
+      nvm --version >/dev/null
       \. "$NVM_COMPLETION"
     }
     compdef _nvm_lazy_completion nvm
@@ -194,4 +251,3 @@ if command -v fzf &> /dev/null; then
     fi
   }
 fi
-

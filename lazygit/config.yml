@@ -1,9 +1,10 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
 os:
   # Open files/URLs from lazygit.
   # Delegate to a helper script living in ~/configs so the same repo works everywhere.
-  openCommand: "~/configs/lazygit/scripts/lazygit-open.sh {{filename}}"
+  open: "~/configs/lazygit/scripts/lazygit-open.sh {{filename}}"
+  openLink: "~/configs/lazygit/scripts/lazygit-open.sh {{link}}"
 
   # Copy text (commit hashes, branches, file paths, etc.) to your local clipboard
   # via a helper script in ~/configs.
   copyToClipboardCmd: "~/configs/lazygit/scripts/lazygit-clipboard.sh {{text}}"
-

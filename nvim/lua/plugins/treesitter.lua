@@ -33,7 +33,22 @@ return {
         "graphql",
       }
 
-      require("nvim-treesitter").install(ensure_installed)
+      local function install_missing()
+        local treesitter = require("nvim-treesitter")
+        local installed = {}
+        for _, language in ipairs(treesitter.get_installed("parsers")) do
+          installed[language] = true
+        end
+
+        local missing = vim.tbl_filter(function(language)
+          return not installed[language]
+        end, ensure_installed)
+        if #missing > 0 then
+          treesitter.install(missing, { force = true })
+        end
+      end
+
+      install_missing()
 
       -- On a brand-new machine, tree-sitter-cli (installed via Mason, see
       -- lsp.lua) may still be downloading when the install above runs,
@@ -42,7 +57,7 @@ return {
       vim.api.nvim_create_autocmd("User", {
         pattern = "MasonToolsUpdateCompleted",
         callback = function()
-          require("nvim-treesitter").install(ensure_installed)
+          install_missing()
         end,
       })
 
@@ -51,8 +66,12 @@ return {
       -- no-ops if no parser is installed for the filetype).
       vim.api.nvim_create_autocmd("FileType", {
         callback = function(ev)
-          if pcall(vim.treesitter.start) then
-            vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          if vim.b[ev.buf].large_file then return end
+          local language = vim.treesitter.language.get_lang(vim.bo[ev.buf].filetype)
+          if language and pcall(vim.treesitter.language.add, language) then
+            if pcall(vim.treesitter.start, ev.buf, language) then
+              vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+            end
           end
         end,
       })
