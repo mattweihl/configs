@@ -5,6 +5,7 @@ description: >
   questions, or sketching a change, without editing any files. Analog of
   Cursor's Ask mode. Invoke via the /ask skill.
 model: inherit
+readonly: true
 disallowedTools: Edit, Write, NotebookEdit, Agent, Artifact
 color: blue
 ---

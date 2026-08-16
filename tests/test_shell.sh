@@ -88,10 +88,16 @@ test_formatter_trust() {
   local home="$test_root/formatter home"
   local project="$test_root/trusted project"
   local file="$project/file with spaces.js"
+  local direct_file="$project/direct file.js"
+  local codex_file_one="$project/codex one.js"
+  local codex_file_two="$project/codex two.js"
   mkdir -p "$home" "$project/node_modules/.bin"
   git init -q "$project"
   printf '{}\n' >"$project/.prettierrc"
   printf 'original\n' >"$file"
+  printf 'original\n' >"$direct_file"
+  printf 'original\n' >"$codex_file_one"
+  printf 'original\n' >"$codex_file_two"
   cat >"$project/node_modules/.bin/prettier" <<'SCRIPT'
 #!/bin/sh
 printf 'formatted\n' >>"$4"
@@ -107,6 +113,64 @@ SCRIPT
   git -C "$project" config --local agent.formatEditsTrusted true
   printf '%s' "$payload" | HOME="$home" TMUX_PANE='%7' sh "$repo_dir/claude/hooks/format-edits.sh"
   assert_contains "$(cat "$file")" formatted
+
+  HOME="$home" sh "$repo_dir/claude/hooks/format-edits.sh" "$direct_file"
+  assert_contains "$(cat "$direct_file")" formatted
+
+  payload="$(jq -n --arg cwd "$project" --arg command '*** Begin Patch
+*** Update File: codex one.js
+*** Add File: codex two.js
+*** End Patch' '{cwd: $cwd, tool_input: {command: $command}}')"
+  printf '%s' "$payload" | HOME="$home" sh "$repo_dir/claude/hooks/format-edits.sh"
+  assert_contains "$(cat "$codex_file_one")" formatted
+  assert_contains "$(cat "$codex_file_two")" formatted
+}
+
+test_agentic_links() {
+  local home="$test_root/agentic home"
+  mkdir -p "$home"
+
+  local output
+  output="$(HOME="$home" CONFIGS_ROOT="$repo_dir" bash -c '
+    source "$1"
+    _lac_register_claude_mcp() { :; }
+    _lac_register_cursor_mcp() { :; }
+    link-agentic-configs >/dev/null
+
+    [ "$(readlink "$HOME/.claude/CLAUDE.md")" = "$CONFIGS_ROOT/agents/AGENTS.md" ]
+    [ "$(readlink "$HOME/.codex/AGENTS.md")" = "$CONFIGS_ROOT/agents/AGENTS.md" ]
+    [ "$(readlink "$HOME/.config/opencode/AGENTS.md")" = "$CONFIGS_ROOT/agents/AGENTS.md" ]
+    [ "$(readlink "$HOME/.agents/skills/ask")" = "$CONFIGS_ROOT/skills/ask" ]
+    [ "$(readlink "$HOME/.config/opencode/commands/ask.md")" = "$CONFIGS_ROOT/skills/ask/SKILL.md" ]
+    [ ! -e "$HOME/.config/opencode/commands/diagnosing-bugs.md" ]
+    [ ! -e "$HOME/.codex/skills/ask" ]
+
+    link-agentic-configs
+  ' _ "$repo_dir/zsh/link-agentic-configs.sh")"
+  assert_contains "$output" "everything already linked"
+}
+
+test_skill_policies() {
+  local manual_skill_names denied_skill_names
+  manual_skill_names="$(for skill_file in "$repo_dir"/skills/*/SKILL.md; do
+    if grep -Eq '^disable-model-invocation:[[:space:]]*true[[:space:]]*$' "$skill_file"; then
+      basename "${skill_file%/SKILL.md}"
+    fi
+  done | sort)"
+  denied_skill_names="$(jq -r '
+    .permission.skill
+    | to_entries[]
+    | select(.value == "deny")
+    | .key
+  ' "$repo_dir/opencode/opencode.jsonc" | sort)"
+  assert_eq "$denied_skill_names" "$manual_skill_names"
+
+  while IFS= read -r skill_name; do
+    [ -n "$skill_name" ] || continue
+    grep -Eq 'allow_implicit_invocation:[[:space:]]*false' \
+      "$repo_dir/skills/$skill_name/agents/openai.yaml" \
+      || fail "manual skill lacks Codex policy: $skill_name"
+  done <<<"$manual_skill_names"
 }
 
 test_nvm_resolution() {
@@ -129,9 +193,11 @@ SCRIPT
       [ "$entry" = "$node_bin" ] && count=$((count + 1))
     done
     printf "selected=%s count=%s\n" "${PATH%%:*}" "$count"
+    printf "opencode=%s\n" "$OPENCODE_DISABLE_CLAUDE_CODE"
     nvm --version
   ' _ "$repo_dir/zsh/config.zsh")"
   assert_contains "$output" "selected=$home/.nvm/versions/node/v18.2.0/bin count=1"
+  assert_contains "$output" "opencode=1"
   assert_contains "$output" "local-nvm:--version"
 
   mkdir -p "$home/.nvm/alias/lts" "$home/.nvm/versions/node/v24.15.0/bin"
@@ -189,6 +255,8 @@ test_lazygit_schema() {
 
 test_worktrees
 test_formatter_trust
+test_agentic_links
+test_skill_policies
 test_nvm_resolution
 test_statusline_cache
 test_lazygit_schema

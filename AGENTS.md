@@ -13,13 +13,15 @@ agents/           Cross-tool agent instructions (user-level)
                     rules/      path-scoped, loaded when a matching file is read
                     reference/  never loaded; read on demand by absolute path
 claude/           Claude Code config: settings.json, subagents, hooks, statusline
+codex/            Codex hooks
 cursor/           Cursor config: hooks.json (skills and MCP are not files here)
 ghostty/          Ghostty terminal config + custom icons
 glow/             Glow markdown viewer config
 iterm2/           iTerm2 profile, keymaps, color themes (legacy/backup)
 lazygit/          Lazygit config + helper scripts
 nvim/             Neovim config (Lua, lazy.nvim)
-skills/           Agent skills, shared between Claude Code and Cursor
+opencode/         OpenCode config: formatters, permissions, MCP servers
+skills/           Agent skills, shared across all four agent tools
 tmux/             tmux config + Claude Code integration scripts
 zsh/              zsh config (config.zsh) + worktree and linking helpers
 ```
@@ -28,7 +30,8 @@ Note the two `AGENTS.md` files, which are not the same thing:
 
 - `./AGENTS.md` (this file) describes **the repo** to an agent working on it.
 - `agents/AGENTS.md` describes **the user** to every agent on the machine. It is
-  linked to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`.
+  linked for Claude Code, Codex, and OpenCode. Cursor needs a manual User Rules
+  paste because it stores those rules in its settings UI.
 
 ## How configs are deployed
 
@@ -37,21 +40,22 @@ Note the two `AGENTS.md` files, which are not the same thing:
 
   | Repo | Claude Code | Codex | Cursor | OpenCode |
   | --- | --- | --- | --- | --- |
-  | `agents/AGENTS.md` | `~/.claude/CLAUDE.md` | `~/.codex/AGENTS.md` | — | — |
-  | `agents/rules/*.md` | `~/.claude/rules/` | — | — | — |
+  | `agents/AGENTS.md` | `~/.claude/CLAUDE.md` | `~/.codex/AGENTS.md` | User Rules paste | `~/.config/opencode/AGENTS.md` |
+  | `agents/rules/*.md` | `~/.claude/rules/` | global pointer | User Rules pointer | global pointer |
   | `claude/settings.json` | `~/.claude/settings.json` | — | — | — |
-  | `claude/agents/*.md` | `~/.claude/agents/` | — | — | — |
-  | `claude/hooks/format-edits.sh` | named by `settings.json` | — | `~/.cursor/hooks/` | — |
+  | `claude/agents/*.md` | `~/.claude/agents/` | — | Claude compatibility | — |
+  | `codex/hooks.json` | — | `~/.codex/hooks.json` | — | — |
+  | `opencode/opencode.jsonc` | — | — | — | `~/.config/opencode/opencode.jsonc` |
+  | `claude/hooks/format-edits.sh` | named by settings | named by hooks | `~/.cursor/hooks/` | named by formatter |
   | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` | — |
-  | `skills/*/` | `~/.claude/skills/` | `~/.codex/skills/` | `~/.cursor/skills/` | `~/.config/opencode/skills/` |
-  | MCP servers | `~/.claude.json` | — | `~/.cursor/mcp.json` | — |
+  | `skills/*/` | `~/.claude/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` |
+  | MCP servers | `~/.claude.json` | hand-maintained | `~/.cursor/mcp.json` | `opencode/opencode.jsonc` |
 
-  MCP servers are registered, not linked, from the single `LAC_MCP_SERVERS`
-  table in the script. Codex is left out of that: its servers live in a
+  Claude and Cursor MCP servers are registered from the single
+  `LAC_MCP_SERVERS` table. Codex is left out because its servers live in a
   `[mcp_servers.*]` table in `~/.codex/config.toml`, which is hand-maintained
-  and not in this repo. The script covers agentic tooling only; the entries
-  below are deployed by hand. `link-configs` and `link-skills` are aliases
-  for it.
+  and not in this repo. OpenCode reads the same Context7 endpoint from its
+  tracked config. `link-configs` and `link-skills` are aliases for the script.
 - The script is bash but zsh sources it, so it enumerates directories with
   `find`, never a glob. zsh has `nomatch` on by default: a glob matching
   nothing aborts the command instead of expanding to nothing.
@@ -72,43 +76,42 @@ relinks, and prints where the backup went — diff it to recover the change.
 
 - `claude/settings.json` in this repo **is** the live `~/.claude/settings.json`.
   Edit it here, not there.
-- After changing anything under `agents/`, `claude/`, or `skills/`, run
+- After changing anything under `agents/`, `claude/`, `codex/`, `cursor/`,
+  `opencode/`, or `skills/`, run
   `link-agentic-configs` and start a new session. Hooks, rules, settings, and
   subagents are all read at launch.
 - `CLAUDE.md` at the repo root contains a single `@AGENTS.md` import and nothing
   else. Claude Code reads `CLAUDE.md` and never `AGENTS.md`, so that import is
   what lets one file serve both Claude and Codex. Do not add content to it.
-- `agents/AGENTS.md` is always loaded, in every session, in every project. Keep
-  it short; the docs recommend staying under 200 lines.
+- `agents/AGENTS.md` loads globally in Claude, Codex, and OpenCode. Cursor User
+  Rules need the same content pasted through Customize → Rules. Keep it short;
+  the docs recommend staying under 200 lines.
 - `agents/rules/*.md` use `paths:` frontmatter and load only when the agent
   reads a matching file. Long or language-specific guidance goes here. A rule
   with no `paths:` field loads unconditionally — put reference material in
   `agents/reference/` instead, which nothing links or preloads.
-- Skills load on demand, by name or by description match. A skill with
-  `disable-model-invocation: true` is user-invocable only — it stays in the `/`
-  menu but the model never loads it on its own. Do not use that flag for
-  anything meant to apply automatically; use a rule.
+- Skills load on demand, by name or by description match. Manual-only skills
+  use `disable-model-invocation: true` in Claude and Cursor. Codex reads the
+  matching `agents/openai.yaml` policy. OpenCode hides them through permission
+  rules and exposes the same files as slash commands.
 - `always-apply` is Cursor frontmatter. Claude Code ignores it.
-- Code style ships as both, deliberately. The rule fires automatically on code
-  being written; the `code-style` skill is invoked against code the agent is
-  only reading, such as a pull request. `agents/rules/code-style.md` is the
-  single source of truth — the skill points at it and copies nothing.
+- Code style ships as both, deliberately. Claude loads the path-scoped rule.
+  The global instructions tell every other tool to read the same source before
+  edits. The `code-style` skill covers reviews. The rule remains authoritative.
 - Subagents live in `claude/agents/`. Set `model:` explicitly — it defaults to
   `inherit`, which silently runs cheap mechanical work on the session's model.
-- Unrecognized agent frontmatter keys are dropped without a warning. There is
-  no `skills:` field: an agent that must read a skill needs an explicit
-  instruction to `Read` the file by path. Verify a frontmatter key exists
-  before relying on it, because nothing will tell you it did not.
+- Claude supports `skills:` in subagent frontmatter. Cursor reads agents from
+  `~/.claude/agents/` but uses `readonly: true` for read-only enforcement.
+  Shared agents use both fields and keep explicit file reads as a fallback.
 - `claude/hooks/format-edits.sh` runs prettier/ruff/terraform on files an agent
   writes, because agent edits never pass through nvim's format-on-save. One
-  script serves both agents. It stays under `claude/` despite that: the path is
-  named by `claude/settings.json` and by the link script, so the directory is a
-  historical name, not a scope. It reads the path from the
-  hook's **stdin JSON**, and the two agents spell it differently: Claude
-  uses `.tool_response.filePath` (falling back to `.tool_input.file_path` /
-  `.tool_input.notebook_path`), Cursor's `afterFileEdit` payload is a flat
-  `.file_path`. There is no `CLAUDE_FILE_PATHS` environment variable — a hook
-  written against one silently formats nothing.
+  script serves all four tools. It stays under `claude/` despite that: the path
+  is named by `claude/settings.json` and by the link script, so the directory is a
+  historical name, not a scope. Claude sends a file path in JSON. Cursor sends
+  a flat `.file_path`. Codex sends apply-patch text in `.tool_input.command`.
+  OpenCode passes the file as an argument through its custom formatter.
+- Codex requires trust for each new or changed hook definition. Review the
+  exact command through `/hooks` before relying on the hook.
 - prettier and ruff only run when the project has a matching config file, so a
   repo that never opted into them does not get a whole-file reformat from one
   agent edit. terraform has no such gate: `terraform fmt` is the one canonical
@@ -118,10 +121,10 @@ relinks, and prints where the backup went — diff it to recover the change.
 ## Cursor coverage
 
 Cursor reads skills, hooks, and MCP servers from the home directory. It reads
-instructions from a project only. That split is the whole story:
+file-backed instructions from a project only. That split is the whole story:
 
-- `~/.cursor/skills/` is a documented global skill root, alongside
-  `~/.agents/skills/`. A `SKILL.md` needs `name` (matching the folder) and
+- `~/.agents/skills/` is the shared global skill root. Cursor also scans
+  `~/.claude/skills/` for compatibility. A `SKILL.md` needs `name` and
   `description`; the optional `paths:` field scopes a skill to matching files,
   which is the closest thing Cursor has to a path-scoped rule.
 - `~/.cursor/hooks.json` holds user hooks. A user hook runs with `~/.cursor/` as
@@ -140,9 +143,21 @@ instructions from a project only. That split is the whole story:
   paste into Customize → Rules, once per machine.
 - `~/.cursor/cli-config.json` is `cursor-agent`'s own state (model, permissions,
   sandbox). It is not linked; treat it as machine state.
+- Cursor reads `~/.claude/agents/` for compatibility. Shared read-only agents
+  set `readonly: true`; Claude ignores that Cursor-specific field.
 - Cursor is migrating slash commands to skills — it ships a `/migrate-to-skills`
   command. Do not add a `~/.cursor/commands/` link; put shared behaviour in
   `skills/`, which both agents already load.
+
+## OpenCode coverage
+
+- `~/.config/opencode/AGENTS.md` links the canonical global instructions.
+- `~/.agents/skills/` is the shared skill root. `zsh/config.zsh` disables
+  OpenCode's Claude compatibility scans because every source is explicit.
+- OpenCode ignores `disable-model-invocation`. Its config denies those skills
+  to the skill tool. The link script exposes them under `commands/` instead.
+- `opencode/opencode.jsonc` enables Context7 and routes supported file types
+  through the trusted shared formatter.
 
 ## tmux + Claude Code
 

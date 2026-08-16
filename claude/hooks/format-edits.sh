@@ -1,8 +1,8 @@
 #!/bin/sh
 # Formats the file that an agent just wrote.
 #
-# Wired to PostToolUse (Edit|Write|NotebookEdit) in claude/settings.json, and to
-# afterFileEdit in cursor/hooks.json.
+# Wired to PostToolUse in Claude and Codex, afterFileEdit in Cursor, and the
+# custom agent-edits formatter in OpenCode.
 #
 # Why this exists: nvim formats on save through conform.nvim, but Claude edits
 # files directly and never goes through nvim. Without this hook, every file the
@@ -11,24 +11,50 @@
 #
 # The formatter list mirrors nvim/lua/plugins/format.lua. Keep the two in step.
 #
-# Both agents pass the hook payload as JSON on stdin and set no per-tool
-# environment variables, but they spell the path differently. Claude Code puts
-# it at .tool_response.filePath, with .tool_input.file_path /
-# .tool_input.notebook_path as fallbacks -- the pattern its own hook docs use.
-# Cursor's afterFileEdit payload is flat: .file_path. One edit means one file,
-# so there is no list to split and paths containing spaces are safe.
+# Claude and Cursor pass one file path in JSON. Codex passes apply_patch text in
+# .tool_input.command and the session directory in .cwd. OpenCode passes one
+# file path as the first argument.
 
 set -u
 
-command -v jq >/dev/null 2>&1 || exit 0
+if [ "$#" -gt 0 ]; then
+  path="$1"
+else
+  command -v jq >/dev/null 2>&1 || exit 0
 
-path="$(jq -r '
-  .tool_response.filePath
-  // .tool_input.file_path
-  // .tool_input.notebook_path
-  // .file_path
-  // empty
-' 2>/dev/null)"
+  payload="$(jq -c . 2>/dev/null)" || exit 0
+  path="$(printf '%s' "$payload" | jq -r '
+    .tool_response.filePath
+    // .tool_input.file_path
+    // .tool_input.notebook_path
+    // .file_path
+    // empty
+  ')"
+
+  if [ -z "$path" ]; then
+    hook_cwd="$(printf '%s' "$payload" | jq -r '.cwd // empty')"
+    patch_paths="$(printf '%s' "$payload" | jq -r '
+      [
+        (.tool_input.command // ""
+          | split("\n")[]
+          | select(test("^\\*\\*\\* (Add File|Update File|Move to): "))
+          | sub("^\\*\\*\\* (Add File|Update File|Move to): "; ""))
+      ]
+      | unique[]
+    ')"
+
+    [ -n "$patch_paths" ] || exit 0
+    printf '%s\n' "$patch_paths" | while IFS= read -r patch_path; do
+      [ -n "$patch_path" ] || continue
+      case "$patch_path" in
+        /*) ;;
+        *) [ -n "$hook_cwd" ] && patch_path="$hook_cwd/$patch_path" ;;
+      esac
+      "$0" "$patch_path"
+    done
+    exit 0
+  fi
+fi
 
 [ -n "$path" ] || exit 0
 [ -f "$path" ] || exit 0

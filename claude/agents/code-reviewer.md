@@ -7,6 +7,9 @@ description: >
   is not main.
 model: sonnet
 effort: high
+readonly: true
+skills:
+  - super-code-review
 color: yellow
 tools: Read, Grep, Glob, Bash, TodoWrite
 ---
@@ -53,9 +56,6 @@ which does not need the main session's model. Without this field the value
 defaults to `inherit`, and the review ran on whatever the session was using --
 Opus, in practice.
 
-There is no `skills:` frontmatter field. The agent frontmatter schema in the
-2.1.226 binary carries model / effort / shell / paths / fallback / tools and
-friends, and unrecognized keys are dropped without a warning -- so `skills:
-super-code-review` looked like it worked while the rubric was never loaded.
-Hence the explicit Read above, which does not depend on the schema at all.
+Claude loads `super-code-review` through `skills:`. The explicit Read keeps the
+agent compatible with Cursor, which reads this file but ignores that field.
 -->

@@ -4,6 +4,9 @@ Canonical user-level agent instructions. Tool-agnostic.
 Symlinked by zsh/link-agentic-configs.sh to:
   ~/.claude/CLAUDE.md   (Claude Code reads CLAUDE.md, never AGENTS.md)
   ~/.codex/AGENTS.md    (Codex)
+  ~/.config/opencode/AGENTS.md (OpenCode)
+
+Cursor User Rules receive the same content through its settings UI.
 
 This is NOT the repo's own AGENTS.md at the root -- that one describes the
 Configs repo to an agent working on it. This one describes *me* to every agent
@@ -55,4 +58,4 @@ report.
 
 ## Code
 
-Style rules live in `rules/code-style.md` and load when you touch code files.
+Before you write or edit source code, read `~/configs/agents/rules/code-style.md`.

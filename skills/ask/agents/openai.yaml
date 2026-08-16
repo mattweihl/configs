@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ask"
+  short_description: "Ask questions without changing files"
+  default_prompt: "Use $ask to answer this question without changing files."
+policy:
+  allow_implicit_invocation: false

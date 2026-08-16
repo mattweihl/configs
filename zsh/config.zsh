@@ -1,6 +1,10 @@
 # macOS: BSD ls reads LSCOLORS (enabled by CLICOLOR=1 below)
 export LSCOLORS=exBxhxDxfxhxhxhxhxcxcx
 
+# OpenCode gets explicit AGENTS.md and ~/.agents/skills links. Disable its
+# Claude compatibility scans so those sources do not appear twice.
+export OPENCODE_DISABLE_CLAUDE_CODE=1
+
 # Linux + zsh completion: GNU ls and zsh completion read LS_COLORS
 if command -v dircolors &> /dev/null; then
   eval "$(dircolors -b)"

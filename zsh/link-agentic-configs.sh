@@ -16,16 +16,22 @@
 #
 #   agents/AGENTS.md      -> ~/.claude/CLAUDE.md   (Claude reads CLAUDE.md only)
 #                            ~/.codex/AGENTS.md
+#                            ~/.config/opencode/AGENTS.md
 #   agents/rules/*.md     -> ~/.claude/rules/
 #   agents/reference/     not linked -- read on demand by absolute path. A rule
 #                         without `paths:` frontmatter loads every session, so
 #                         long reference material must not live in rules/.
 #   claude/settings.json  -> ~/.claude/settings.json
 #   claude/agents/*.md    -> ~/.claude/agents/
+#   codex/hooks.json      -> ~/.codex/hooks.json
+#   opencode/opencode.jsonc -> ~/.config/opencode/opencode.jsonc
 #   claude/statusline.sh  } referenced by absolute path from settings.json,
 #   claude/hooks/*.sh     } so they only need the executable bit
-#   skills/*/             -> ~/.claude/skills/, ~/.cursor/skills/,
-#                            ~/.codex/skills/, and ~/.config/opencode/skills/
+#   skills/*/             -> ~/.claude/skills/ and ~/.agents/skills/
+#                         The shared ~/.agents root serves Codex, Cursor, and
+#                         OpenCode. Manual-only skills also become OpenCode
+#                         commands because OpenCode ignores their invocation
+#                         frontmatter.
 #                         Codex ships its own bundled skills in
 #                         ~/.codex/skills/.system/. That is a real directory,
 #                         not a link, so pruning never touches it.
@@ -55,8 +61,12 @@ LAC_SKILL_SOURCES=(
 )
 
 LAC_SKILL_TARGETS=(
-  "$HOME/.cursor/skills"
   "$HOME/.claude/skills"
+  "$HOME/.agents/skills"
+)
+
+LAC_LEGACY_SKILL_TARGETS=(
+  "$HOME/.cursor/skills"
   "$HOME/.codex/skills"
   "$HOME/.config/opencode/skills"
 )
@@ -70,6 +80,7 @@ LAC_SKILL_TARGETS=(
 # Codex is deliberately not covered. It reads MCP servers from a [mcp_servers.*]
 # table in ~/.codex/config.toml, which also holds hand-maintained stdio servers
 # this script has no business rewriting. Add Codex entries there by hand.
+# OpenCode reads the same Context7 entry from opencode/opencode.jsonc.
 #
 # Format: name|transport|url
 LAC_MCP_SERVERS=(
@@ -105,6 +116,17 @@ _lac_link() {
   _lac_linked=$((_lac_linked + 1))
 }
 
+# Removes one link only when it still points at the managed source.
+_lac_unlink() {
+  local src="$1" dest="$2"
+  [[ -L "$dest" ]] || return 0
+  [[ "$(readlink "$dest")" == "$src" ]] || return 0
+
+  rm "$dest"
+  echo "unlinked ${dest/#$HOME/~}"
+  _lac_linked=$((_lac_linked + 1))
+}
+
 # Links every top-level file of one extension into a target directory.
 _lac_link_files() {
   # _lac_link_files <source-dir> <extension> <target-dir>
@@ -131,6 +153,57 @@ _lac_link_skills() {
       done
     done < <(find "$source_root" -mindepth 1 -maxdepth 1 -type d | sort)
   done
+}
+
+# Removes personal skill links from the old tool-specific roots. Claude keeps
+# its own root; Codex, Cursor, and OpenCode now share ~/.agents/skills.
+_lac_remove_legacy_skill_links() {
+  local target_root entry link_target source_root
+
+  for target_root in "${LAC_LEGACY_SKILL_TARGETS[@]}"; do
+    [[ -d "$target_root" ]] || continue
+
+    while IFS= read -r entry; do
+      [[ -n "$entry" ]] || continue
+      link_target="$(readlink "$entry")"
+
+      for source_root in "${LAC_SKILL_SOURCES[@]}"; do
+        case "$link_target" in
+          "$source_root"/*)
+            rm "$entry"
+            echo "unlinked legacy ${entry/#$HOME/~}"
+            _lac_linked=$((_lac_linked + 1))
+            break
+            ;;
+        esac
+      done
+    done < <(find "$target_root" -mindepth 1 -maxdepth 1 -type l | sort)
+  done
+}
+
+# OpenCode ignores disable-model-invocation. Expose those skills as commands,
+# while opencode.jsonc hides them from the model-facing skill tool.
+_lac_link_opencode_commands() {
+  local source_root skill_dir skill_name skill_file command_file
+
+  for source_root in "${LAC_SKILL_SOURCES[@]}"; do
+    [[ -d "$source_root" ]] || continue
+
+    while IFS= read -r skill_dir; do
+      [[ -n "$skill_dir" ]] || continue
+      skill_name="$(basename "$skill_dir")"
+      skill_file="$skill_dir/SKILL.md"
+      command_file="$HOME/.config/opencode/commands/$skill_name.md"
+
+      if grep -Eq '^disable-model-invocation:[[:space:]]*true[[:space:]]*$' "$skill_file"; then
+        _lac_link "$skill_file" "$command_file"
+      else
+        _lac_unlink "$skill_file" "$command_file"
+      fi
+    done < <(find "$source_root" -mindepth 1 -maxdepth 1 -type d | sort)
+  done
+
+  _lac_prune "$HOME/.config/opencode/commands"
 }
 
 # Removes symlinks whose target no longer exists. Without this, deleting a skill
@@ -228,11 +301,15 @@ link-agentic-configs() {
   # AGENTS.md, so the Claude side is a rename, not a copy.
   _lac_link "$CONFIGS_ROOT/agents/AGENTS.md" "$HOME/.claude/CLAUDE.md"
   _lac_link "$CONFIGS_ROOT/agents/AGENTS.md" "$HOME/.codex/AGENTS.md"
+  _lac_link "$CONFIGS_ROOT/agents/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
 
   _lac_prune "$HOME/.claude/rules"
   _lac_link_files "$CONFIGS_ROOT/agents/rules" md "$HOME/.claude/rules"
 
   _lac_link "$CONFIGS_ROOT/claude/settings.json" "$HOME/.claude/settings.json"
+  _lac_link "$CONFIGS_ROOT/codex/hooks.json" "$HOME/.codex/hooks.json"
+  _lac_link "$CONFIGS_ROOT/opencode/opencode.jsonc" \
+    "$HOME/.config/opencode/opencode.jsonc"
 
   _lac_prune "$HOME/.claude/agents"
   _lac_link_files "$CONFIGS_ROOT/claude/agents" md "$HOME/.claude/agents"
@@ -247,11 +324,14 @@ link-agentic-configs() {
   _lac_link "$CONFIGS_ROOT/claude/hooks/format-edits.sh" \
     "$HOME/.cursor/hooks/format-edits.sh"
 
+  _lac_remove_legacy_skill_links
+
   local target_root
   for target_root in "${LAC_SKILL_TARGETS[@]}"; do
     _lac_prune "$target_root"
   done
   _lac_link_skills
+  _lac_link_opencode_commands
 
   _lac_register_claude_mcp
   _lac_register_cursor_mcp

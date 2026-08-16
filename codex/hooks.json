@@ -1,0 +1,18 @@
+{
+  "description": "Format trusted files after Codex edits.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/configs/claude/hooks/format-edits.sh",
+            "timeout": 30,
+            "statusMessage": "Formatting edited files"
+          }
+        ]
+      }
+    ]
+  }
+}
