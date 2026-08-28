@@ -500,10 +500,15 @@ _rwt_worktree_completion() {
   local -a candidates
   local current_path
   local common_dir
+  local repo_root
 
-  current_path="$(git rev-parse --show-toplevel 2>/dev/null || pwd -P)"
+  repo_root="$(wt_resolve_repo)" || return 1
+  [[ -z "$repo_root" ]] && return 1
+  repo_root="$(cd "$repo_root" 2>/dev/null && pwd -P)" || return 1
+
+  current_path="$(git -C "$repo_root" rev-parse --show-toplevel 2>/dev/null || pwd -P)"
   current_path="$(cd "$current_path" 2>/dev/null && pwd -P)" || return 1
-  common_dir="$(git rev-parse --git-common-dir 2>/dev/null)" || return 1
+  common_dir="$(git -C "$repo_root" rev-parse --git-common-dir 2>/dev/null)" || return 1
   common_dir="$(cd "$common_dir" 2>/dev/null && pwd -P)" || return 1
 
   candidates=(

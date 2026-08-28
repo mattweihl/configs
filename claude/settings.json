@@ -155,7 +155,7 @@
     "command": "~/configs/claude/statusline.sh",
     "padding": 0
   },
-  "model": "opus",
+  "outputStyle": "concise",
   "effortLevel": "medium",
   "tui": "fullscreen",
   "theme": "dark",

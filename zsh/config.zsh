@@ -48,10 +48,6 @@ alias c='go_to_code'
 alias dt='go_to_desktop'
 
 
-if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
-  source "$HOME/configs/zsh/worktree.sh"
-fi
-
 if [[ -r "$HOME/configs/zsh/link-agentic-configs.sh" ]]; then
   source "$HOME/configs/zsh/link-agentic-configs.sh"
 fi
@@ -126,6 +122,12 @@ if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
   compinit
 else
   compinit -C
+fi
+
+# Sourced after compinit so its compdef registrations (rwt/cwt branch and
+# worktree completion) actually take effect.
+if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
+  source "$HOME/configs/zsh/worktree.sh"
 fi
 
 # pyenv: lazy-load. Shims stay on PATH so python/pip resolve; full `pyenv init`
