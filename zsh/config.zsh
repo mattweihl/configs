@@ -124,11 +124,12 @@ else
   compinit -C
 fi
 
+# Worktree support (cwt/rwt) is disabled. Uncomment to re-enable.
 # Sourced after compinit so its compdef registrations (rwt/cwt branch and
 # worktree completion) actually take effect.
-if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
-  source "$HOME/configs/zsh/worktree.sh"
-fi
+# if [[ -r "$HOME/configs/zsh/worktree.sh" ]]; then
+#   source "$HOME/configs/zsh/worktree.sh"
+# fi
 
 # pyenv: lazy-load. Shims stay on PATH so python/pip resolve; full `pyenv init`
 # (which installs pyenv-virtualenv's cd-hook) defers until `pyenv` is called.
