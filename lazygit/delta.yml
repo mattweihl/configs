@@ -1,0 +1,7 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# Merged into config.yml only when `delta` (git-delta) is installed.
+# See the `lg` function in zsh/config.zsh for the availability check.
+git:
+  diffRenderers:
+    - colorArg: always
+      command: delta --dark --side-by-side --paging=never --line-numbers

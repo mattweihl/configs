@@ -85,7 +85,14 @@ fi
 
 if command -v lazygit &> /dev/null
 then
-  alias lg='lazygit'
+ lg() {
+    if command -v delta &> /dev/null
+    then
+      lazygit --use-config-file="$HOME/configs/lazygit/config.yml,$HOME/configs/lazygit/delta.yml" "$@"
+    else
+      lazygit "$@"
+    fi
+  }
 fi
 
 #alias clawd='claude --dangerously-skip-permissions'
