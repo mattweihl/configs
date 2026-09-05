@@ -27,10 +27,6 @@ return {
         python = { "ruff_format" },
         terraform = { "terraform_fmt" },
       },
-      format_on_save = {
-        timeout_ms = 500,
-        lsp_format = "fallback",
-      },
     },
     -- Mason prepends its bin/ to PATH on setup (PATH = "prepend" default),
     -- so conform finds mason-installed formatters automatically.

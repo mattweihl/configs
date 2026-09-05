@@ -49,10 +49,10 @@ return {
           },
         },
         files = {
-          cmd = "rg --files --hidden --no-ignore-vcs --glob=!.git/* --glob=!node_modules/* --glob=!__pycache__/* --glob=!*.pyc",
+          cmd = "rg --files --hidden --no-ignore-vcs --glob=!.git --glob=!node_modules --glob=!__pycache__ --glob=!*.pyc",
         },
         grep = {
-          rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096 --hidden --glob=!.git/* --glob=!node_modules/* --glob=!__pycache__/* --glob=!*.pyc -e",
+          rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096 --hidden --glob=!.git --glob=!node_modules --glob=!__pycache__ --glob=!*.pyc -e",
         },
       })
     end,

@@ -104,7 +104,7 @@ relinks, and prints where the backup went — diff it to recover the change.
   `~/.claude/agents/` but uses `readonly: true` for read-only enforcement.
   Shared agents use both fields and keep explicit file reads as a fallback.
 - `claude/hooks/format-edits.sh` runs prettier/ruff/terraform on files an agent
-  writes, because agent edits never pass through nvim's format-on-save. One
+  writes, because agent edits bypass Neovim's formatter. One
   script serves all four tools. It stays under `claude/` despite that: the path
   is named by `claude/settings.json` and by the link script, so the directory is a
   historical name, not a scope. Claude sends a file path in JSON. Cursor sends
@@ -163,13 +163,11 @@ file-backed instructions from a project only. That split is the whole story:
 
 - Claude Code panes are detected in `tmux.conf` by their process name: the
   launcher execs a version-named binary, so `pane_current_command` is e.g.
-  `2.1.226`. `automatic-rename-format` substitutes Claude's own OSC title.
+  `2.1.226`. Claude windows stay named `claude`; this is intentional.
+  The outer terminal title uses the window name without the tmux session name.
 - `tmux/claude-status.sh` is driven by hooks in `claude/settings.json` and sets
-  a per-pane `@claude_state` that renders as a glyph in the window name:
-  `●` working, `◍` needs input, `✦` idle. It then re-asserts `automatic-rename`
-  on the window: tmux only recomputes an auto-name when the pane emits output,
-  and `◍` is by definition the moment the agent has gone quiet, so the glyph
-  would otherwise never repaint.
+  a per-pane `@claude_state`. The picker uses this state for its labels.
+  State glyph formats remain available, but window names do not use them.
 - `<prefix> a` opens `tmux/claude-agents.sh`, an fzf picker over every Claude
   agent — panes from `list-panes`, plus daemon-owned background sessions from
   `claude agents --json`, which have no pane and are otherwise unreachable from
@@ -177,14 +175,11 @@ file-backed instructions from a project only. That split is the whole story:
   and they disagree, because that session's frozen `@claude_state` is exactly
   the value not to trust. The script repairs the disagreement at the source: it
   writes the daemon's live state onto the pane with `set-option -p` *before*
-  listing panes, so tmux renders the row — and the window-name glyph, which was
-  telling the same lie — correctly. State is only as fresh as the last time you
+  listing panes, so tmux renders the row correctly. State is only as fresh as the last time you
   opened the picker. Picking a detached agent opens the agent view in a new
   window.
 - Detached rows print the daemon's own state verbatim (`working`, `done`,
-  `failed`). Do not fold those into the pane vocabulary: a daemon agent can be
-  `failed`, there is no glyph for that, and a catch-all `else idle` hides the
-  one row you needed to see.
+  `failed`). Preserve daemon states in detached rows instead of treating unknown states as idle.
 - The `@_claude_*` formats in `tmux.conf` (pane match, glyph, label, title) are
   the single source of truth; `claude-agents.sh` evaluates them via
   `list-panes -f` rather than reimplementing the matching. Column padding is
@@ -194,15 +189,12 @@ file-backed instructions from a project only. That split is the whole story:
   `#{l:...}` — same formats, same arithmetic.
 - Any text interpolated into a tmux format must have its `#` doubled, or the
   row truncates at that character.
-- The glyph in the window name and `claude/statusline.sh` inside the pane answer
-  different questions: the glyph says *which* pane wants you, the status line
-  says what the agent in front of you is running on.
-- The glyph is scoped to the session you are attached to, because it renders in
-  a window *name*. The `claude_waiting` powerline segment
-  (`tmux/tmux-powerline/segments/`) closes that gap: it lists every *other*
+- The picker identifies panes that need input. `claude/statusline.sh` describes the agent inside the pane.
+- The `claude_waiting` powerline segment (`tmux/tmux-powerline/segments/`) lists every *other*
   session holding a `wait` pane, and prints nothing — which makes powerline drop
   the segment entirely — when there are none. It filters with `list-panes -f`
   against `@claude_state` rather than restating the state vocabulary.
+  The current session remains excluded; use the picker to inspect its agents.
 - The theme's per-window `λ`/`✦`/`$` prefix tests `@_claude_pane`, not
   `#{m:claude,#{pane_current_command}}`. The literal match silently never fired:
   `pane_current_command` is the version string. Anything that needs to know "is
@@ -224,16 +216,13 @@ file-backed instructions from a project only. That split is the whole story:
   lazygit, `M-t` for a shell, both starting in `#{pane_current_path}`. A Claude
   pane reflows badly when it loses columns, so nothing that is transient should
   cost it width. `<prefix> t` is the clock, which is why lazygit is on `g`.
-- Only agents launched inside a pane drive the glyph. `claude-status.sh` targets
+- Only agents launched inside a pane drive its hook state. `claude-status.sh` targets
   `$TMUX_PANE`, and background / daemon-resumed sessions don't inherit it, so
   their hooks exit as a no-op. Don't try to recover the pane by walking the
   process tree: such a session's ancestry either reaches no pane at all, or
   reaches the *parent* agent's pane and marks a window that isn't its own.
-- Diagnostic: a pane whose window *name* tracks Claude's title live but whose
-  glyph is stuck on `✦` is the case above, not a broken hook. The title arrives
-  as an OSC escape on the tty (no env needed); the state needs `$TMUX_PANE`.
-  Same pane, two channels — verify with `tmux list-panes -a -F
-  '#{pane_id} [#{@claude_state}] #{window_name}'`.
+- Inspect hook state with `tmux list-panes -a -F '#{pane_id} [#{@claude_state}] #{window_name}'`.
+  The fixed `claude` window name does not indicate agent state.
 - `claude --resume` refuses a session that is still running in the background
   ("That session is still running as a background agent"). That is correct
   behaviour, not a broken session: the daemon owns it, and a second client
@@ -249,8 +238,9 @@ file-backed instructions from a project only. That split is the whole story:
 ## Worktree workflow
 
 - `cwt`/`rwt` and their shared helpers (`wt_ensure_worktree`, `wt_remove_worktree`,
-  `wt_resolve_repo`, `wt_resolve_root`) live in `~/configs/zsh/worktree.sh`, sourced
-  from `~/configs/zsh/config.zsh`. Both commands work standalone, with no
+  `wt_resolve_repo`, `wt_resolve_root`) live in `~/configs/zsh/worktree.sh`.
+  Its source block in `~/configs/zsh/config.zsh` is currently disabled.
+  When sourced explicitly, both commands work standalone, with no
   work-repo config loaded: they default to the current git checkout as the repo
   and `~/code/worktrees` as the worktrees directory.
 - `cwt <branch> [base-branch]` (or `--base <base-branch>`) creates/reuses the
@@ -268,8 +258,8 @@ file-backed instructions from a project only. That split is the whole story:
 
 - All config files should work on both macOS and Linux where possible
 - Shell scripts in `lazygit/scripts/` use `~/configs/` as the base path
-- No completion/autocomplete plugin in nvim (intentional)
-- Format-on-save enabled in nvim (conform.nvim); `<leader>F` also available for manual formatting
+- Neovim uses Blink completion, configured in `nvim/lua/plugins/completion.lua`.
+- Neovim formatting is manual through `<leader>F` or the context menu. Saving does not invoke Conform.
 - Formatter lists in `nvim/lua/plugins/format.lua` and `claude/hooks/format-edits.sh` must stay in step, binary names and arguments included (`terraform fmt -no-color -`)
 - Before adding a formatter to either file, check the binary actually resolves. `sql_formatter` sat in `format.lua` doing nothing for as long as it was there: conform runs `sql-formatter`, which was installed nowhere
 - Run a script against a realistic input before documenting how it behaves. Every wrong claim in this file so far came from describing intent instead of observed output
