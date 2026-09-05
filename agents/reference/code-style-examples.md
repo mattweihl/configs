@@ -100,14 +100,11 @@ func RenderReport(data ReportData, format ReportFormat) ReportResult {
 }
 ```
 
-Still valid when modes are truly distinct behaviors: split functions.
+When callers already know the format, they can call `buildSummary` or `buildDetailed` directly.
 
-```ts
-const renderSummaryReport = (data: ReportData): ReportResult => buildSummary(data);
-const renderDetailedReport = (data: ReportData): ReportResult => buildDetailed(data);
-```
+## Group Related Parameters
 
-## 4+ Parameters -> Structured Input
+These fields form one creation request. Parameter count alone does not require a wrapper.
 
 Go:
 
@@ -164,3 +161,54 @@ if (items.length === 0) {
 }
 ```
 
+## Local Mutation and a Single Pass
+
+TypeScript:
+
+```ts
+type LineItem = {
+  isActive: boolean;
+  amountCents: number;
+};
+
+const totalActiveCents = (items: readonly LineItem[]): number => {
+  let totalCents = 0;
+  for (const item of items) {
+    if (!item.isActive) {
+      continue;
+    }
+    totalCents += item.amountCents;
+  }
+  return totalCents;
+};
+```
+
+The function preserves its inputs. The local accumulator makes the calculation visible in one place.
+Keep this operation together; the loop does not need a helper for each step.
+
+## Keep Related Work Together
+
+Python:
+
+```python
+def summarize_orders(orders):
+    total_cents = 0
+    count_by_status = {}
+
+    for order in orders:
+        status = order["status"]
+        count_by_status[status] = count_by_status.get(status, 0) + 1
+        if status == "cancelled":
+            continue
+        total_cents += order["amount_cents"]
+
+    return {
+        "total_cents": total_cents,
+        "count_by_status": count_by_status,
+    }
+```
+
+Counting and totaling serve one purpose: summarizing the orders.
+The cancellation rule stays beside the calculation it affects.
+A helper for each assignment would make the reader jump around to reconstruct this operation.
+Extract a helper when a calculation becomes a distinct policy worth naming or reusing.

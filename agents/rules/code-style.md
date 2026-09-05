@@ -23,10 +23,10 @@ Apply these preferences across languages by translating each rule to the languag
 
 ## Core Principles
 
-- Optimize for readability first. Prefer clear, boring code over clever code.
+- Write code whose behavior is easy to follow from its inputs to its result.
 - Keep code simple. Add complexity only when it is clearly justified.
 - Leave touched code cleaner than you found it.
-- Prefer immutable data flow unless there is a strong reason not to.
+- Keep related work together. Prefer direct operations over layers that only pass work along.
 - Favor explicitness over hidden behavior.
 
 ## Naming
@@ -38,30 +38,31 @@ Apply these preferences across languages by translating each rule to the languag
 
 ## Functions
 
-- Functions should do one thing and have one reason to change.
-- Target small functions. Around 35-40 lines is a soft warning threshold, not a hard limit.
+- Give each function a coherent purpose. Keep related work together when it shares data or computation.
+- Extract helpers when they clarify intent, isolate a policy, or remove meaningful duplication.
+- Preserve debugging locality: keep a sequence together when understanding its helpers requires repeatedly opening their implementations.
+- Judge function length by comprehension. Keep a readable algorithm together regardless of line count.
 - Prefer early returns and guard clauses; avoid `else` after a terminal branch.
-- Keep nesting shallow. Max 2 levels before extracting helpers.
+- Keep nesting shallow where practical. Extract helpers when they improve comprehension, not at a fixed nesting depth.
 - Avoid boolean function arguments. Prefer explicit mode values:
   - In TypeScript, prefer enum-like `as const` objects plus union value types (instead of native `enum`).
   - In other languages, use the idiomatic equivalent (`enum`, tagged union, constants, or sealed variants).
   Use separate functions or structured options when that reads better.
-- Use positional arguments for small signatures; at 4+ arguments, switch to a structured input object/record/struct.
-- Treat 4+ arguments as a smell: verify whether the function should be split.
+- Use positional arguments for small signatures. At 4+ arguments, consider a structured input when the values form a concept.
 - Prefer explicit `return` statements in function bodies.
 
 ## Control Flow
 
 - Simple ternaries are fine.
 - Never use nested ternaries.
-- If branching becomes complex, extract a helper function first; only use mutable temporary assignment as a fallback.
+- Choose direct branches, local assignment, or a helper based on which makes the complete operation easiest to follow.
 
 ## Data and Types
 
-- Never mutate inputs.
-- Prefer creating new values instead of mutating existing ones.
-- Use language-native collection transforms by default (`map`/`filter`/`reduce` style).
-- Use loops only when transform chains become harder to read or early termination is required.
+- Preserve caller-owned inputs unless the contract explicitly permits mutation or transfers ownership.
+- Use local mutation for accumulators, builders, and owned buffers. Copy when isolation or value semantics require it.
+- Use loops or collection transforms, whichever makes the operation clearest. Avoid unnecessary intermediate collections and repeated traversal.
+- Prefer a single pass when related operations can share work without obscuring their purpose.
 - In typed languages, prefer named contracts over large inline structural types.
 - Keep type definitions close to usage; extract shared types only when reuse is real and coupling stays clean.
 
@@ -83,9 +84,12 @@ Apply these preferences across languages by translating each rule to the languag
 
 ## Organization
 
-- Prefer one main export per file and keep private helpers colocated.
+- Group related operations and data by module. Keep private helpers colocated; allow multiple cohesive exports.
 - Order dependencies from most distant to most local (external -> internal -> local).
 - Prefer configuration-style APIs over wrapper-heavy composition chains.
+- Choose data structures around the operations the module performs.
+- Use direct branches or tagged data for a fixed set of cases. Introduce runtime polymorphism when implementations need independent extension.
+- Let module internals use their data representation directly. Preserve encapsulation at the module boundary.
 
 ## Errors
 
@@ -103,7 +107,7 @@ Apply these preferences across languages by translating each rule to the languag
 
 ## During Reviews
 
-- Review from correctness and maintainability first, style second.
+- Judge the complete operation, not how small its individual pieces look.
 - Flag violations of these principles with concrete, actionable suggestions.
 - Use numbered findings in severity order when giving review feedback.
 - Call out missing tests for business logic changes and risky paths.

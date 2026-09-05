@@ -1,7 +1,7 @@
 ---
 name: code-style
 description: >
-  Matthew Weihl's language-agnostic code style and clean-code preferences.
+  Matthew Weihl's language-agnostic preferences for straightforward, readable code.
   Use when reviewing code you did not write, when judging whether existing code
   meets these standards, or when the user asks about style, naming, function
   design, control flow, error handling, or structure. Also use on request via
@@ -42,8 +42,7 @@ not write needs a different bar:
   the change under review touches it, or when it causes the bug being discussed.
 - Weight findings by blast radius: a leaked abstraction outranks a naming nit.
 - Number findings in severity order.
-- Give the concrete replacement, not the principle. "Extract the tier lookup to
-  `getDiscountRate`" beats "this function does too much".
+- Give a concrete replacement. For example: "Keep this calculation in the loop so its inputs remain visible."
 - Say when the code is fine. A review that finds nothing is a valid review.
 
 For a full structural review — abstraction health, spaghetti growth, file-size
