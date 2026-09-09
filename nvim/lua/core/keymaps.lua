@@ -41,7 +41,7 @@ map("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease window width"
 map("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width", silent = true })
 
 -- Splits (VSCode-style editor groups)
-map("n", "<leader>\\", "<cmd>vsplit<cr>", { desc = "Split right" })
+map("n", "<leader>\\", "<cmd>vnew<cr>", { desc = "Split right (empty buffer)" })
 map("n", "<leader>-", "<cmd>split<cr>", { desc = "Split down" })
 map("n", "<leader>sx", "<cmd>close<cr>", { desc = "Close split" })
 map("n", "<leader>so", "<cmd>only<cr>", { desc = "Close other splits" })
