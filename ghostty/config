@@ -1,6 +1,6 @@
 font-family = JetBrainsMono Nerd Font Mono
 font-style = "Bold"
-font-size = 22
+font-size = 16
 macos-icon = custom
 macos-custom-icon = ~/configs/ghostty/icons/ghostty-black.icns
 
