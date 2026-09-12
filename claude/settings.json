@@ -1,4 +1,29 @@
 {
+  "permissions": {
+    "deny": [
+      "Read(//**/.env)",
+      "Read(//**/.env.*)",
+      "Read(//**/*.env)",
+      "Read(//**/.netrc)",
+      "Read(//**/*.pem)",
+      "Read(//**/*.p12)",
+      "Read(//**/id_rsa)",
+      "Read(//**/id_ed25519)",
+      "Read(//**/.ssh/**)",
+      "Read(//**/.aws/credentials)",
+      "Read(//**/.docker/config.json)",
+      "Read(//**/.kube/config)",
+      "Bash(docker inspect *)",
+      "Bash(docker compose config *)",
+      "Bash(podman inspect *)",
+      "Bash(kubectl get secret *)",
+      "Bash(kubectl describe secret *)",
+      "Bash(env)",
+      "Bash(env *)",
+      "Bash(printenv *)",
+      "Bash(set)"
+    ]
+  },
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -159,40 +184,17 @@
   "effortLevel": "medium",
   "tui": "fullscreen",
   "theme": "dark",
+  "autoCompactEnabled": true,
   "agentPushNotifEnabled": true,
-  "voiceEnabled": true,
-  "permissions": {
-    "deny": [
-      "Read(//**/.env)",
-      "Read(//**/.env.*)",
-      "Read(//**/*.env)",
-      "Read(//**/.netrc)",
-      "Read(//**/*.pem)",
-      "Read(//**/*.p12)",
-      "Read(//**/id_rsa)",
-      "Read(//**/id_ed25519)",
-      "Read(//**/.ssh/**)",
-      "Read(//**/.aws/credentials)",
-      "Read(//**/.docker/config.json)",
-      "Read(//**/.kube/config)",
-      "Bash(docker inspect *)",
-      "Bash(docker compose config *)",
-      "Bash(podman inspect *)",
-      "Bash(kubectl get secret *)",
-      "Bash(kubectl describe secret *)",
-      "Bash(env)",
-      "Bash(env *)",
-      "Bash(printenv *)",
-      "Bash(set)"
-    ]
-  },
   "autoMode": {
     "hard_deny": [
       "$defaults",
       "Reading, printing, decoding or otherwise extracting the contents of a secret-bearing file (.env and variants, .netrc, private keys, .ssh/, cloud or container credential files) by ANY means, including shell readers (cat, sed, awk, head, grep, python, node), editors, or archive/encoding tools.",
-      "Extracting credentials from container, orchestrator or process metadata \u2014 docker/podman inspect, docker compose config, kubectl get/describe secret, /proc/*/environ, launchctl or systemctl show-environment \u2014 or dumping the whole environment (env, printenv, set).",
+      "Extracting credentials from container, orchestrator or process metadata — docker/podman inspect, docker compose config, kubectl get/describe secret, /proc/*/environ, launchctl or systemctl show-environment — or dumping the whole environment (env, printenv, set).",
       "Using a credential obtained by any of the above to authenticate to a database, API, cloud provider or other service, including indirectly via docker exec, kubectl exec, ssh, or a wrapper script.",
       "Re-attempting a blocked action through a different command spelling, wrapper, container, or tool after a denial. A denial is the answer; stop and ask the user."
     ]
-  }
+  },
+  "voiceEnabled": true,
+  "includeCoAuthoredBy": false
 }
