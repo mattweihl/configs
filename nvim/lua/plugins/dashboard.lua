@@ -57,7 +57,7 @@ return {
     require('dashboard').setup {
       theme = 'hyper',
       config = {
-        header = shuttle,
+        header = {},
         shortcut = {},
         packages = { enable = false },
         project = {
