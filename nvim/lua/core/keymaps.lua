@@ -21,7 +21,7 @@ map("n", "<leader>q", function()
   end
 
   vim.cmd("confirm quit")
-end, { desc = "Close split/buffer", silent = true })
+end, { desc = "Close split/buffer or quit", silent = true })
 map("n", "<leader>qq", "<cmd>confirm qall<CR>", { desc = "Quit all", silent = true })
 map("n", "<leader>wq", "<cmd>wqall<CR>", { desc = "Save and quit all", silent = true })
 map("n", "<leader>ww", "<cmd>write<CR>", { desc = "Save", silent = true })
@@ -33,7 +33,7 @@ map("n", "<leader>R", function()
   end
   require("core.fswatch").setup()
   vim.notify("Config reloaded")
-end, { desc = "Reload config" })
+end, { desc = "Reload core config" })
 
 map("n", "<C-Up>", ":resize +2<CR>", { desc = "Increase window height", silent = true })
 map("n", "<C-Down>", ":resize -2<CR>", { desc = "Decrease window height", silent = true })

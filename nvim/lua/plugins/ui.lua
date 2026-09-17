@@ -94,19 +94,19 @@ return {
 
       wk.add({
         { "<leader>b", group = "Buffer" },
-        { "<leader>c", group = "Code" },
-        { "<leader>d", group = "Diagnostics" },
+        { "<leader>c", group = "Code", mode = { "n", "v" } },
+        { "<leader>d", group = "Debug / Diagnostics" },
+        { "<leader>d", group = "Debug", mode = "v" },
         { "<leader>f", group = "Find" },
         { "<leader>s", group = "Splits" },
-        { "<leader>F", desc = "Format buffer" },
-        { "<leader>g", group = "Git" },
-        { "<leader>h", group = "Hunks" },
+        { "<leader>g", group = "Git / Go to" },
+        { "<leader>h", group = "Hunks", mode = { "n", "v" } },
         { "<leader>i", group = "Inlay" },
+        { "<leader>r", group = "Rename" },
         { "<leader>w", group = "Write/Quit" },
         { "<leader>x", group = "Problems" },
-        { "<leader>y", group = "Yank with path" },
+        { "<leader>y", group = "Yank with path", mode = { "n", "v" } },
       })
     end,
   },
 }
-

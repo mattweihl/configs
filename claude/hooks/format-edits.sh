@@ -148,6 +148,15 @@ case "$path" in
     bin="$(resolve_formatter "$path" ruff)" || exit 0
     "$bin" format --quiet "$path" >/dev/null 2>&1
     ;;
+  *.sql)
+    has_config "$path" '.sql-formatter.json' || exit 0
+    bin="$(resolve_formatter "$path" sql-formatter)" || exit 0
+    # Discover the SQL dialect config from the edited file's directory.
+    (
+      cd "$path_dir" || exit 0
+      format_via_stdin "$path_dir/$(basename -- "$path")" "$bin"
+    )
+    ;;
   *.tf|*.tfvars)
     # `terraform fmt <file>` is rejected -- the positional argument is a
     # directory. conform's terraform_fmt formatter pipes through stdin instead,

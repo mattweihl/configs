@@ -38,7 +38,7 @@ return {
         "html-lsp",
         "css-lsp",
         "pyright",
-        "vscode-eslint-language-server",
+        "eslint-lsp",
         "jdtls",
         "marksman",
         "texlab",

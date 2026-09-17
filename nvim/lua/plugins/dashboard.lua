@@ -1,5 +1,6 @@
 return {
   'nvimdev/dashboard-nvim',
+  enabled = false,
   event = 'VimEnter',
   config = function()
     local function pad_to_block(lines)
@@ -61,7 +62,7 @@ return {
         shortcut = {},
         packages = { enable = false },
         project = {
-          enable = true,
+          enable = false,
           limit = 8,
           action = function(path)
             vim.cmd('cd ' .. vim.fn.fnameescape(path))

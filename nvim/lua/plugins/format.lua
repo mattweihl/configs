@@ -25,6 +25,7 @@ return {
         markdown = { "prettier" },
         yaml = { "prettier" },
         python = { "ruff_format" },
+        sql = { "sql_formatter" },
         terraform = { "terraform_fmt" },
       },
     },

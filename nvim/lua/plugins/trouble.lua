@@ -5,12 +5,12 @@ return {
     {
       "<leader>xx",
       function() require("trouble").toggle({ mode = "diagnostics", filter = { buf = 0 } }) end,
-      desc = "Errors (this file)",
+      desc = "Toggle diagnostics (this file)",
     },
     {
       "<leader>xw",
       function() require("trouble").toggle({ mode = "diagnostics" }) end,
-      desc = "Errors (all files)",
+      desc = "Toggle diagnostics (all files)",
     },
   },
   opts = {

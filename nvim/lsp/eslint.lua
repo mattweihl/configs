@@ -1,5 +1,5 @@
 return {
   settings = {
-    workingDirectories = { mode = "auto" },
+    workingDirectory = { mode = "auto" },
   },
 }
