@@ -5,6 +5,7 @@ return {
     dependencies = { "nvim-tree/nvim-web-devicons" },
     event = "VeryLazy",
     keys = {
+      { "<leader>bd", "<cmd>confirm bdelete<cr>", desc = "Delete current buffer" },
       { "<leader>bp", "<cmd>BufferLinePick<cr>", desc = "Pick buffer" },
       { "<leader>bc", "<cmd>BufferLinePickClose<cr>", desc = "Pick close" },
       { "<leader>bo", "<cmd>BufferLineCloseOthers<cr>", desc = "Close others" },

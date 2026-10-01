@@ -137,7 +137,6 @@ return {
           map("n", "gd", vim.lsp.buf.definition, "Go to definition")
           map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
           map("n", "gi", vim.lsp.buf.implementation, "Go to implementation")
-          map("n", "gr", vim.lsp.buf.references, "Go to references")
 
           -- Open in vertical split (VSCode: Cmd+K F12 "Open Definition to Side")
           map("n", "<leader>gd", function()
@@ -162,6 +161,8 @@ return {
 
           map("n", "<leader>rn", vim.lsp.buf.rename, "Rename symbol")
           map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code action")
+          map("n", "<leader>ci", vim.lsp.buf.incoming_calls, "Incoming calls")
+          map("n", "<leader>co", vim.lsp.buf.outgoing_calls, "Outgoing calls")
 
           map("n", "<leader>ih", function()
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())

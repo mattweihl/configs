@@ -9,7 +9,7 @@ map("n", "<CR>", function()
   vim.cmd("noh")
 end, { desc = "Clear search highlight", silent = true })
 
-map("n", "<leader>q", function()
+map("n", "<leader>qc", function()
   if #vim.api.nvim_list_wins() > 1 then
     vim.cmd("close")
     return

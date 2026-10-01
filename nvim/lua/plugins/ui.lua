@@ -102,6 +102,7 @@ return {
         { "<leader>g", group = "Git / Go to" },
         { "<leader>h", group = "Hunks", mode = { "n", "v" } },
         { "<leader>i", group = "Inlay" },
+        { "<leader>q", group = "Quit / Close" },
         { "<leader>r", group = "Rename" },
         { "<leader>w", group = "Write/Quit" },
         { "<leader>x", group = "Problems" },
