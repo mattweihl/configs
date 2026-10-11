@@ -34,3 +34,8 @@ skill = "#ad7bf9"
 
 [mcp_servers.context7]
 url = "https://mcp.context7.com/mcp"
+
+[tui]
+screen_reader_detection_done = true
+status_line = ["model-with-reasoning", "current-dir", "thread-name", "model", "reasoning", "git-branch", "run-state", "context-used"]
+status_line_use_colors = true

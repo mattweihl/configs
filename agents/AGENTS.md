@@ -1,21 +1,3 @@
-<!--
-Canonical user-level agent instructions. Tool-agnostic.
-
-Symlinked by zsh/link-agentic-configs.sh to:
-  ~/.claude/CLAUDE.md   (Claude Code reads CLAUDE.md, never AGENTS.md)
-  ~/.codex/AGENTS.md    (Codex)
-  ~/.config/opencode/AGENTS.md (OpenCode)
-
-Cursor User Rules receive the same content through its settings UI.
-
-This is NOT the repo's own AGENTS.md at the root -- that one describes the
-Configs repo to an agent working on it. This one describes *me* to every agent
-on this machine, in every project.
-
-Loaded in full at the start of every session, so keep it short. Anything long,
-or anything that only matters for one kind of file, belongs in rules/ instead.
--->
-
 # Working agreement
 
 ## Response style
