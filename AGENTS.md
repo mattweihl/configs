@@ -12,12 +12,11 @@ agents/           Cross-tool agent instructions (user-level)
                     AGENTS.md   always loaded, every session
                     rules/      path-scoped, loaded when a matching file is read
                     reference/  never loaded; read on demand by absolute path
-claude/           Claude Code config: settings.json, subagents, hooks, statusline
+claude/           Claude Code config: settings.json, agents, hooks, statusline
 codex/            Codex hooks
 cursor/           Cursor config: hooks.json (skills and MCP are not files here)
 ghostty/          Ghostty terminal config + custom icons
 glow/             Glow markdown viewer config
-iterm2/           iTerm2 profile, keymaps, color themes (legacy/backup)
 lazygit/          Lazygit config + helper scripts
 nvim/             Neovim config (Lua, lazy.nvim)
 opencode/         OpenCode config: formatters, permissions, MCP servers
@@ -79,7 +78,7 @@ relinks, and prints where the backup went — diff it to recover the change.
 - After changing anything under `agents/`, `claude/`, `codex/`, `cursor/`,
   `opencode/`, or `skills/`, run
   `link-agentic-configs` and start a new session. Hooks, rules, settings, and
-  subagents are all read at launch.
+  agents are all read at launch.
 - `CLAUDE.md` at the repo root contains a single `@AGENTS.md` import and nothing
   else. Claude Code reads `CLAUDE.md` and never `AGENTS.md`, so that import is
   what lets one file serve both Claude and Codex. Do not add content to it.
@@ -166,35 +165,12 @@ file-backed instructions from a project only. That split is the whole story:
   `2.1.226`. Claude windows stay named `claude`; this is intentional.
   The outer terminal title uses the window name without the tmux session name.
 - `tmux/claude-status.sh` is driven by hooks in `claude/settings.json` and sets
-  a per-pane `@claude_state`. The picker uses this state for its labels.
-  State glyph formats remain available, but window names do not use them.
-- `<prefix> a` opens `tmux/claude-agents.sh`, an fzf picker over every Claude
-  agent — panes from `list-panes`, plus daemon-owned background sessions from
-  `claude agents --json`, which have no pane and are otherwise unreachable from
-  tmux. The two sources overlap when a background agent is attached to a pane,
-  and they disagree, because that session's frozen `@claude_state` is exactly
-  the value not to trust. The script repairs the disagreement at the source: it
-  writes the daemon's live state onto the pane with `set-option -p` *before*
-  listing panes, so tmux renders the row correctly. State is only as fresh as the last time you
-  opened the picker. Picking a detached agent opens the agent view in a new
-  window.
-- Detached rows print the daemon's own state verbatim (`working`, `done`,
-  `failed`). Preserve daemon states in detached rows instead of treating unknown states as idle.
-- The `@_claude_*` formats in `tmux.conf` (pane match, glyph, label, title) are
-  the single source of truth; `claude-agents.sh` evaluates them via
-  `list-panes -f` rather than reimplementing the matching. Column padding is
-  part of that: `#{p10:}` / `#{p20:}` pad by display width, which `printf
-  "%-10s"` cannot do once a glyph or a `…` is in the string. Detached rows have
-  no pane to render from, so they go through `display-message -p` with
-  `#{l:...}` — same formats, same arithmetic.
-- Any text interpolated into a tmux format must have its `#` doubled, or the
-  row truncates at that character.
-- The picker identifies panes that need input. `claude/statusline.sh` describes the agent inside the pane.
+  a per-pane `@claude_state` for the waiting-session powerline segment.
 - The `claude_waiting` powerline segment (`tmux/tmux-powerline/segments/`) lists every *other*
   session holding a `wait` pane, and prints nothing — which makes powerline drop
   the segment entirely — when there are none. It filters with `list-panes -f`
   against `@claude_state` rather than restating the state vocabulary.
-  The current session remains excluded; use the picker to inspect its agents.
+  The current session remains excluded.
 - The theme's per-window `λ`/`✦`/`$` prefix tests `@_claude_pane`, not
   `#{m:claude,#{pane_current_command}}`. The literal match silently never fired:
   `pane_current_command` is the version string. Anything that needs to know "is
@@ -226,7 +202,7 @@ file-backed instructions from a project only. That split is the whole story:
 - `claude --resume` refuses a session that is still running in the background
   ("That session is still running as a background agent"). That is correct
   behaviour, not a broken session: the daemon owns it, and a second client
-  cannot attach. Reach it with `<prefix> a` or `claude agents`, or stop it there
+  cannot attach. Reach it with `claude agents`, or stop it there
   first. `~/.claude/daemon.log` records which sessions are background and why,
   as `bg claimed-spare <id> (<reason>)`.
 
@@ -263,4 +239,4 @@ file-backed instructions from a project only. That split is the whole story:
 - Formatter lists in `nvim/lua/plugins/format.lua` and `claude/hooks/format-edits.sh` must stay in step, binary names and arguments included (`terraform fmt -no-color -`)
 - Before adding a formatter to either file, check the binary actually resolves. `sql_formatter` sat in `format.lua` doing nothing for as long as it was there: conform runs `sql-formatter`, which was installed nowhere
 - Run a script against a realistic input before documenting how it behaves. Every wrong claim in this file so far came from describing intent instead of observed output
-- Binary/generated files (`.icns`, `lazy-lock.json`, iTerm themes) are committed as-is
+- Binary/generated files (`.icns`, `lazy-lock.json`) are committed as-is

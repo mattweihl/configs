@@ -59,8 +59,3 @@ report.
 ## Code
 
 Before you write or edit source code, read `~/configs/agents/rules/code-style.md`.
-
-## Subagents
-
-Do not run subagents. Do not use the Agent tool, the Task tool, or the
-Workflow tool. Do the work yourself in the main conversation.

@@ -4,18 +4,14 @@
 #
 # Usage: claude-status.sh busy|wait|idle|failed
 #
-#   busy  agent is working            -> window name shows ●
-#   wait  agent needs your input      -> window name shows ◍
-#   idle  agent is done / at rest     -> window name shows ✦
-#   failed turn ended with an error   -> window name shows ✕
-#
-# The glyph is rendered by @_claude_glyph in tmux.conf, so it lands in the
-# window *name* and is therefore readable from any session's status bar.
+#   busy    agent is working
+#   wait    agent needs your input
+#   idle    agent is done or at rest
+#   failed  turn ended with an error
 #
 # State is stored per *pane* (-p), not per window. A window can hold two agents,
 # and with a window-scoped option whichever one goes idle first wipes the other's
-# state. A window still has only one name, so the name shows the active pane's
-# glyph; tmux/claude-agents.sh is where every pane's state is visible at once.
+# state. The claude_waiting powerline segment reads this state.
 
 command -v tmux >/dev/null 2>&1 || exit 0
 tmux has-session 2>/dev/null || exit 0
@@ -42,23 +38,7 @@ case "$1" in
     ;;
 esac
 
-# Setting @claude_state does not dirty the window, and tmux only recomputes an
-# automatic-rename name when the pane produces *output*. "wait" is precisely the
-# state where the agent has gone quiet, so without a nudge that glyph would
-# never appear -- the one state you most need to see would be the one that never
-# repaints. Re-asserting automatic-rename to the value it already holds dirties
-# the window and forces the recompute.
-#
-# This is not the off/on toggle that races with tmux's rename pass and can
-# strand a stale name: writing `on` over `on` is idempotent. Windows reading
-# "off" were renamed by hand (tmux clears the flag on rename-window) and are not
-# ours to relabel.
-if [ "$(tmux show-options -wqv -t "$TMUX_PANE" automatic-rename 2>/dev/null)" != "off" ]; then
-  tmux set-option -w -t "$TMUX_PANE" automatic-rename on 2>/dev/null
-fi
-
-# Belt and braces: the rename above should dirty the status line on its own, but
-# powerline owns the status format here, so force the redraw rather than assume.
+# Powerline owns the status format, so force a redraw after changing the state.
 tmux refresh-client -S 2>/dev/null
 
 exit 0

@@ -21,9 +21,7 @@
       "Bash(env)",
       "Bash(env *)",
       "Bash(printenv *)",
-      "Bash(set)",
-      "Agent",
-      "Workflow"
+      "Bash(set)"
     ]
   },
   "hooks": {

@@ -1,13 +1,9 @@
 # shellcheck shell=bash
 # Names the sessions holding a Claude agent that is waiting on you.
 #
-# The ◍ glyph from @_claude_glyph lands in a *window name*, so it is only
-# visible from the session you are attached to. With one session per worktree,
-# an agent that stops to ask a question in a detached session waits unseen
-# until you happen to open `<prefix> a`. This segment scans every pane on the
-# server and prints where to go.
-#
-# The current session is left out: its window name already carries the glyph.
+# With one session per worktree, a waiting agent in a detached session is easy
+# to miss. This segment scans every pane and prints the other affected sessions.
+# The current session is left out because this segment only reports elsewhere.
 # When nothing is waiting the segment prints nothing, and tmux-powerline drops
 # an empty segment from the status line rather than rendering an empty block.
 

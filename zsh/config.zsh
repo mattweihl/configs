@@ -80,7 +80,6 @@ if command -v nvim &> /dev/null
 then
     export EDITOR="nvim"
     alias vim='nvim'
-    alias vi='nvim'
 fi
 
 if command -v lazygit &> /dev/null
