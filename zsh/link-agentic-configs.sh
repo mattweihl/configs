@@ -23,6 +23,7 @@
 #                         long reference material must not live in rules/.
 #   claude/settings.json  -> ~/.claude/settings.json
 #   claude/agents/*.md    -> ~/.claude/agents/
+#   codex/config.toml     -> /etc/codex/config.toml (via link-codex-config)
 #   codex/hooks.json      -> ~/.codex/hooks.json
 #   opencode/opencode.jsonc -> ~/.config/opencode/opencode.jsonc
 #   claude/statusline.sh  } referenced by absolute path from settings.json,
@@ -77,10 +78,9 @@ LAC_LEGACY_SKILL_TARGETS=(
 # plain config file, but Cursor writes to it whenever you add a server from the
 # UI, so it is merged into rather than replaced.
 #
-# Codex is deliberately not covered. It reads MCP servers from a [mcp_servers.*]
-# table in ~/.codex/config.toml, which also holds hand-maintained stdio servers
-# this script has no business rewriting. Add Codex entries there by hand.
-# OpenCode reads the same Context7 entry from opencode/opencode.jsonc.
+# Codex is not registered from this table. Its tracked defaults live at the
+# lower-precedence system layer, while ~/.codex/config.toml remains machine
+# state. OpenCode reads the same Context7 entry from opencode/opencode.jsonc.
 #
 # Format: name|transport|url
 LAC_MCP_SERVERS=(
@@ -339,6 +339,32 @@ link-agentic-configs() {
   ((_lac_linked == 0)) && echo "link-agentic-configs: everything already linked"
   ((_lac_warned > 0)) && echo "link-agentic-configs: finished with $_lac_warned warning(s)" >&2
   return 0
+}
+
+# Links shared Codex defaults into the system configuration layer. Creating or
+# changing this link needs administrator access; editing its repo target does not.
+link-codex-config() {
+  local src="$CONFIGS_ROOT/codex/config.toml"
+  local dest="/etc/codex/config.toml"
+  local backup
+
+  if [[ -L "$dest" && "$(readlink "$dest")" == "$src" ]]; then
+    echo "link-codex-config: already linked"
+    return 0
+  fi
+
+  sudo mkdir -p /etc/codex || return 1
+
+  if [[ -L "$dest" ]]; then
+    sudo rm "$dest" || return 1
+  elif [[ -e "$dest" ]]; then
+    backup="$dest.bak.$(date +%Y%m%d%H%M%S)"
+    sudo mv "$dest" "$backup" || return 1
+    echo "link-codex-config: $dest was a real file; backed up to $backup" >&2
+  fi
+
+  sudo ln -s "$src" "$dest" || return 1
+  echo "linked $dest"
 }
 
 # Previous names; some notes and muscle memory still use them.

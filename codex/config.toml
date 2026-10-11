@@ -1,0 +1,36 @@
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
+service_tier = "default"
+
+[desktop]
+followUpQueueMode = "steer"
+external-agent-import-sync-item-types = "all"
+external-agent-import-sync-enabled = true
+conversationDetailMode = "STEPS_COMMANDS"
+ambient-suggestions-enabled = true
+show-context-window-usage = true
+appearanceTheme = "dark"
+open-link-in-target-preference = "external-browser"
+keepRemoteControlAwakeWhilePluggedIn = true
+
+[desktop.open-in-target-preferences]
+global = "fileManager"
+
+[desktop.appearanceDarkChromeTheme]
+accent = "#3a83f7"
+accentSource = "chatgpt"
+contrast = 60
+ink = "#ffffff"
+opaqueWindows = false
+surface = "#181818"
+
+[desktop.appearanceDarkChromeTheme.fonts]
+code = '"Iosevka Nerd Font Mono"'
+
+[desktop.appearanceDarkChromeTheme.semanticColors]
+diffAdded = "#40c977"
+diffRemoved = "#fa423e"
+skill = "#ad7bf9"
+
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"

@@ -13,7 +13,7 @@ agents/           Cross-tool agent instructions (user-level)
                     rules/      path-scoped, loaded when a matching file is read
                     reference/  never loaded; read on demand by absolute path
 claude/           Claude Code config: settings.json, agents, hooks, statusline
-codex/            Codex hooks
+codex/            Codex config and hooks
 cursor/           Cursor config: hooks.json (skills and MCP are not files here)
 ghostty/          Ghostty terminal config + custom icons
 glow/             Glow markdown viewer config
@@ -43,18 +43,17 @@ Note the two `AGENTS.md` files, which are not the same thing:
   | `agents/rules/*.md` | `~/.claude/rules/` | global pointer | User Rules pointer | global pointer |
   | `claude/settings.json` | `~/.claude/settings.json` | — | — | — |
   | `claude/agents/*.md` | `~/.claude/agents/` | — | Claude compatibility | — |
+  | `codex/config.toml` | — | `/etc/codex/config.toml` | — | — |
   | `codex/hooks.json` | — | `~/.codex/hooks.json` | — | — |
   | `opencode/opencode.jsonc` | — | — | — | `~/.config/opencode/opencode.jsonc` |
   | `claude/hooks/format-edits.sh` | named by settings | named by hooks | `~/.cursor/hooks/` | named by formatter |
   | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` | — |
   | `skills/*/` | `~/.claude/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` |
-  | MCP servers | `~/.claude.json` | hand-maintained | `~/.cursor/mcp.json` | `opencode/opencode.jsonc` |
+  | MCP servers | `~/.claude.json` | `codex/config.toml` | `~/.cursor/mcp.json` | `opencode/opencode.jsonc` |
 
   Claude and Cursor MCP servers are registered from the single
-  `LAC_MCP_SERVERS` table. Codex is left out because its servers live in a
-  `[mcp_servers.*]` table in `~/.codex/config.toml`, which is hand-maintained
-  and not in this repo. OpenCode reads the same Context7 endpoint from its
-  tracked config. `link-configs` and `link-skills` are aliases for the script.
+  `LAC_MCP_SERVERS` table. Codex and OpenCode read tracked configuration files.
+  `link-configs` and `link-skills` are aliases for the script.
 - The script is bash but zsh sources it, so it enumerates directories with
   `find`, never a glob. zsh has `nomatch` on by default: a glob matching
   nothing aborts the command instead of expanding to nothing.
@@ -71,10 +70,17 @@ that path itself when you change theme or model through `/config`. If it ever
 replaces the symlink with a real file, `link-configs` backs the file up and
 relinks, and prints where the backup went — diff it to recover the change.
 
+`codex/config.toml` provides stable defaults through `/etc/codex/config.toml`.
+Run `link-codex-config` once with administrator access to create that symlink.
+Codex keeps machine-specific preferences, projects, and trust state in the real
+`~/.codex/config.toml` file. User settings override the shared defaults.
+
 ## Agent configuration
 
 - `claude/settings.json` in this repo **is** the live `~/.claude/settings.json`.
   Edit it here, not there.
+- `codex/config.toml` contains shared Codex defaults. Run `link-codex-config`
+  once on each machine. Later repository edits need no administrator access.
 - After changing anything under `agents/`, `claude/`, `codex/`, `cursor/`,
   `opencode/`, or `skills/`, run
   `link-agentic-configs` and start a new session. Hooks, rules, settings, and
