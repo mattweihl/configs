@@ -48,7 +48,6 @@ TMUX_POWERLINE_WINDOW_STATUS_STYLE=(
 
 # 20-char session-name truncation, matching the original tmux.conf.
 export TMUX_POWERLINE_SEG_TMUX_SESSION_INFO_FORMAT="#{=/20/…:session_name}"
-export TMUX_POWERLINE_SEG_TIME_FORMAT="%l:%M %p"
 
 # Left: green session badge transitioning into the window list.
 # claude_waiting sits after it and renders only when an agent in *another*
@@ -58,6 +57,4 @@ TMUX_POWERLINE_LEFT_STATUS_SEGMENTS=(
 	"claude_waiting 166 234"
 )
 
-TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS=(
-	"time 235 136"
-)
+TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS=()
