@@ -4,18 +4,17 @@ description: >
   Matthew Weihl's language-agnostic preferences for straightforward, readable code.
   Use when reviewing code you did not write, when judging whether existing code
   meets these standards, or when the user asks about style, naming, function
-  design, control flow, error handling, or structure. Also use on request via
-  /code-style.
+  design, control flow, error handling, or structure.
 ---
 
 # Code Style
 
 ## Read the rules first
 
-The preferences live in one file, which this skill does not duplicate:
+The preferences live in one portable reference file:
 
-- `~/configs/agents/rules/code-style.md` — the complete rule set.
-- `~/configs/agents/reference/code-style-examples.md` — per-language examples.
+- [references/rules.md](references/rules.md) — the complete rule set.
+- [references/examples.md](references/examples.md) — per-language examples.
   Read this only when the preferred pattern is ambiguous in the language at hand.
 
 Read the rule file now, before you review anything.
@@ -36,5 +35,6 @@ not write needs a different bar:
 - Call out missing tests for business logic changes and risky paths.
 - Say when the code is fine. A review that finds nothing is a valid review.
 
-For a full structural review — abstraction health, spaghetti growth, file-size
-discipline — use the `super-code-review` skill instead. This one is about style.
+For a full structural review, use the bundled
+[super-code-review](../super-code-review/SKILL.md) skill instead. This skill
+covers style only.

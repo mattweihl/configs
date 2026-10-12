@@ -1,0 +1,17 @@
+{
+  "name": "mattweihl-configs",
+  "owner": {
+    "name": "Matthew Weihl"
+  },
+  "metadata": {
+    "description": "Portable agent tools from Matthew Weihl's configs."
+  },
+  "plugins": [
+    {
+      "name": "review-tools",
+      "source": "./plugins/review-tools",
+      "description": "Strict code review, code style, and module design skills.",
+      "version": "0.1.0"
+    }
+  ]
+}

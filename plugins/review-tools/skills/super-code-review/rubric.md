@@ -68,8 +68,8 @@ frequency. A threshold crossing is not sufficient evidence for a finding.
 
 ## Refactoring quality
 
-When a remedy adds or moves a module, interface, seam, or adapter, apply the
-`codebase-design` skill.
+When a remedy adds or moves a module, interface, seam, or adapter, read and
+apply `../codebase-design/SKILL.md`.
 
 A useful refactor must improve at least one of these properties:
 
@@ -84,7 +84,7 @@ machine, helper, or abstraction without evidence that it improves the design.
 
 ## Code style
 
-Read `~/configs/agents/rules/code-style.md` as the source of truth. Repository
+Read `../code-style/references/rules.md` as the source of truth. Repository
 conventions, formatters, and linters take precedence.
 
 Apply style rules to changed or directly affected code. Separate code-style

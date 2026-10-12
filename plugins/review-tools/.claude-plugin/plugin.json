@@ -1,0 +1,9 @@
+{
+  "name": "review-tools",
+  "version": "0.1.0",
+  "description": "Portable code review, code style, and module design skills.",
+  "author": {
+    "name": "Matthew Weihl"
+  },
+  "repository": "https://github.com/mattweihl/configs"
+}

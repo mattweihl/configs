@@ -22,6 +22,7 @@ lazygit/          Lazygit config + helper scripts
 nvim/             Neovim config (Lua, lazy.nvim)
 opencode/         OpenCode config: formatters, permissions, MCP servers
 pi/               Pi user config: settings, MCP files, extensions, resources
+plugins/          Portable Agent Plugin packages
 skills/           Agent skills, shared across agent tools
 tmux/             tmux config + Claude Code integration scripts
 zsh/              zsh config (config.zsh) + worktree and linking helpers
@@ -53,7 +54,7 @@ Note the two `AGENTS.md` files, which are not the same thing:
   | `pi/extensions/`, `pi/prompts/`, `pi/themes/` | — | — | — | — | `~/.pi/agent/` when present |
   | `agents/hooks/format-edits.sh` | named by settings | named by hooks | `~/.cursor/hooks/` | named by formatter | called by extension |
   | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` | — | — |
-  | `skills/*/` | `~/.claude/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` |
+  | `skills/*/`, plugin skills | `~/.claude/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` |
   | MCP servers | `~/.claude.json` | `codex/config.toml` | `~/.cursor/mcp.json` | `opencode/opencode.jsonc` | `pi/mcp.json` |
 
   Claude and Cursor MCP servers are registered from the single
@@ -90,7 +91,7 @@ Codex keeps machine-specific preferences, projects, and trust state in the real
   Edit it here, not there. Keep Pi credentials, OAuth tokens, sessions, logs,
   generated model catalogs, and bundled helper binaries out of this repo.
 - After changing anything under `agents/`, `claude/`, `codex/`, `cursor/`,
-  `opencode/`, `pi/`, or `skills/`, run
+  `opencode/`, `pi/`, `plugins/`, or `skills/`, run
   `link-agentic-configs` and start a new session. Hooks, rules, settings, and
   agents are all read at launch.
 - `CLAUDE.md` at the repo root contains a single `@AGENTS.md` import and nothing
@@ -108,9 +109,15 @@ Codex keeps machine-specific preferences, projects, and trust state in the real
   the matching `agents/openai.yaml` policy. OpenCode reads its namespaced
   metadata from the same `SKILL.md` file.
 - `always-apply` is Cursor frontmatter. Claude Code ignores it.
-- Code style ships as both, deliberately. Claude loads the path-scoped rule.
-  The global instructions tell every other tool to read the same source before
-  edits. The `code-style` skill covers reviews. The rule remains authoritative.
+- Code style ships as a path-scoped pointer and a skill. Claude loads the
+  pointer. The skill reference remains authoritative for every agent.
+- `plugins/review-tools/` is the portable source for `super-code-review`,
+  `code-style`, and `codebase-design`. Codex and Cursor can import the package.
+  Local agents receive the same files through `link-agentic-configs`.
+- `.claude-plugin/marketplace.json` exposes the package to Claude and Codex.
+- `.cursor-plugin/marketplace.json` exposes the package to Cursor imports.
+- Claude can install the compatibility manifest for local sessions.
+  Claude remote sessions must use project skills because plugins are unavailable.
 - Subagents live in `claude/agents/`. Set `model:` explicitly — it defaults to
   `inherit`, which silently runs cheap mechanical work on the session's model.
 - Claude supports `skills:` in subagent frontmatter. Cursor reads agents from

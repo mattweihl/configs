@@ -29,7 +29,7 @@
 #   opencode/opencode.jsonc -> ~/.config/opencode/opencode.jsonc
 #   claude/statusline.sh  -> referenced by absolute path from settings.json
 #   agents/hooks/*.sh     -> shared hooks named by each tool's configuration
-#   skills/*/             -> ~/.claude/skills/ and ~/.agents/skills/
+#   skills/*/ and plugin skills -> ~/.claude/skills/ and ~/.agents/skills/
 #                         The shared ~/.agents root serves Codex, Cursor, and
 #                         OpenCode. Skill frontmatter controls invocation.
 #                         Codex ships its own bundled skills in
@@ -47,7 +47,7 @@
 #                         Pi also discovers the shared ~/.agents/skills/ root,
 #                         so skills are not duplicated under ~/.pi/agent/skills.
 #
-# Skill source roots are ~/configs/skills (personal) and
+# Skill source roots are ~/configs/skills, portable plugin skills, and
 # ~/code/work-configs/skills (work-specific, absent on some machines).
 #
 # Pi gets settings, MCP/model/keybinding files, resource directories, shared
@@ -70,6 +70,7 @@ CONFIGS_ROOT="${CONFIGS_ROOT:-$HOME/configs}"
 
 LAC_SKILL_SOURCES=(
   "$CONFIGS_ROOT/skills"
+  "$CONFIGS_ROOT/plugins/review-tools/skills"
   "$HOME/code/work-configs/skills"
 )
 
@@ -151,19 +152,21 @@ _lac_link_files() {
 }
 
 _lac_link_skills() {
-  local source_root target_root skill_dir skill_name
+  local source_root target_root skill_file skill_dir skill_name
 
   for source_root in "${LAC_SKILL_SOURCES[@]}"; do
     [[ -d "$source_root" ]] || continue
 
-    while IFS= read -r skill_dir; do
-      [[ -n "$skill_dir" ]] || continue
+    while IFS= read -r skill_file; do
+      [[ -n "$skill_file" ]] || continue
+      skill_dir="$(dirname "$skill_file")"
       skill_name="$(basename "$skill_dir")"
 
       for target_root in "${LAC_SKILL_TARGETS[@]}"; do
         _lac_link "$skill_dir" "$target_root/$skill_name"
       done
-    done < <(find "$source_root" -mindepth 1 -maxdepth 1 -type d | sort)
+    done < <(find "$source_root" -mindepth 2 -maxdepth 2 -type f \
+      -name SKILL.md | sort)
   done
 }
 

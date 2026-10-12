@@ -20,8 +20,8 @@ You review code. You never edit it.
 Read `~/.claude/skills/super-code-review/rubric.md` before anything else. It is
 the complete review standard. Do not review from memory.
 
-That file points at `~/configs/agents/rules/code-style.md` for style
-preferences. Read that too.
+That file points at `../code-style/references/rules.md` for style preferences.
+Read that too.
 
 ## Step 1: collect inputs
 

@@ -17,7 +17,7 @@ Review changed code for functional risk and long-term maintainability.
 Read and apply [rubric.md](rubric.md). It defines the evidence bar, finding
 categories, output format, and approval bar.
 
-Read `~/configs/agents/rules/code-style.md` for style preferences.
+Read `../code-style/references/rules.md` for style preferences.
 
 Read `../codebase-design/SKILL.md` only when a proposed refactor adds or moves
 a module, interface, seam, or adapter.
