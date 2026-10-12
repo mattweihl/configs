@@ -20,7 +20,8 @@ glow/             Glow markdown viewer config
 lazygit/          Lazygit config + helper scripts
 nvim/             Neovim config (Lua, lazy.nvim)
 opencode/         OpenCode config: formatters, permissions, MCP servers
-skills/           Agent skills, shared across all four agent tools
+pi/               Pi user config: settings, MCP/model/keybinding files, resources
+skills/           Agent skills, shared across agent tools
 tmux/             tmux config + Claude Code integration scripts
 zsh/              zsh config (config.zsh) + worktree and linking helpers
 ```
@@ -29,31 +30,34 @@ Note the two `AGENTS.md` files, which are not the same thing:
 
 - `./AGENTS.md` (this file) describes **the repo** to an agent working on it.
 - `agents/AGENTS.md` describes **the user** to every agent on the machine. It is
-  linked for Claude Code, Codex, and OpenCode. Cursor needs a manual User Rules
-  paste because it stores those rules in its settings UI.
+  linked for Claude Code, Codex, OpenCode, and Pi. Cursor needs a manual User
+  Rules paste because it stores those rules in its settings UI.
 
 ## How configs are deployed
 
 - `link-agentic-configs` (from `zsh/link-agentic-configs.sh`) deploys everything
   agent-related. Each tool gets only what it can read, which is not the same set:
 
-  | Repo | Claude Code | Codex | Cursor | OpenCode |
-  | --- | --- | --- | --- | --- |
-  | `agents/AGENTS.md` | `~/.claude/CLAUDE.md` | `~/.codex/AGENTS.md` | User Rules paste | `~/.config/opencode/AGENTS.md` |
-  | `agents/rules/*.md` | `~/.claude/rules/` | global pointer | User Rules pointer | global pointer |
-  | `claude/settings.json` | `~/.claude/settings.json` | — | — | — |
-  | `claude/agents/*.md` | `~/.claude/agents/` | — | Claude compatibility | — |
-  | `codex/config.toml` | — | `/etc/codex/config.toml` | — | — |
-  | `codex/hooks.json` | — | `~/.codex/hooks.json` | — | — |
-  | `opencode/opencode.jsonc` | — | — | — | `~/.config/opencode/opencode.jsonc` |
-  | `claude/hooks/format-edits.sh` | named by settings | named by hooks | `~/.cursor/hooks/` | named by formatter |
-  | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` | — |
-  | `skills/*/` | `~/.claude/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` |
-  | MCP servers | `~/.claude.json` | `codex/config.toml` | `~/.cursor/mcp.json` | `opencode/opencode.jsonc` |
+  | Repo | Claude Code | Codex | Cursor | OpenCode | Pi |
+  | --- | --- | --- | --- | --- | --- |
+  | `agents/AGENTS.md` | `~/.claude/CLAUDE.md` | `~/.codex/AGENTS.md` | User Rules paste | `~/.config/opencode/AGENTS.md` | `~/.pi/agent/AGENTS.md` |
+  | `agents/rules/*.md` | `~/.claude/rules/` | global pointer | User Rules pointer | global pointer | — |
+  | `claude/settings.json` | `~/.claude/settings.json` | — | — | — | — |
+  | `claude/agents/*.md` | `~/.claude/agents/` | — | Claude compatibility | — | — |
+  | `codex/config.toml` | — | `/etc/codex/config.toml` | — | — | — |
+  | `codex/hooks.json` | — | `~/.codex/hooks.json` | — | — | — |
+  | `opencode/opencode.jsonc` | — | — | — | `~/.config/opencode/opencode.jsonc` | — |
+  | `pi/settings.json` | — | — | — | — | `~/.pi/agent/settings.json` |
+  | `pi/keybindings.json`, `pi/models.json` | — | — | — | — | `~/.pi/agent/` when present |
+  | `pi/extensions/`, `pi/prompts/`, `pi/themes/` | — | — | — | — | `~/.pi/agent/` when present |
+  | `claude/hooks/format-edits.sh` | named by settings | named by hooks | `~/.cursor/hooks/` | named by formatter | — |
+  | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` | — | — |
+  | `skills/*/` | `~/.claude/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` |
+  | MCP servers | `~/.claude.json` | `codex/config.toml` | `~/.cursor/mcp.json` | `opencode/opencode.jsonc` | `pi/mcp.json` |
 
   Claude and Cursor MCP servers are registered from the single
-  `LAC_MCP_SERVERS` table. Codex and OpenCode read tracked configuration files.
-  `link-configs` and `link-skills` are aliases for the script.
+  `LAC_MCP_SERVERS` table. Codex, OpenCode, and Pi read tracked configuration
+  files. `link-configs` and `link-skills` are aliases for the script.
 - The script is bash but zsh sources it, so it enumerates directories with
   `find`, never a glob. zsh has `nomatch` on by default: a glob matching
   nothing aborts the command instead of expanding to nothing.
@@ -81,15 +85,18 @@ Codex keeps machine-specific preferences, projects, and trust state in the real
   Edit it here, not there.
 - `codex/config.toml` contains shared Codex defaults. Run `link-codex-config`
   once on each machine. Later repository edits need no administrator access.
+- `pi/settings.json` in this repo **is** the live `~/.pi/agent/settings.json`.
+  Edit it here, not there. Keep Pi credentials, OAuth tokens, sessions, logs,
+  generated model catalogs, and bundled helper binaries out of this repo.
 - After changing anything under `agents/`, `claude/`, `codex/`, `cursor/`,
-  `opencode/`, or `skills/`, run
+  `opencode/`, `pi/`, or `skills/`, run
   `link-agentic-configs` and start a new session. Hooks, rules, settings, and
   agents are all read at launch.
 - `CLAUDE.md` at the repo root contains a single `@AGENTS.md` import and nothing
   else. Claude Code reads `CLAUDE.md` and never `AGENTS.md`, so that import is
   what lets one file serve both Claude and Codex. Do not add content to it.
-- `agents/AGENTS.md` loads globally in Claude, Codex, and OpenCode. Cursor User
-  Rules need the same content pasted through Customize → Rules. Keep it short;
+- `agents/AGENTS.md` loads globally in Claude, Codex, OpenCode, and Pi. Cursor
+  User Rules need the same content pasted through Customize → Rules. Keep it short;
   the docs recommend staying under 200 lines.
 - `agents/rules/*.md` use `paths:` frontmatter and load only when the agent
   reads a matching file. Long or language-specific guidance goes here. A rule

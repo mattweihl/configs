@@ -4,8 +4,8 @@
 # actually read it from, so a new machine needs one command and a new skill,
 # rule, or subagent needs none.
 #
-# Scope is agentic tooling only -- Claude Code, Codex, Cursor, OpenCode. nvim,
-# tmux, zsh, ghostty, lazygit, and glow are deployed the way they always were (see
+# Scope is agentic tooling only -- Claude Code, Codex, Cursor, OpenCode, Pi.
+# nvim, tmux, zsh, ghostty, lazygit, and glow are deployed the way they always were (see
 # AGENTS.md, "How configs are deployed"); this script does not touch them.
 #
 # Run `link-agentic-configs`. It is idempotent: it re-links only what is wrong
@@ -17,6 +17,7 @@
 #   agents/AGENTS.md      -> ~/.claude/CLAUDE.md   (Claude reads CLAUDE.md only)
 #                            ~/.codex/AGENTS.md
 #                            ~/.config/opencode/AGENTS.md
+#                            ~/.pi/agent/AGENTS.md
 #   agents/rules/*.md     -> ~/.claude/rules/
 #   agents/reference/     not linked -- read on demand by absolute path. A rule
 #                         without `paths:` frontmatter loads every session, so
@@ -39,9 +40,23 @@
 #   cursor/hooks.json     -> ~/.cursor/hooks.json
 #   claude/hooks/         -> ~/.cursor/hooks/format-edits.sh (see below)
 #     format-edits.sh
+#   pi/settings.json      -> ~/.pi/agent/settings.json
+#   pi/keybindings.json   -> ~/.pi/agent/keybindings.json (when present)
+#   pi/mcp.json           -> ~/.pi/agent/mcp.json (when present)
+#   pi/models.json        -> ~/.pi/agent/models.json (when present)
+#   pi/extensions/        -> ~/.pi/agent/extensions/ (when present)
+#   pi/prompts/           -> ~/.pi/agent/prompts/ (when present)
+#   pi/themes/            -> ~/.pi/agent/themes/ (when present)
+#                         Pi also discovers the shared ~/.agents/skills/ root,
+#                         so skills are not duplicated under ~/.pi/agent/skills.
 #
 # Skill source roots are ~/configs/skills (personal) and
 # ~/code/work-configs/skills (work-specific, absent on some machines).
+#
+# Pi gets settings, MCP/model/keybinding files, resource directories, and global
+# instructions in its agent directory. Auth, OAuth tokens, session history,
+# generated model catalogs, logs, and Pi's bundled helper binaries stay in
+# ~/.pi/agent as machine state.
 #
 # Cursor gets skills, hooks, and MCP servers, and cannot get the rest. It has no
 # user-level rules directory and reads AGENTS.md from a project root only, so
@@ -302,6 +317,7 @@ link-agentic-configs() {
   _lac_link "$CONFIGS_ROOT/agents/AGENTS.md" "$HOME/.claude/CLAUDE.md"
   _lac_link "$CONFIGS_ROOT/agents/AGENTS.md" "$HOME/.codex/AGENTS.md"
   _lac_link "$CONFIGS_ROOT/agents/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
+  _lac_link "$CONFIGS_ROOT/agents/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
 
   _lac_prune "$HOME/.claude/rules"
   _lac_link_files "$CONFIGS_ROOT/agents/rules" md "$HOME/.claude/rules"
@@ -310,6 +326,14 @@ link-agentic-configs() {
   _lac_link "$CONFIGS_ROOT/codex/hooks.json" "$HOME/.codex/hooks.json"
   _lac_link "$CONFIGS_ROOT/opencode/opencode.jsonc" \
     "$HOME/.config/opencode/opencode.jsonc"
+
+  _lac_link "$CONFIGS_ROOT/pi/settings.json" "$HOME/.pi/agent/settings.json"
+  _lac_link "$CONFIGS_ROOT/pi/keybindings.json" "$HOME/.pi/agent/keybindings.json"
+  _lac_link "$CONFIGS_ROOT/pi/mcp.json" "$HOME/.pi/agent/mcp.json"
+  _lac_link "$CONFIGS_ROOT/pi/models.json" "$HOME/.pi/agent/models.json"
+  _lac_link "$CONFIGS_ROOT/pi/extensions" "$HOME/.pi/agent/extensions"
+  _lac_link "$CONFIGS_ROOT/pi/prompts" "$HOME/.pi/agent/prompts"
+  _lac_link "$CONFIGS_ROOT/pi/themes" "$HOME/.pi/agent/themes"
 
   _lac_prune "$HOME/.claude/agents"
   _lac_link_files "$CONFIGS_ROOT/claude/agents" md "$HOME/.claude/agents"
