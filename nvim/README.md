@@ -8,7 +8,7 @@ The default indentation is two spaces. Python uses four spaces through an autocm
 
 Blink provides completion through `nvim/lua/plugins/completion.lua`.
 
-Formatting is manual through `<leader>F` or the context menu.
+Formatting and trailing-whitespace cleanup are manual through `<leader>F` or the context menu.
 
 Saving does not invoke Conform.
 

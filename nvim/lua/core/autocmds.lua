@@ -38,21 +38,6 @@ autocmd("TextYankPost", {
   end,
 })
 
-augroup("TrimWhitespace", { clear = true })
-autocmd("BufWritePre", {
-  group = "TrimWhitespace",
-  pattern = "*",
-  callback = function(args)
-    if not vim.api.nvim_buf_is_loaded(args.buf) then return end
-    if vim.b[args.buf].large_file or vim.bo[args.buf].filetype == "markdown" then return end
-    vim.api.nvim_buf_call(args.buf, function()
-      local view = vim.fn.winsaveview()
-      vim.cmd([[silent keepjumps keeppatterns %s/\s\+$//e]])
-      vim.fn.winrestview(view)
-    end)
-  end,
-})
-
 augroup("RestoreCursor", { clear = true })
 autocmd("BufReadPost", {
   group = "RestoreCursor",
@@ -137,7 +122,7 @@ local function build_right_click_menu()
     vim.cmd("amenu PopUp.Show\\ Call\\ Hierarchy       <cmd>lua vim.lsp.buf.incoming_calls()<CR>")
     vim.cmd("amenu PopUp.-sep2- :")
     vim.cmd("amenu PopUp.Rename\\ Symbol               <cmd>lua vim.lsp.buf.rename()<CR>")
-    vim.cmd("amenu PopUp.Format\\ Document             <cmd>lua require('conform').format({ async = true, lsp_format = 'fallback' })<CR>")
+    vim.cmd("amenu PopUp.Format\\ Document             <cmd>Format<CR>")
     vim.cmd("amenu PopUp.Code\\ Action                 <cmd>lua vim.lsp.buf.code_action()<CR>")
     vim.cmd("amenu PopUp.-sep3- :")
   end

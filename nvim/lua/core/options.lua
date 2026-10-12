@@ -38,8 +38,8 @@ opt.wrap = true
 opt.linebreak = true
 
 opt.backup = false
-opt.writebackup = false
-opt.swapfile = false
+opt.writebackup = true
+opt.swapfile = true
 
 -- Reload buffer when file changes on disk (e.g. Cursor Agent / Claude editing the file).
 opt.autoread = true
