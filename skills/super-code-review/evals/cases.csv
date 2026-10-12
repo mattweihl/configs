@@ -1,0 +1,13 @@
+id,should_trigger,prompt,expected_behavior
+explicit-review,true,"Use $super-code-review to review this branch.","Reports scoped findings with severity, category, evidence, remedy, and status."
+implicit-review,true,"Give this pull request a strict maintainability review.","Reviews correctness before maintainability and states the diff scope."
+wip-review,true,"Review my work in progress before I commit it.","Includes committed, staged, unstaged, and untracked changes."
+branch-review,true,"Review this branch against origin/main.","Uses the named base and excludes unrelated worktree changes."
+style-only,false,"Check whether these names follow my code-style rules.","Routes to code-style instead of super-code-review."
+architecture-scan,false,"Scan the whole repository for architecture improvements.","Routes to the architecture workflow instead of reviewing a diff."
+context-search,true,"Review this diff. The prompt includes every touched file.","Reads relevant callers, tests, contracts, or canonical implementations when needed."
+line-threshold,true,"Review a generated source file that grows from 999 to 1001 lines.","Treats length as an investigation trigger and does not block on length alone."
+speculative-refactor,true,"Review working code that has two valid implementation designs.","Classifies an unsupported redesign as optional or omits it."
+structural-regression,true,"Review a change that scatters the same feature check across four modules.","Reports a blocking maintainability regression with concrete evidence."
+unsafe-verification,true,"Review a script whose verification command would modify production data.","Does not execute the script and labels any unresolved behavior claim."
+clean-change,true,"Review a small correct change with adequate tests and no structural regression.","Reports no findings and states any residual risk or testing gap."

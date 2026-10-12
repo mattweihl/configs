@@ -1,39 +1,44 @@
 ---
 name: super-code-review
 description: >
-  Strict maintainability-focused code review. Covers structural quality,
-  abstraction health, spaghetti growth, file-size discipline, code-judo
-  simplification, and code style. Works standalone or as a subagent
-  receiving pre-collected diff and file contents.
+  Review a diff for correctness and maintainability. Use for strict checks on
+  structure, abstractions, branching, module depth, and code style. Do not use
+  for a style-only review or a whole-codebase architecture scan.
+metadata:
+  opencode/slash: "true"
 ---
 
 # Super Code Review
 
-An extremely strict code quality review focused on maintainability,
-abstraction quality, and codebase health.
+Review changed code for functional risk and long-term maintainability.
 
 ## Rubric
 
-Read and apply [rubric.md](rubric.md) as the **complete** review rubric —
-tone, approval bar, output ordering, verification bar, and the code-judo /
-1k-line / spaghetti rules. It points at
-`~/configs/agents/rules/code-style.md` for style preferences; read that too.
+Read and apply [rubric.md](rubric.md). It defines the evidence bar, finding
+categories, output format, and approval bar.
+
+Read `~/configs/agents/rules/code-style.md` for style preferences.
+
+Read `../codebase-design/SKILL.md` only when a proposed refactor adds or moves
+a module, interface, seam, or adapter.
 
 ## Inputs
 
-The review needs the diff (`git diff <base>...HEAD`, default base `main`) and
-the full contents of every file it touches. Read the files — a diff alone
-cannot show whether a change fits the module around it.
+Use the supplied diff as the change scope. When you collect the diff, state
+whether it includes committed, staged, unstaged, and untracked changes.
 
-If your prompt already contains both, use them and read nothing further.
+Read enough surrounding code to understand each meaningful change. Inspect
+direct callers, callees, tests, contracts, and comparable implementations when
+they provide material evidence. Read whole files only when their full context
+matters.
 
 ## Constraints
 
-- Apply the rubric **only** to what the diff and file contents show.
-- Trace cross-file impact when the change touches module boundaries.
-- Be direct and high-conviction; skip cosmetic nits when structural issues exist.
-- Verify any claim about tool, API, or config behavior before asserting it. See
-  "Verify Before You Assert" in the rubric.
+- Report only findings caused or exposed by the change.
+- Use wider repository context as evidence, not as extra review scope.
+- Trace cross-file impact when the change touches a module interface or seam.
+- Prefer a few supported findings over speculative improvement ideas.
+- Follow the verification rules in the rubric.
 - Do **not** spawn nested subagents unless explicitly asked.
 
 <!--

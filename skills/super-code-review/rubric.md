@@ -1,312 +1,142 @@
-# Super Code Review — Rubric
+# Super Code Review Rubric
 
-This file is the complete review rubric. It is designed to be read
-standalone or referenced from SKILL.md.
+Review the change for functional risk and maintainability. Report only problems
+that the change causes or exposes. Use wider repository context as evidence.
 
----
+## Review order
 
-Use this skill for an unusually strict review focused on implementation
-quality, maintainability, abstraction quality, and codebase health.
+Review each meaningful change in this order:
 
-Above all, this skill should push the reviewer to be **ambitious** about
-code structure. Do not merely identify local cleanup opportunities.
-Actively search for "code judo" moves: restructurings that preserve
-behavior while making the implementation dramatically simpler, smaller,
-more direct, and more elegant.
+1. Correctness, security, data loss, and behavior regressions.
+2. Missing tests for changed business logic and risky paths.
+3. Maintainability regressions in structure, control flow, types, and ownership.
+4. Refactoring opportunities that materially reduce existing complexity.
+5. Code-style violations in changed or directly affected code.
 
-## Core Prompt
+This skill complements a specification review. It does not prove that the
+change implements every requirement.
 
-Start from this baseline:
+## Finding categories
 
-> Perform a deep code quality audit of the current branch's changes.
-> Rethink how to structure / implement the changes to meaningfully improve
-> code quality without impacting behavior.
-> Work to improve abstractions, modularity, reduce spaghetti code, improve
-> succinctness and legibility.
-> Be ambitious — if there is a clear path to improving the implementation
-> that involves restructuring some of the codebase, go for it.
-> Be extremely thorough and rigorous. Measure twice, cut once.
+Assign one category to each finding:
 
-## Non-Negotiable Review Standards
+- **Defect**: The change can produce incorrect, unsafe, or unintended behavior.
+- **Maintainability regression**: The change demonstrably makes future work
+  harder, riskier, or more scattered.
+- **Code-style preference**: The change conflicts with the repository rules but
+  has no demonstrated functional or structural cost.
+- **Refactoring opportunity**: An optional redesign can remove material
+  complexity without changing behavior.
 
-Apply the core prompt above, plus these explicit rules:
+Defects and maintainability regressions can block approval. Code-style
+preferences and refactoring opportunities do not block approval by default.
 
-### 0. Be ambitious about structural simplification
+Do not promote a possible alternative into a blocker. Show the current cost,
+the evidence, and why the remedy reduces that cost.
 
-- Do not stop at "this could be a bit cleaner."
-- Look for opportunities to reframe the change so that whole branches,
-  helpers, modes, conditionals, or layers disappear entirely.
-- Prefer the solution that makes the code feel inevitable in hindsight.
-- Assume there is often a "code judo" move available: a re-organization
-  that uses the existing architecture more effectively and makes the
-  change dramatically simpler and more elegant.
-- If you see a path to delete complexity rather than rearrange it, push
-  hard for that path.
+## Functional risk
 
-### 1. Do not let a PR push a file from under 1k lines to over 1k lines without a very strong reason
+Trace inputs, outputs, state changes, errors, and externally visible behavior.
+Check changed edge cases and failure paths. Check concurrency, ordering, and
+atomicity when the change relies on them.
 
-- Treat this as a strong code-quality smell by default.
-- Prefer extracting helpers, subcomponents, modules, or local
-  abstractions instead of letting a file sprawl past 1000 lines.
-- If the diff crosses that threshold, explicitly ask whether the code
-  should be decomposed first.
-- Only waive this if there is a compelling structural reason and the
-  resulting file is still clearly organized.
+Call out missing tests when they leave changed behavior or risky paths
+unverified. Do not request tests that only mirror the implementation.
 
-### 2. Do not allow random spaghetti growth in existing code
+## Maintainability
 
-- Be highly suspicious of new ad-hoc conditionals, scattered special
-  cases, or one-off branches inserted into unrelated flows.
-- If a change adds "weird if statements in random places", treat that as
-  a design problem, not a stylistic nit.
-- Prefer pushing the logic into a dedicated abstraction, helper, state
-  machine, policy object, or separate module instead of tangling an
-  existing path.
-- Call out changes that make the surrounding code harder to reason about,
-  even if they technically work.
+Look for these regressions:
 
-### 3. Bias toward cleaning the design, not just accepting working code
+- Scattered feature checks or repeated conditionals.
+- New modes represented by booleans, nullability, casts, or loose object shapes.
+- Feature logic in a module that does not own the concept.
+- Duplicate logic beside an established canonical implementation.
+- Partial updates that can leave related state inconsistent.
+- Unnecessary sequential orchestration of independent work.
+- Hidden behavior, brittle conventions, or generic mechanisms that obscure a
+  simple data shape.
+- Wrappers or helper layers that add interface without hiding complexity.
+- Refactors that move complexity without reducing concepts or coupling.
 
-- If behavior can stay the same while the structure becomes meaningfully
-  cleaner, push for the cleaner version.
-- Do not rubber-stamp "it works" implementations that leave the codebase
-  messier.
-- Strongly prefer simplifications that remove moving pieces altogether
-  over refactors that merely spread the same complexity around.
+Prefer direct code when a new abstraction would only rename the same work.
+Prefer a refactor when it removes branches, concepts, duplication, or leaked
+knowledge.
 
-### 4. Prefer direct, boring, maintainable code over hacky or magical code
+Treat 1,000 lines as an investigation trigger, not a verdict. Consider
+cohesion, generated content, language conventions, navigation cost, and change
+frequency. A threshold crossing is not sufficient evidence for a finding.
 
-- Treat brittle, ad-hoc, or "magic" behavior as a code-quality problem.
-- Be skeptical of generic mechanisms that hide simple data-shape
-  assumptions.
-- Flag thin abstractions, identity wrappers, or pass-through helpers that
-  add indirection without buying clarity.
+## Refactoring quality
 
-### 5. Push hard on type and boundary cleanliness when they affect maintainability
+When a remedy adds or moves a module, interface, seam, or adapter, apply the
+`codebase-design` skill.
 
-- Question unnecessary optionality, `unknown`, `any`, or cast-heavy code
-  when a clearer type boundary could exist.
-- Prefer explicit typed models or shared contracts over loosely-shaped
-  ad-hoc objects.
-- If a branch relies on silent fallback to paper over an unclear
-  invariant, ask whether the boundary should be made explicit instead.
+A useful refactor must improve at least one of these properties:
 
-### 6. Keep logic in the canonical layer and reuse existing helpers
+- **Locality**: Related knowledge and changes stay together.
+- **Depth**: A smaller interface hides more useful behavior.
+- **Concept count**: The reader tracks fewer modes, branches, or layers.
+- **Test surface**: Tests exercise behavior through the same interface as callers.
 
-- Call out feature logic leaking into shared paths or implementation
-  details leaking through APIs.
-- Prefer existing canonical utilities/helpers over bespoke one-offs.
-- Push code toward the right package, service, or module instead of
-  normalizing architectural drift.
+Apply the deletion test. If removing the proposed module makes its complexity
+disappear, the module is probably a pass-through. Do not prescribe a state
+machine, helper, or abstraction without evidence that it improves the design.
 
-### 7. Treat unnecessary sequential orchestration and non-atomic updates as design smells when the cleaner structure is obvious
+## Code style
 
-- If independent work is serialized for no good reason, ask whether the
-  flow should run in parallel instead.
-- If related updates can leave state half-applied, push for a more atomic
-  structure.
-- Do not over-index on micro-optimizations, but do flag avoidable
-  orchestration complexity that makes the implementation more brittle.
+Read `~/configs/agents/rules/code-style.md` as the source of truth. Repository
+conventions, formatters, and linters take precedence.
 
-## Code Style Standards
+Apply style rules to changed or directly affected code. Separate code-style
+preferences from defects and maintainability regressions.
 
-Read `~/configs/agents/rules/code-style.md`. That file is the single source of
-truth for naming, function design, control flow, immutability, error handling,
-and comments. It is not reproduced here — a second copy is a copy that drifts.
+## Evidence and verification
 
-Apply it to changed lines only. Treat violations as review findings, prioritized
-below structural issues but above cosmetic nits.
+Support every finding with code or observed behavior. Prefer repository tests,
+documentation, vendored source, tool help, and primary documentation.
 
-## Verify Before You Assert
+Use wider context when it establishes callers, contracts, ownership, or an
+existing implementation. Do not report unrelated problems found during that
+search.
 
-A finding that names a behavior — how a tool reads its input, what a config key
-does, which fields an API returns — is only a finding once you have checked it.
-Do not review from memory.
+Run code only when execution is safe, read-only, and useful. Use disposable
+inputs for scripts. Do not execute untrusted or side-effecting code merely to
+strengthen a review comment.
 
-- Run `--help`, read the man page, or read the vendored source.
-- For a script, run it against a realistic input and observe the result.
-- State the evidence in the finding, so the author can re-check it cheaply.
-- If you could not verify something, label it as unverified rather than
-  dropping it or asserting it.
+Label a material claim as unverified when available evidence cannot establish
+it. Do not state uncertain behavior as fact.
 
-The same bar applies to the code under review: documentation the diff adds
-about its own behavior is a claim, not evidence.
+## Output
 
-## Primary Review Questions
+List findings first. Order them by user impact, not by rubric section.
 
-For every meaningful change, ask:
+Each finding must include:
 
-- Is there a "code judo" move that would make this dramatically simpler?
-- Can this change be reframed so fewer concepts, branches, or helper
-  layers are needed?
-- Does this improve or worsen the local architecture?
-- Did the diff add branching complexity where a better abstraction should
-  exist?
-- Did a previously cohesive module become more coupled, more stateful, or
-  harder to scan?
-- Is this logic living in the right file and layer?
-- Did this change enlarge a file or component past a healthy size boundary?
-- Are there repeated conditionals that signal a missing model or missing
-  helper?
-- Is the implementation direct and legible, or does it rely on special
-  cases and incidental control flow?
-- Is this abstraction actually earning its keep, or is it just a wrapper?
-- Did the diff introduce casts, optionality, or ad-hoc object shapes that
-  obscure the real invariant?
-- Is this logic living in the canonical layer, or did the diff leak
-  details across a boundary?
-- Is this orchestration more sequential or less atomic than it needs to be?
-- Does the code follow the style standards for naming, function design,
-  control flow, and immutability?
+1. Severity and category.
+2. File and line.
+3. The observed cost or risk.
+4. Supporting evidence.
+5. A concrete remedy.
+6. `Blocking` or `Optional` status.
 
-## What to Flag Aggressively
+Use these severity levels:
 
-Escalate findings when you see:
+- **P0**: Immediate data loss, security compromise, or unusable behavior.
+- **P1**: Likely serious regression without a practical workaround.
+- **P2**: Real defect or maintainability regression with limited impact.
+- **P3**: Code-style preference or optional refactoring opportunity.
 
-- A complicated implementation where a cleaner reframing could delete
-  whole categories of complexity.
-- Refactors that move code around but fail to reduce the number of
-  concepts a reader must hold in their head.
-- A file crossing 1000 lines due to the PR, especially if the new code
-  could be split out.
-- New conditionals bolted onto unrelated code paths.
-- One-off booleans, nullable modes, or flags that complicate existing
-  control flow.
-- Feature-specific logic leaking into general-purpose modules.
-- Generic "magic" handling that hides simple structure and makes the code
-  harder to reason about.
-- Thin wrappers or identity abstractions that add indirection without
-  simplifying anything.
-- Unnecessary casts, `any`, `unknown`, or optional params that muddy the
-  real contract.
-- Copy-pasted logic instead of extracted helpers.
-- Narrow edge-case handling implemented in the middle of an already busy
-  function.
-- Refactors that technically pass tests but make the code less modular or
-  less readable.
-- "Temporary" branching that is likely to become permanent debt.
-- Bespoke helpers where the codebase already has a canonical utility for
-  the job.
-- Logic added in the wrong layer/package when it should live somewhere
-  more central.
-- Sequential async flow where obviously independent work could stay
-  simpler and clearer with parallel execution.
-- Partial-update logic that leaves state less atomic than necessary.
-- Boolean function arguments where an explicit mode would be clearer.
-- Nested ternaries or deeply nested control flow.
-- Input mutation where a new value would be safer.
-- Missing or misleading names that hide intent.
+Keep the finding title concise. Keep summaries secondary to findings. Skip
+cosmetic nits while more important findings remain.
 
-## Preferred Remedies
+If no findings remain, say so explicitly. State any residual risk, unverified
+behavior, or testing gap.
 
-When you identify a code-quality problem, prefer suggestions like:
+## Approval bar
 
-- Delete a whole layer of indirection rather than polishing it.
-- Reframe the state model so conditionals disappear instead of getting
-  centralized.
-- Change the ownership boundary so the feature becomes a natural extension
-  of an existing abstraction.
-- Turn special-case logic into a simpler default flow with fewer
-  exceptions.
-- Extract a helper or pure function.
-- Split a large file into smaller focused modules.
-- Move feature-specific logic behind a dedicated abstraction.
-- Replace condition chains with a typed model or explicit dispatcher.
-- Separate orchestration from business logic.
-- Collapse duplicate branches into a single clearer flow.
-- Delete wrappers that do not meaningfully clarify the API.
-- Reuse the existing canonical helper instead of introducing a
-  near-duplicate.
-- Make type boundaries more explicit so the control flow gets simpler.
-- Move the logic to the package/module/layer that already owns the
-  concept.
-- Parallelize independent work when that also simplifies the
-  orchestration.
-- Restructure related updates into a more atomic flow when partial state
-  would be harder to reason about.
-- Replace boolean arguments with explicit mode values or separate
-  functions.
-- Extract deeply nested logic into named helpers with clear intent.
+Do not approve while a supported blocking finding remains. Do not block solely
+on file length, personal taste, or the existence of another valid design.
 
-Do not be satisfied with "maybe rename this" feedback when the real issue
-is structural.
-Do not be satisfied with a merely cleaner version of the same messy idea
-if there is a plausible path to a much simpler idea.
-
-## Review Tone
-
-Be direct, serious, and demanding about quality.
-Do not be rude, but do not soften major maintainability issues into mild
-suggestions.
-If the code is making the codebase messier, say so clearly.
-If the implementation missed an opportunity for a dramatic simplification,
-say that clearly too.
-
-Good phrases:
-
-- `this pushes the file past 1k lines. can we decompose this first?`
-- `this adds another special-case branch into an already busy flow. can we move this behind its own abstraction?`
-- `this works, but it makes the surrounding code more spaghetti. let's keep the behavior and restructure the implementation.`
-- `this feels like feature logic leaking into a shared path. can we isolate it?`
-- `this abstraction seems unnecessary. can we just keep the direct flow?`
-- `why does this need a cast / optional here? can we make the boundary more explicit instead?`
-- `this looks like a bespoke helper for something we already have elsewhere. can we reuse the canonical one?`
-- `i think there's a code-judo move here that makes this much simpler. can we reframe this so these branches disappear?`
-- `this refactor moves complexity around, but doesn't really delete it. is there a way to make the model itself simpler?`
-- `this boolean arg makes the callsite ambiguous. can we use an explicit mode instead?`
-
-## Output Expectations
-
-Prioritize findings in this order:
-
-1. Structural code-quality regressions
-2. Missed opportunities for dramatic simplification / code-judo restructuring
-3. Spaghetti / branching complexity increases
-4. Boundary / abstraction / type-contract problems that make the code harder to reason about
-5. File-size and decomposition concerns
-6. Modularity and abstraction issues
-7. Code style violations (naming, function design, control flow, immutability)
-8. Legibility and maintainability concerns
-
-Use numbered findings in severity order when giving review feedback.
-Call out missing tests for business logic changes and risky paths.
-
-Do not flood the review with low-value nits if there are larger structural
-issues. Prefer a smaller number of high-conviction comments over a long
-list of cosmetic notes.
-
-## Approval Bar
-
-Do not approve merely because behavior seems correct.
-The bar for approval is:
-
-- no clear structural regression
-- no obvious missed opportunity to make the implementation dramatically
-  simpler when such a path is visible
-- no unjustified file-size explosion
-- no obvious spaghetti-growth from special-case branching
-- no obviously hacky or magical abstraction that makes the code harder to
-  reason about
-- no unnecessary wrapper/cast/optionality churn obscuring the real design
-- no clear architecture-boundary leak or avoidable canonical-helper
-  duplication
-- no missed opportunity for an obvious decomposition that would materially
-  improve maintainability
-- no egregious code style violations in changed lines
-
-Treat these as presumptive blockers unless the author can justify them
-clearly:
-
-- the PR preserves a lot of incidental complexity when there is a
-  plausible code-judo move that would delete it
-- the PR pushes a file from below 1000 lines to above 1000 lines
-- the PR adds ad-hoc branching that makes an existing flow more tangled
-- the PR solves a local problem by scattering feature checks across
-  shared code
-- the PR adds an unnecessary abstraction, wrapper, or cast-heavy contract
-  that makes the design more indirect
-- the PR duplicates an existing helper or puts logic in the wrong layer
-  when there is a clear canonical home
-
-If those conditions are not met, leave explicit, actionable feedback and
-push for a cleaner decomposition.
+Approve when the change has no demonstrated defect or maintainability
+regression. List worthwhile redesigns separately as optional refactoring
+opportunities.
