@@ -20,29 +20,20 @@ The preferences live in one file, which this skill does not duplicate:
 
 Read the rule file now, before you review anything.
 
-<!--
-Same file, two delivery paths, on purpose:
-
-- As a user rule (linked into ~/.claude/rules/), it loads automatically whenever
-  the agent reads a matching source file. That covers code being *written*.
-- As this skill, it can be invoked deliberately against code that no rule fired
-  for -- a pull request, a pasted diff, a repo you are reading but not editing.
-
-The rule file is the single source of truth. Do not copy its contents here.
--->
-
 ## Reviewing someone else's code
 
 The rule set was written for code being authored. Applying it to code you did
 not write needs a different bar:
 
 - Judge the code as it is. Do not rewrite it in your own style.
+- Judge the complete operation, not how small its individual pieces look.
 - Separate defects from preferences. State which one each finding is.
 - A rule violation in untouched code is not a review finding. Raise it only when
   the change under review touches it, or when it causes the bug being discussed.
 - Weight findings by blast radius: a leaked abstraction outranks a naming nit.
 - Number findings in severity order.
 - Give a concrete replacement. For example: "Keep this calculation in the loop so its inputs remain visible."
+- Call out missing tests for business logic changes and risky paths.
 - Say when the code is fine. A review that finds nothing is a valid review.
 
 For a full structural review — abstraction health, spaghetti growth, file-size
