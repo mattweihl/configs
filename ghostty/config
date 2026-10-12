@@ -7,7 +7,7 @@ keybind = global:cmd+ctrl+t=toggle_quick_terminal
 
 shell-integration-features = ssh-terminfo,ssh-env
 
-theme = Gruvbox Material
+theme = Monokai Pro Machine
 
 window-width = 98
 window-height = 30
