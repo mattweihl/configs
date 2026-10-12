@@ -27,19 +27,16 @@
 #   codex/config.toml     -> /etc/codex/config.toml (via link-codex-config)
 #   codex/hooks.json      -> ~/.codex/hooks.json
 #   opencode/opencode.jsonc -> ~/.config/opencode/opencode.jsonc
-#   claude/statusline.sh  } referenced by absolute path from settings.json,
-#   claude/hooks/*.sh     } so they only need the executable bit
+#   claude/statusline.sh  -> referenced by absolute path from settings.json
+#   agents/hooks/*.sh     -> shared hooks named by each tool's configuration
 #   skills/*/             -> ~/.claude/skills/ and ~/.agents/skills/
 #                         The shared ~/.agents root serves Codex, Cursor, and
-#                         OpenCode. Manual-only skills also become OpenCode
-#                         commands because OpenCode ignores their invocation
-#                         frontmatter.
+#                         OpenCode. Skill frontmatter controls invocation.
 #                         Codex ships its own bundled skills in
 #                         ~/.codex/skills/.system/. That is a real directory,
 #                         not a link, so pruning never touches it.
 #   cursor/hooks.json     -> ~/.cursor/hooks.json
-#   claude/hooks/         -> ~/.cursor/hooks/format-edits.sh (see below)
-#     format-edits.sh
+#   agents/hooks/format-edits.sh -> ~/.cursor/hooks/format-edits.sh
 #   pi/settings.json      -> ~/.pi/agent/settings.json
 #   pi/keybindings.json   -> ~/.pi/agent/keybindings.json (when present)
 #   pi/mcp.json           -> ~/.pi/agent/mcp.json (when present)
@@ -53,10 +50,10 @@
 # Skill source roots are ~/configs/skills (personal) and
 # ~/code/work-configs/skills (work-specific, absent on some machines).
 #
-# Pi gets settings, MCP/model/keybinding files, resource directories, and global
-# instructions in its agent directory. Auth, OAuth tokens, session history,
-# generated model catalogs, logs, and Pi's bundled helper binaries stay in
-# ~/.pi/agent as machine state.
+# Pi gets settings, MCP/model/keybinding files, resource directories, shared
+# edit formatting, and global instructions in its agent directory. Auth, OAuth
+# tokens, session history, generated model catalogs, logs, and bundled helper
+# binaries stay in ~/.pi/agent as machine state.
 #
 # Cursor gets skills, hooks, and MCP servers, and cannot get the rest. It has no
 # user-level rules directory and reads AGENTS.md from a project root only, so
@@ -196,29 +193,25 @@ _lac_remove_legacy_skill_links() {
   done
 }
 
-# OpenCode ignores disable-model-invocation. Expose those skills as commands,
-# while opencode.jsonc hides them from the model-facing skill tool.
-_lac_link_opencode_commands() {
-  local source_root skill_dir skill_name skill_file command_file
+# Removes command links from the old OpenCode workaround. OpenCode now reads
+# slash-command and automatic-invocation policy from each skill's metadata.
+_lac_remove_legacy_opencode_commands() {
+  local source_root command_file link_target
 
+  [[ -d "$HOME/.config/opencode/commands" ]] || return 0
   for source_root in "${LAC_SKILL_SOURCES[@]}"; do
-    [[ -d "$source_root" ]] || continue
-
-    while IFS= read -r skill_dir; do
-      [[ -n "$skill_dir" ]] || continue
-      skill_name="$(basename "$skill_dir")"
-      skill_file="$skill_dir/SKILL.md"
-      command_file="$HOME/.config/opencode/commands/$skill_name.md"
-
-      if grep -Eq '^disable-model-invocation:[[:space:]]*true[[:space:]]*$' "$skill_file"; then
-        _lac_link "$skill_file" "$command_file"
-      else
-        _lac_unlink "$skill_file" "$command_file"
-      fi
-    done < <(find "$source_root" -mindepth 1 -maxdepth 1 -type d | sort)
+    while IFS= read -r command_file; do
+      [[ -n "$command_file" ]] || continue
+      link_target="$(readlink "$command_file")"
+      case "$link_target" in
+        "$source_root"/*/SKILL.md)
+          rm "$command_file"
+          echo "unlinked legacy ${command_file/#$HOME/~}"
+          _lac_linked=$((_lac_linked + 1))
+          ;;
+      esac
+    done < <(find "$HOME/.config/opencode/commands" -maxdepth 1 -type l | sort)
   done
-
-  _lac_prune "$HOME/.config/opencode/commands"
 }
 
 # Removes symlinks whose target no longer exists. Without this, deleting a skill
@@ -339,13 +332,13 @@ link-agentic-configs() {
   _lac_link_files "$CONFIGS_ROOT/claude/agents" md "$HOME/.claude/agents"
 
   chmod +x "$CONFIGS_ROOT/claude/statusline.sh" 2>/dev/null
-  _lac_make_executable "$CONFIGS_ROOT/claude/hooks" sh
+  _lac_make_executable "$CONFIGS_ROOT/agents/hooks" sh
 
   # Cursor runs a user hook from ~/.cursor/, and its docs spell the path
   # relative to that directory. So the script is linked next to hooks.json
   # rather than named by an absolute path the way settings.json names it.
   _lac_link "$CONFIGS_ROOT/cursor/hooks.json" "$HOME/.cursor/hooks.json"
-  _lac_link "$CONFIGS_ROOT/claude/hooks/format-edits.sh" \
+  _lac_link "$CONFIGS_ROOT/agents/hooks/format-edits.sh" \
     "$HOME/.cursor/hooks/format-edits.sh"
 
   _lac_remove_legacy_skill_links
@@ -355,7 +348,7 @@ link-agentic-configs() {
     _lac_prune "$target_root"
   done
   _lac_link_skills
-  _lac_link_opencode_commands
+  _lac_remove_legacy_opencode_commands
 
   _lac_register_claude_mcp
   _lac_register_cursor_mcp

@@ -8,11 +8,12 @@ This file is the single source of truth for agents working on this repo.
 ## Structure
 
 ```
-agents/           Cross-tool agent instructions (user-level)
+agents/           Cross-tool agent instructions and hooks
                     AGENTS.md   always loaded, every session
+                    hooks/      shared edit hooks
                     rules/      path-scoped, loaded when a matching file is read
                     reference/  never loaded; read on demand by absolute path
-claude/           Claude Code config: settings.json, agents, hooks, statusline
+claude/           Claude Code config: settings.json, agents, statusline
 codex/            Codex config and hooks
 cursor/           Cursor config: hooks.json (skills and MCP are not files here)
 ghostty/          Ghostty terminal config + custom icons
@@ -20,7 +21,7 @@ glow/             Glow markdown viewer config
 lazygit/          Lazygit config + helper scripts
 nvim/             Neovim config (Lua, lazy.nvim)
 opencode/         OpenCode config: formatters, permissions, MCP servers
-pi/               Pi user config: settings, MCP/model/keybinding files, resources
+pi/               Pi user config: settings, MCP files, extensions, resources
 skills/           Agent skills, shared across agent tools
 tmux/             tmux config + Claude Code integration scripts
 zsh/              zsh config (config.zsh) + worktree and linking helpers
@@ -50,7 +51,7 @@ Note the two `AGENTS.md` files, which are not the same thing:
   | `pi/settings.json` | — | — | — | — | `~/.pi/agent/settings.json` |
   | `pi/keybindings.json`, `pi/models.json` | — | — | — | — | `~/.pi/agent/` when present |
   | `pi/extensions/`, `pi/prompts/`, `pi/themes/` | — | — | — | — | `~/.pi/agent/` when present |
-  | `claude/hooks/format-edits.sh` | named by settings | named by hooks | `~/.cursor/hooks/` | named by formatter | — |
+  | `agents/hooks/format-edits.sh` | named by settings | named by hooks | `~/.cursor/hooks/` | named by formatter | called by extension |
   | `cursor/hooks.json` | — | — | `~/.cursor/hooks.json` | — | — |
   | `skills/*/` | `~/.claude/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` | `~/.agents/skills/` |
   | MCP servers | `~/.claude.json` | `codex/config.toml` | `~/.cursor/mcp.json` | `opencode/opencode.jsonc` | `pi/mcp.json` |
@@ -103,9 +104,9 @@ Codex keeps machine-specific preferences, projects, and trust state in the real
   with no `paths:` field loads unconditionally — put reference material in
   `agents/reference/` instead, which nothing links or preloads.
 - Skills load on demand, by name or by description match. Manual-only skills
-  use `disable-model-invocation: true` in Claude and Cursor. Codex reads the
-  matching `agents/openai.yaml` policy. OpenCode hides them through permission
-  rules and exposes the same files as slash commands.
+  use `disable-model-invocation: true` in Claude, Cursor, and Pi. Codex reads
+  the matching `agents/openai.yaml` policy. OpenCode reads its namespaced
+  metadata from the same `SKILL.md` file.
 - `always-apply` is Cursor frontmatter. Claude Code ignores it.
 - Code style ships as both, deliberately. Claude loads the path-scoped rule.
   The global instructions tell every other tool to read the same source before
@@ -115,13 +116,11 @@ Codex keeps machine-specific preferences, projects, and trust state in the real
 - Claude supports `skills:` in subagent frontmatter. Cursor reads agents from
   `~/.claude/agents/` but uses `readonly: true` for read-only enforcement.
   Shared agents use both fields and keep explicit file reads as a fallback.
-- `claude/hooks/format-edits.sh` runs prettier/ruff/terraform on files an agent
-  writes, because agent edits bypass Neovim's formatter. One
-  script serves all four tools. It stays under `claude/` despite that: the path
-  is named by `claude/settings.json` and by the link script, so the directory is a
-  historical name, not a scope. Claude sends a file path in JSON. Cursor sends
-  a flat `.file_path`. Codex sends apply-patch text in `.tool_input.command`.
-  OpenCode passes the file as an argument through its custom formatter.
+- `agents/hooks/format-edits.sh` runs prettier/ruff/terraform on files an agent
+  writes, because agent edits bypass Neovim's formatter. Claude sends a file
+  path in JSON. Cursor sends a flat `.file_path`. Codex sends apply-patch text
+  in `.tool_input.command`. OpenCode passes a path through its formatter. The
+  Pi extension passes a path after its `edit` or `write` tool succeeds.
 - Codex requires trust for each new or changed hook definition. Review the
   exact command through `/hooks` before relying on the hook.
 - prettier and ruff only run when the project has a matching config file, so a
@@ -166,8 +165,8 @@ file-backed instructions from a project only. That split is the whole story:
 - `~/.config/opencode/AGENTS.md` links the canonical global instructions.
 - `~/.agents/skills/` is the shared skill root. `zsh/config.zsh` disables
   OpenCode's Claude compatibility scans because every source is explicit.
-- OpenCode ignores `disable-model-invocation`. Its config denies those skills
-  to the skill tool. The link script exposes them under `commands/` instead.
+- OpenCode reads `opencode/slash` and `opencode/autoinvoke` from skill metadata.
+  Manual-only skills remain slash commands without separate command links.
 - `opencode/opencode.jsonc` enables Context7 and routes supported file types
   through the trusted shared formatter.
 
@@ -188,12 +187,11 @@ file-backed instructions from a project only. That split is the whole story:
   `#{m:claude,#{pane_current_command}}`. The literal match silently never fired:
   `pane_current_command` is the version string. Anything that needs to know "is
   this a Claude pane" goes through that format.
-- `<prefix> e` opens `tmux/claude-edits.sh`, an fzf picker over the files the
-  agent in *that pane* has edited, newest first. `claude/hooks/format-edits.sh`
-  appends each path to `~/.cache/claude-edits/<pane-id>` before its formatter
-  gates, so the list covers every edit and not just the reformatted ones. The
-  `SessionStart` hook clears it, matched to `startup` only — a resume or a
-  compact keeps the history it had.
+- `<prefix> e` opens `tmux/agent-edits.sh`, an fzf picker over the files the
+  agent in *that pane* has edited, newest first. `agents/hooks/format-edits.sh`
+  appends each path to `~/.cache/agent-edits/<pane-id>` before its formatter
+  gates, so the list covers every edit and not just the reformatted ones.
+  Session hooks clear new history. Resumed sessions keep their existing history.
 - Do not build that path with `#{s/%//:pane_id}`. tmux substitution works on
   other characters but leaves the leading `%` of a pane id in place, so the
   binding passes `#{pane_id}` verbatim as an argument and the file is named
@@ -249,7 +247,7 @@ file-backed instructions from a project only. That split is the whole story:
 - Shell scripts in `lazygit/scripts/` use `~/configs/` as the base path
 - Neovim uses Blink completion, configured in `nvim/lua/plugins/completion.lua`.
 - Neovim formatting is manual through `<leader>F` or the context menu. Saving does not invoke Conform.
-- Formatter lists in `nvim/lua/plugins/format.lua` and `claude/hooks/format-edits.sh` must stay in step, binary names and arguments included (`terraform fmt -no-color -`)
+- Formatter lists in `nvim/lua/plugins/format.lua` and `agents/hooks/format-edits.sh` must stay in step, binary names and arguments included (`terraform fmt -no-color -`)
 - Before adding a formatter to either file, check the binary actually resolves. `sql_formatter` sat in `format.lua` doing nothing for as long as it was there: conform runs `sql-formatter`, which was installed nowhere
 - Run a script against a realistic input before documenting how it behaves. Every wrong claim in this file so far came from describing intent instead of observed output
 - Binary/generated files (`.icns`, `lazy-lock.json`) are committed as-is

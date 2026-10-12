@@ -3,6 +3,9 @@ name: update-plan-for-agent
 description: Expand an existing implementation plan for another coding agent and write it in Simplified Technical English.
 argument-hint: "[plan path, plan artifact, or pasted plan]"
 disable-model-invocation: true
+metadata:
+  opencode/slash: "true"
+  opencode/autoinvoke: "false"
 ---
 
 # Spec Plan

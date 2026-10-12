@@ -1,23 +1,23 @@
 #!/bin/sh
-# Picks from the files Claude edited in this pane and opens one in nvim.
+# Picks from the files an agent edited in this pane and opens one in nvim.
 #
 # Bound to `<prefix> e` in tmux.conf. Runs inside a display-popup, and nvim
 # runs there too: this is a peek at what the agent changed, not a workspace.
 # Close the popup to return to the agent, untouched and un-resized.
 #
-# Usage: claude-edits.sh <pane-id>
+# Usage: agent-edits.sh <pane-id>
 #
-# The list is appended by claude/hooks/format-edits.sh on every Edit/Write and
-# cleared per pane by the SessionStart hook in claude/settings.json. Reading it
-# per pane is the point: `git status` shows one worktree's changes, whoever
-# made them, while this shows one agent's.
+# The shared format hook appends the list after each file edit. Session hooks
+# clear the list for tools that support them. Reading it per pane is the point:
+# `git status` shows one worktree's changes, whoever made them, while this shows
+# one agent's.
 
 set -u
 
 pane="${1:-}"
-[ -n "$pane" ] || { echo 'claude-edits: no pane id given'; sleep 2; exit 1; }
+[ -n "$pane" ] || { echo 'agent-edits: no pane id given'; sleep 2; exit 1; }
 
-list="$HOME/.cache/claude-edits/$pane"
+list="$HOME/.cache/agent-edits/$pane"
 
 # The popup closes the instant this exits, so a message needs to hold the
 # window open long enough to be read.

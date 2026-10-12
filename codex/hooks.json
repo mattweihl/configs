@@ -1,13 +1,25 @@
 {
-  "description": "Format trusted files after Codex edits.",
+  "description": "Track and format trusted files after Codex edits.",
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"${TMUX_PANE:-}\" ] && rm -f \"$HOME/.cache/agent-edits/$TMUX_PANE\" || true",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "~/configs/claude/hooks/format-edits.sh",
+            "command": "~/configs/agents/hooks/format-edits.sh",
             "timeout": 30,
             "statusMessage": "Formatting edited files"
           }

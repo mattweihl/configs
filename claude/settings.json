@@ -59,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/configs/claude/hooks/format-edits.sh"
+            "command": "~/configs/agents/hooks/format-edits.sh"
           }
         ]
       }
@@ -139,7 +139,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -n \"${TMUX_PANE:-}\" ] && rm -f \"$HOME/.cache/claude-edits/$TMUX_PANE\" || true"
+            "command": "[ -n \"${TMUX_PANE:-}\" ] && rm -f \"$HOME/.cache/agent-edits/$TMUX_PANE\" || true"
           }
         ]
       }

@@ -5,6 +5,9 @@ description: >
   questions, or sketches a change without editing any files. Use only on
   request via /ask.
 disable-model-invocation: true
+metadata:
+  opencode/slash: "true"
+  opencode/autoinvoke: "false"
 ---
 
 # /ask — read-only mode

@@ -6,6 +6,8 @@ license: MIT
 metadata:
   tags: "ADHD, Output Style, Productivity, Formatting"
   category: "productivity"
+  opencode/slash: "true"
+  opencode/autoinvoke: "false"
 ---
 
 # i-have-adhd

@@ -1,19 +1,18 @@
 #!/bin/sh
 # Formats the file that an agent just wrote.
 #
-# Wired to PostToolUse in Claude and Codex, afterFileEdit in Cursor, and the
-# custom agent-edits formatter in OpenCode.
+# Wired to Claude and Codex hooks, a Cursor hook, an OpenCode formatter, and a
+# Pi extension.
 #
-# Why this exists: nvim formats on save through conform.nvim, but Claude edits
-# files directly and never goes through nvim. Without this hook, every file the
-# agent touches skips prettier/ruff, and the next human save produces a diff
-# full of unrelated reformatting.
+# Why this exists: nvim formats on save through conform.nvim. Agent edits do
+# not go through nvim. Without this hook, the next human save can produce a
+# diff full of unrelated formatting changes.
 #
 # The formatter list mirrors nvim/lua/plugins/format.lua. Keep the two in step.
 #
 # Claude and Cursor pass one file path in JSON. Codex passes apply_patch text in
-# .tool_input.command and the session directory in .cwd. OpenCode passes one
-# file path as the first argument.
+# .tool_input.command and the session directory in .cwd. OpenCode and Pi pass
+# one file path as the first argument.
 
 set -u
 
@@ -59,7 +58,7 @@ fi
 [ -n "$path" ] || exit 0
 [ -f "$path" ] || exit 0
 
-# Record what the agent touched, for `<prefix> e` (tmux/claude-edits.sh).
+# Record what the agent touched, for `<prefix> e` (tmux/agent-edits.sh).
 #
 # Keyed by pane, not by session: two agents can share a window, and `git
 # status` cannot tell their edits apart. No pane means no reader, so skip it.
@@ -69,7 +68,7 @@ fi
 # $TMPDIR is deliberately not used: on macOS it is per-process-context, so the
 # tmux server that reads this list can resolve it to a different directory.
 if [ -n "${TMUX_PANE:-}" ]; then
-  edits_dir="$HOME/.cache/claude-edits"
+  edits_dir="$HOME/.cache/agent-edits"
   mkdir -p "$edits_dir" 2>/dev/null && printf '%s\n' "$path" >>"$edits_dir/$TMUX_PANE"
 fi
 
