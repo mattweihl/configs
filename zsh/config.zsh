@@ -264,3 +264,12 @@ if command -v fzf &> /dev/null; then
     fi
   }
 fi
+
+t() {
+  if (( $# == 0 )); then
+    print -u2 "Usage: t <session-name>"
+    return 1
+  fi
+
+  tmux new-session -A -s "$1"
+}
