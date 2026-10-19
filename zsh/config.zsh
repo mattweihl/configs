@@ -96,6 +96,7 @@ fi
 
 #alias clawd='claude --dangerously-skip-permissions'
 alias clawd='claude --permission-mode auto'
+alias cask='codex --sandbox read-only --ask-for-approval never'
 alias neovide='neovide --fork'
 
 bindkey -e
